@@ -66,7 +66,7 @@ class cPathtracer{
 		} image;
 		
 		std::vector<cObject *> objects;
-		std::vector<rendModel*> render_models;
+		std::vector<rendModel> render_models;
 		
 		col3 traceRay(Ray ray);
 		void intersectScene(Ray& ray);

@@ -9,54 +9,184 @@
 #include "vecmat.h"
 #include "rendModel.h"
 #include "carrizo.h"
+#include "cObject.h"
 #include <iostream>
 
-rendModel::rendModel()
+
+float min(const float a, const float b)
 {
-	triangles = new renderTriangle[2];
-	triangle_count = 2;
-	
-	renderTriangle triangle1;
-	point3 t1v1 = point3(-0.1, 0.1, -0.25);
-	point3 t1v3 = point3(0.0, 0.1, -0.25);
-	point3 t1v2 = point3(-0.1, -0.1, -0.25);
-	
-	triangle1.u = t1v2 - t1v1;
-	triangle1.v = t1v3 - t1v1;
-	triangle1.a = t1v1;
+    if (a > b)
+    {
+        return b;
+    }
+    return a;
+}
+
+float max(const float a, const float b)
+{
+    if (a > b)
+    {
+        return a;
+    }
+    return b;
+}
+
+
+BVHnode * rendModel::constructBVHSub(renderTriangle *tri_list, std::vector<int> index_list, bbox *bounds_list)
+{
+    BVHnode *node = new BVHnode;
+    node->bounds.low.x = bounds_list[index_list[0]].low.x;
+    node->bounds.low.y = bounds_list[index_list[0]].low.y;
+    node->bounds.low.z = bounds_list[index_list[0]].low.z;
     
-	triangle1.normal = triangle1.u.vecCross(triangle1.v);
-	
-	float lengt = triangle1.normal * triangle1.normal;
-	
-	triangle1.u = (t1v3 - t1v1).vecCross(triangle1.normal)
-    * (1.0 / lengt);
-	triangle1.v = triangle1.normal.vecCross(t1v2 - t1v1)
-    * (1.0 / lengt);
-	
-	triangles[0] = triangle1;
-	
-	
-	renderTriangle triangle2;
-	point3 t2v1 = point3(0.2, 0.1, -0.55);
-	point3 t2v3 = point3(0.3, 0.1, -0.50);
-	point3 t2v2 = point3(0.2, -0.1, -0.53);
-	
-	triangle2.u = t2v2 - t2v1;
-	triangle2.v = t2v3 - t2v1;
-	triangle2.a = t2v1;
+    node->bounds.high.x = bounds_list[index_list[0]].high.x;
+    node->bounds.high.y = bounds_list[index_list[0]].high.y;
+    node->bounds.high.z = bounds_list[index_list[0]].high.z;
     
-	triangle2.normal = triangle2.u.vecCross(triangle2.v);
+    if (index_list.size() == 1)
+    {
+        std::vector<int> tri_list_;
+        tri_list_.push_back( index_list[0] );
+        node->tri_list = tri_list_;
+        node->left = NULL;
+        node->right = NULL;
+        return node;
+    }
+    
+    for (int i = 0; i < index_list.size(); i++)
+    {
+        node->bounds.low.x = min(node->bounds.low.x, bounds_list[index_list[i]].low.x);
+        node->bounds.low.y = min(node->bounds.low.y, bounds_list[index_list[i]].low.y);
+        node->bounds.low.z = min(node->bounds.low.z, bounds_list[index_list[i]].low.z);
+        
+        node->bounds.high.x = max(node->bounds.high.x, bounds_list[index_list[i]].high.x);
+        node->bounds.high.y = max(node->bounds.high.y, bounds_list[index_list[i]].high.y);
+        node->bounds.high.z = max(node->bounds.high.z, bounds_list[index_list[i]].high.z);
+    }
+    
+    float split; //((node->bounds.high.x - node->bounds.low.x)/2,
+                //(node->bounds.high.y - node->bounds.low.y)/2,
+                //(node->bounds.high.z - node->bounds.low.z)/2);
+    
+    int dim;
+    
+    if (node->bounds.high.x - node->bounds.low.x > node->bounds.high.y - node->bounds.low.y)
+    {
+        if (node->bounds.high.x - node->bounds.low.x > node->bounds.high.z - node->bounds.low.z)
+        {
+            dim = 0;
+            split = node->bounds.high.x - node->bounds.low.x;
+        }
+        else
+        {   dim = 2;
+            split = node->bounds.high.z - node->bounds.low.z;
+        }
+    }
+    else
+    {
+        if (node->bounds.high.y - node->bounds.low.y > node->bounds.high.z - node->bounds.low.z)
+        {
+            dim = 1;
+            split = node->bounds.high.y - node->bounds.low.y;
+        }
+        else
+        {
+            dim = 2;
+            split = node->bounds.high.z - node->bounds.low.z;
+        }
+    }
+    
+    split = 0.5 * split;
+    
+    std::vector<int> left_index;
+    std::vector<int> right_index;
+    
+    for (int i = 0; i < index_list.size(); i++)
+    {
+        bbox curr_bound = bounds_list[index_list[i]];
+        if (curr_bound.low.data[dim] < node->bounds.low.data[dim] + split)
+        {
+            left_index.push_back(i);
+        }
+        if (curr_bound.high.data[dim] > node->bounds.low.data[dim] + split)
+        {
+            right_index.push_back(i);
+        }
+    }    
+    if (left_index.size() == index_list.size())
+    {
+        node->left = NULL;
+        node->right = NULL;
+        node->tri_list = left_index;
+    }
+    else
+    {
+        node->left = constructBVHSub(tri_list, left_index, bounds_list);
+        
+        if (right_index.size() == index_list.size())
+        {
+            free(node->left);
+            node->left = NULL;
+            node->right = NULL;
+            node->tri_list = right_index;            
+        }
+        else
+        {
+            node->right = constructBVHSub(tri_list, right_index, bounds_list);
+        }
+    }
+    
+
+    
+    return node;    
+}
+
+BVHnode * rendModel::constructBVH(renderTriangle *tri_list, int tri_count, bbox *bounds_list)
+{
+    std::vector<int> remaining_tri;
+    
+    for (int i = 0; i < tri_count; i++)
+    {
+        remaining_tri.push_back(i);
+    }
+    
+    return constructBVHSub(tri_list, remaining_tri, bounds_list);
+}
+
+rendModel::rendModel(objectTriangle *tris, int tri_count)
+{
+	triangles = new renderTriangle[tri_count];
+	triangle_count = tri_count;
+    
+    struct bbox *bounding_boxes = new struct bbox[tri_count];
+    
 	
- 	lengt = triangle2.normal * triangle2.normal;
-	
-	triangle2.u = (t2v3 - t2v1).vecCross(triangle2.normal)
-    * (1.0 / lengt);
-	triangle2.v = triangle2.normal.vecCross(t2v2 - t2v1)
-    * (1.0 / lengt);
-	
-	triangles[1] = triangle2;
-	
+	for (int i=0;i<tri_count;i++)
+	{
+		point3 p1 = tris[i].vertices[0];
+		point3 p2 = tris[i].vertices[1];
+		point3 p3 = tris[i].vertices[2];
+        
+        bounding_boxes[i].low.x = min(p1.x, min(p2.x,p3.x));
+        bounding_boxes[i].low.y = min(p1.y, min(p2.y,p3.y));
+        bounding_boxes[i].low.z = min(p1.z, min(p2.z,p3.z));
+        
+        bounding_boxes[i].high.x = max(p1.x, max(p2.x,p3.x));
+        bounding_boxes[i].high.y = max(p1.y, max(p2.y,p3.y));
+        bounding_boxes[i].high.z = max(p1.z, max(p2.z,p3.z));
+        
+		
+		triangles[i].a = p1;
+		triangles[i].normal = (p2 - p1).vecCross(p3 - p1);
+		float nlength = triangles[i].normal * triangles[i].normal;
+		
+		triangles[i].u = (p3 - p1).vecCross(triangles[i].normal)
+	    	* (1.0 / nlength);
+		triangles[i].v = triangles[i].normal.vecCross(p2 - p1)
+    		* (1.0 / nlength);
+	}
+    
+    root = constructBVH(triangles, triangle_count, bounding_boxes);
 }
 
 

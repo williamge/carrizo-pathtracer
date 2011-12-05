@@ -10,15 +10,30 @@
 #include "rendModel.h"
 #include "cObject.h"
 
-rendModel * cObject::addToRender()
+rendModel cObject::addToRender()
 {
-	rendModel *simple = new rendModel;
-	return simple;
+    return rendModel (triangles, triangle_count);
 }
 
 cObject::cObject(const char *filename)
 {
-    
+    triangles = new objectTriangle[2];
+	triangle_count = 2;
+	
+	objectTriangle triangle1;
+	triangle1.vertices[0] = point3(-0.1, 0.1, -0.25);
+	triangle1.vertices[2] = point3(0.0, 0.1, -0.25);
+	triangle1.vertices[1] = point3(-0.1, -0.1, -0.25);
+	
+	triangles[0] = triangle1;
+	
+	
+	objectTriangle triangle2;
+	triangle2.vertices[0] = point3(-0.2, 0.1, -1.55);
+	triangle2.vertices[2] = point3(0.3, 0.1, -1.50);
+	triangle2.vertices[1]= point3(0.2, -0.1, -1.53);
+	
+	triangles[1] = triangle2;
 }
 void cObject::translate()
 {

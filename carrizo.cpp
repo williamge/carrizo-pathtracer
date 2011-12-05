@@ -21,7 +21,7 @@ void cPathtracer::intersectScene(Ray& ray)
 	
 	for (int i = 0; i < render_models.size(); i++)
 	{
-		render_models[0]->intersect(ray);
+		render_models[0].intersect(ray);
 	}
 }
 
@@ -30,8 +30,8 @@ col3 cPathtracer::traceRay(Ray ray)
 	intersectScene(ray);
 	if (ray.intersection.hit)
 	{
-		//return (0.5 * ray.intersection.normal + 0.5);
-		return ray.intersection.normal;
+		return (0.5 * ray.intersection.normal + 0.5);
+		//return ray.intersection.normal;
 	}
 	return col3(0,0,0);
 }
@@ -88,8 +88,8 @@ int main(int argc, const char* argv[])
 	
 	/* prototype start *
 	
-	cObject *model1 ("filename");
-	pt.addObject(model1);
+	-cObject *model1 ("filename");
+	-pt.addObject(model1);
 	model1.translate(...)
 	model1.rotate(...);
 	model1.scale(...);
