@@ -9,15 +9,17 @@
 #ifndef carrizo_pathtracer_cObject_h
 #define carrizo_pathtracer_cObject_h
 
+class rendModel;
+
 class cObject
 {
 public:
-    cObject();
+    cObject(const char *filename);
     void translate();
     void rotate();
     void scale();
     void assignMaterial();	
-    rendModel * cObject::addToRender();
+    rendModel * addToRender();
 };
 
 #endif

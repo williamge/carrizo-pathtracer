@@ -6,14 +6,17 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
+#include "vecmat.h"
+#include "rendModel.h"
+#include "carrizo.h"
 #include <iostream>
 
-rend_model::rend_model()
+rendModel::rendModel()
 {
-	triangles = new triangle_s[2];
+	triangles = new renderTriangle[2];
 	triangle_count = 2;
 	
-	triangle_s triangle1;
+	renderTriangle triangle1;
 	point3 t1v1 = point3(-0.1, 0.1, -0.25);
 	point3 t1v3 = point3(0.0, 0.1, -0.25);
 	point3 t1v2 = point3(-0.1, -0.1, -0.25);
@@ -22,19 +25,19 @@ rend_model::rend_model()
 	triangle1.v = t1v3 - t1v1;
 	triangle1.a = t1v1;
     
-	triangle1.normal = cross(triangle1.u, triangle1.v);
+	triangle1.normal = triangle1.u.vecCross(triangle1.v);
 	
 	float lengt = triangle1.normal * triangle1.normal;
 	
-	triangle1.u = cross(t1v3 - t1v1, triangle1.normal)
+	triangle1.u = (t1v3 - t1v1).vecCross(triangle1.normal)
     * (1.0 / lengt);
-	triangle1.v = cross(triangle1.normal, t1v2 - t1v1)
+	triangle1.v = triangle1.normal.vecCross(t1v2 - t1v1)
     * (1.0 / lengt);
 	
 	triangles[0] = triangle1;
 	
 	
-	triangle_s triangle2;
+	renderTriangle triangle2;
 	point3 t2v1 = point3(0.2, 0.1, -0.55);
 	point3 t2v3 = point3(0.3, 0.1, -0.50);
 	point3 t2v2 = point3(0.2, -0.1, -0.53);
@@ -43,13 +46,13 @@ rend_model::rend_model()
 	triangle2.v = t2v3 - t2v1;
 	triangle2.a = t2v1;
     
-	triangle2.normal = cross(triangle2.u, triangle2.v);
+	triangle2.normal = triangle2.u.vecCross(triangle2.v);
 	
  	lengt = triangle2.normal * triangle2.normal;
 	
-	triangle2.u = cross(t2v3 - t2v1, triangle2.normal)
+	triangle2.u = (t2v3 - t2v1).vecCross(triangle2.normal)
     * (1.0 / lengt);
-	triangle2.v = cross(triangle2.normal, t2v2 - t2v1)
+	triangle2.v = triangle2.normal.vecCross(t2v2 - t2v1)
     * (1.0 / lengt);
 	
 	triangles[1] = triangle2;
@@ -57,7 +60,7 @@ rend_model::rend_model()
 }
 
 
-bool rend_model::intersect(Ray& ray)
+bool rendModel::intersect(Ray& ray)
 {
 	int hit_triangle = -1;
 	for (int i = 0; i < triangle_count; i++)

@@ -10,8 +10,10 @@
 		3D5B81EA1489734100396E91 /* carrizo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D5B81D61489728C00396E91 /* carrizo.cpp */; };
 		3D5B81EC1489734F00396E91 /* libpthread.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D5B81EB1489734F00396E91 /* libpthread.dylib */; };
 		3D5BA9A61489771B00396E91 /* libX11.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D5BA9A51489771B00396E91 /* libX11.6.dylib */; };
-		3D5BA9B8148C4D4D00396E91 /* cObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D5BA9B7148C4D4D00396E91 /* cObject.cpp */; };
-		3D5BA9BB148C4E5500396E91 /* rendModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D5BA9BA148C4E5500396E91 /* rendModel.cpp */; };
+		3D5BA9C4148C505F00396E91 /* cObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D5BA9BE148C505D00396E91 /* cObject.cpp */; };
+		3D5BA9C5148C505F00396E91 /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 3D5BA9C0148C505D00396E91 /* Makefile */; };
+		3D5BA9C6148C505F00396E91 /* rendModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D5BA9C1148C505E00396E91 /* rendModel.cpp */; };
+		3D5BA9C8148C6B1500396E91 /* vecmat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D5BA9C7148C6B1500396E91 /* vecmat.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,16 +31,17 @@
 /* Begin PBXFileReference section */
 		3D5B81D61489728C00396E91 /* carrizo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = carrizo.cpp; sourceTree = SOURCE_ROOT; };
 		3D5B81D71489728C00396E91 /* carrizo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = carrizo.h; sourceTree = SOURCE_ROOT; };
-		3D5B81D81489728C00396E91 /* CImg.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CImg.h; path = ../CImg.h; sourceTree = "<group>"; };
-		3D5B81D91489728C00396E91 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = ../Makefile; sourceTree = "<group>"; };
-		3D5B81DA1489728C00396E91 /* vecmat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = vecmat.h; path = ../vecmat.h; sourceTree = "<group>"; };
 		3D5B81DF1489731300396E91 /* carrizo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = carrizo; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D5B81EB1489734F00396E91 /* libpthread.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpthread.dylib; path = SDKs/MacOSX10.7.sdk/usr/lib/libpthread.dylib; sourceTree = DEVELOPER_DIR; };
 		3D5BA9A51489771B00396E91 /* libX11.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libX11.6.dylib; path = ../../../../../usr/X11/lib/libX11.6.dylib; sourceTree = "<group>"; };
-		3D5BA9B7148C4D4D00396E91 /* cObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cObject.cpp; path = "carrizo-pathtracer.xcodeproj/cObject.cpp"; sourceTree = SOURCE_ROOT; };
-		3D5BA9B9148C4D8300396E91 /* cObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cObject.h; path = "carrizo-pathtracer.xcodeproj/cObject.h"; sourceTree = SOURCE_ROOT; };
-		3D5BA9BA148C4E5500396E91 /* rendModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = rendModel.cpp; path = "carrizo-pathtracer.xcodeproj/rendModel.cpp"; sourceTree = SOURCE_ROOT; };
-		3D5BA9BC148C4EC500396E91 /* rendModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rendModel.h; path = "carrizo-pathtracer.xcodeproj/rendModel.h"; sourceTree = SOURCE_ROOT; };
+		3D5BA9BD148C505C00396E91 /* CImg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CImg.h; sourceTree = SOURCE_ROOT; };
+		3D5BA9BE148C505D00396E91 /* cObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cObject.cpp; sourceTree = SOURCE_ROOT; };
+		3D5BA9BF148C505D00396E91 /* cObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cObject.h; sourceTree = SOURCE_ROOT; };
+		3D5BA9C0148C505D00396E91 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = SOURCE_ROOT; };
+		3D5BA9C1148C505E00396E91 /* rendModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rendModel.cpp; sourceTree = SOURCE_ROOT; };
+		3D5BA9C2148C505E00396E91 /* rendModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rendModel.h; sourceTree = SOURCE_ROOT; };
+		3D5BA9C3148C505F00396E91 /* vecmat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vecmat.h; sourceTree = SOURCE_ROOT; };
+		3D5BA9C7148C6B1500396E91 /* vecmat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = vecmat.cpp; path = "carrizo-pathtracer.xcodeproj/vecmat.cpp"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,15 +78,16 @@
 		3D5B81E21489731300396E91 /* carrizo */ = {
 			isa = PBXGroup;
 			children = (
+				3D5BA9BD148C505C00396E91 /* CImg.h */,
+				3D5BA9BE148C505D00396E91 /* cObject.cpp */,
+				3D5BA9BF148C505D00396E91 /* cObject.h */,
+				3D5BA9C0148C505D00396E91 /* Makefile */,
+				3D5BA9C1148C505E00396E91 /* rendModel.cpp */,
+				3D5BA9C2148C505E00396E91 /* rendModel.h */,
 				3D5B81D61489728C00396E91 /* carrizo.cpp */,
 				3D5B81D71489728C00396E91 /* carrizo.h */,
-				3D5B81D81489728C00396E91 /* CImg.h */,
-				3D5B81D91489728C00396E91 /* Makefile */,
-				3D5B81DA1489728C00396E91 /* vecmat.h */,
-				3D5BA9B7148C4D4D00396E91 /* cObject.cpp */,
-				3D5BA9B9148C4D8300396E91 /* cObject.h */,
-				3D5BA9BA148C4E5500396E91 /* rendModel.cpp */,
-				3D5BA9BC148C4EC500396E91 /* rendModel.h */,
+				3D5BA9C3148C505F00396E91 /* vecmat.h */,
+				3D5BA9C7148C6B1500396E91 /* vecmat.cpp */,
 			);
 			path = carrizo;
 			sourceTree = "<group>";
@@ -136,8 +140,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				3D5B81EA1489734100396E91 /* carrizo.cpp in Sources */,
-				3D5BA9B8148C4D4D00396E91 /* cObject.cpp in Sources */,
-				3D5BA9BB148C4E5500396E91 /* rendModel.cpp in Sources */,
+				3D5BA9C4148C505F00396E91 /* cObject.cpp in Sources */,
+				3D5BA9C5148C505F00396E91 /* Makefile in Sources */,
+				3D5BA9C6148C505F00396E91 /* rendModel.cpp in Sources */,
+				3D5BA9C8148C6B1500396E91 /* vecmat.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -16,21 +16,21 @@ rendModel * cObject::addToRender()
 	return simple;
 }
 
-cObject();
+cObject::cObject(const char *filename)
 {
     
 }
-void translate()
+void cObject::translate()
 {
     
 }
-void rotate()
+void cObject::rotate()
 {
     
 }
-void scale(){
+void cObject::scale(){
     
 }
-void assignMaterial(){
+void cObject::assignMaterial(){
     
 }

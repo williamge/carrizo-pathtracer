@@ -1,17 +1,17 @@
-#ifndef CARRIZO_H
-#define CARRIZO_H
-
 #ifndef M_PI
 #define M_PI 3.14159
 #endif
 
+#ifndef CARRIZO_H
+#define CARRIZO_H
+
+
 #include "CImg.h"
 #include "vecmat.h"
 #include <vector>
-#include "cObject.h"
-#include "rendModel.h"
 
-
+class cObject;
+class rendModel;
 
 
 /*
@@ -26,13 +26,13 @@ u,v and normal = 12 + 12 + 12
 ray triangle interesection takes u, v and normal, which are 3*3*4 bytes, 
 
 3 vertices, 3 vertex normals, u v and normal = 112 bytes = aligned */
-typedef struct tri_t{
+typedef struct renderTriangle_t{
 	//point3 vertices[3];
 	point3 a;
 	vec3 u, v;
 	vec3 normal; //or vec3 normal[3] to interpolate along normals
 	//material *mat;
-} triangle_s;
+} renderTriangle;
 
 typedef struct ray_t{
 	point3 o;
@@ -52,9 +52,6 @@ typedef struct ray_t{
 		intersection.hit = false;
 	}	
 } Ray;
-
-
-
 
 class cPathtracer{
 	private:
@@ -77,6 +74,7 @@ class cPathtracer{
 	public:
 		cPathtracer();
 		void render(int, int);
+        void addObject(cObject *obj);
 			
 };
 

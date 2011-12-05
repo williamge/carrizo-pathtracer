@@ -1,14 +1,20 @@
-#include <cstdio>
-#include <cmath>
-#include "vecmat.h"
 #include "carrizo.h"
 #include "CImg.h"
+#include "rendModel.h"
+#include "cObject.h"
+#include "vecmat.h"
+#include <cstdio>
+#include <cmath>
+
 
 
 using namespace cimg_library;
 
 
-
+void cPathtracer::addObject(cObject *obj)
+{
+    objects.push_back(obj);
+}
 
 void cPathtracer::intersectScene(Ray& ray)
 {
@@ -37,7 +43,7 @@ void cPathtracer::render(int width, int height)
 	image.buffer = new CImg<float> (width, height, 1, 3);
 	for (int i = 0; i < objects.size(); i++)
 	{
-		render_models.push_back( objects[i].addToRender() );
+		render_models.push_back( objects[i]->addToRender() );
 	}
 	
 	point3 origin;
@@ -77,7 +83,8 @@ int main(int argc, const char* argv[])
 {
 	cPathtracer pt;
 	
-	cObject *model1("filename.ext");
+	cObject *model1 = new cObject("filename.ext");
+    pt.addObject(model1);
 	
 	/* prototype start *
 	

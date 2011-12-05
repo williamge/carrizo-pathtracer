@@ -9,12 +9,17 @@
 #ifndef carrizo_pathtracer_rendModel_h
 #define carrizo_pathtracer_rendModel_h
 
-#include "carrizo.h"
+struct renderTriangle_t;
+typedef struct renderTriangle_t renderTriangle;
+
+struct ray_t;
+typedef struct ray_t Ray;
+
 
 class rendModel
 {
 public:
-    triangle_s *triangles;
+    renderTriangle *triangles;
     int triangle_count;
     rendModel();
     bool intersect(Ray& ray);
