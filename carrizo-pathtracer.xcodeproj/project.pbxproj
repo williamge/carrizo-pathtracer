@@ -6,14 +6,109 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		3D5B81EA1489734100396E91 /* carrizo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D5B81D61489728C00396E91 /* carrizo.cpp */; };
+		3D5B81EC1489734F00396E91 /* libpthread.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D5B81EB1489734F00396E91 /* libpthread.dylib */; };
+		3D5BA9A61489771B00396E91 /* libX11.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D5BA9A51489771B00396E91 /* libX11.6.dylib */; };
+		3D5BA9B8148C4D4D00396E91 /* cObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D5BA9B7148C4D4D00396E91 /* cObject.cpp */; };
+		3D5BA9BB148C4E5500396E91 /* rendModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D5BA9BA148C4E5500396E91 /* rendModel.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		3D5B81DD1489731300396E91 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		3D5B81D61489728C00396E91 /* carrizo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = carrizo.cpp; sourceTree = SOURCE_ROOT; };
+		3D5B81D71489728C00396E91 /* carrizo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = carrizo.h; sourceTree = SOURCE_ROOT; };
+		3D5B81D81489728C00396E91 /* CImg.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CImg.h; path = ../CImg.h; sourceTree = "<group>"; };
+		3D5B81D91489728C00396E91 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = ../Makefile; sourceTree = "<group>"; };
+		3D5B81DA1489728C00396E91 /* vecmat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = vecmat.h; path = ../vecmat.h; sourceTree = "<group>"; };
+		3D5B81DF1489731300396E91 /* carrizo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = carrizo; sourceTree = BUILT_PRODUCTS_DIR; };
+		3D5B81EB1489734F00396E91 /* libpthread.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpthread.dylib; path = SDKs/MacOSX10.7.sdk/usr/lib/libpthread.dylib; sourceTree = DEVELOPER_DIR; };
+		3D5BA9A51489771B00396E91 /* libX11.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libX11.6.dylib; path = ../../../../../usr/X11/lib/libX11.6.dylib; sourceTree = "<group>"; };
+		3D5BA9B7148C4D4D00396E91 /* cObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cObject.cpp; path = "carrizo-pathtracer.xcodeproj/cObject.cpp"; sourceTree = SOURCE_ROOT; };
+		3D5BA9B9148C4D8300396E91 /* cObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cObject.h; path = "carrizo-pathtracer.xcodeproj/cObject.h"; sourceTree = SOURCE_ROOT; };
+		3D5BA9BA148C4E5500396E91 /* rendModel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = rendModel.cpp; path = "carrizo-pathtracer.xcodeproj/rendModel.cpp"; sourceTree = SOURCE_ROOT; };
+		3D5BA9BC148C4EC500396E91 /* rendModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rendModel.h; path = "carrizo-pathtracer.xcodeproj/rendModel.h"; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3D5B81DC1489731300396E91 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3D5BA9A61489771B00396E91 /* libX11.6.dylib in Frameworks */,
+				3D5B81EC1489734F00396E91 /* libpthread.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
 /* Begin PBXGroup section */
 		3D5B81CD1489727200396E91 = {
 			isa = PBXGroup;
 			children = (
+				3D5BA9A51489771B00396E91 /* libX11.6.dylib */,
+				3D5B81EB1489734F00396E91 /* libpthread.dylib */,
+				3D5B81E21489731300396E91 /* carrizo */,
+				3D5B81E01489731300396E91 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
+		3D5B81E01489731300396E91 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3D5B81DF1489731300396E91 /* carrizo */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3D5B81E21489731300396E91 /* carrizo */ = {
+			isa = PBXGroup;
+			children = (
+				3D5B81D61489728C00396E91 /* carrizo.cpp */,
+				3D5B81D71489728C00396E91 /* carrizo.h */,
+				3D5B81D81489728C00396E91 /* CImg.h */,
+				3D5B81D91489728C00396E91 /* Makefile */,
+				3D5B81DA1489728C00396E91 /* vecmat.h */,
+				3D5BA9B7148C4D4D00396E91 /* cObject.cpp */,
+				3D5BA9B9148C4D8300396E91 /* cObject.h */,
+				3D5BA9BA148C4E5500396E91 /* rendModel.cpp */,
+				3D5BA9BC148C4EC500396E91 /* rendModel.h */,
+			);
+			path = carrizo;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3D5B81DE1489731300396E91 /* carrizo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3D5B81E71489731300396E91 /* Build configuration list for PBXNativeTarget "carrizo" */;
+			buildPhases = (
+				3D5B81DB1489731300396E91 /* Sources */,
+				3D5B81DC1489731300396E91 /* Frameworks */,
+				3D5B81DD1489731300396E91 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = carrizo;
+			productName = carrizo;
+			productReference = 3D5B81DF1489731300396E91 /* carrizo */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		3D5B81CF1489727200396E91 /* Project object */ = {
@@ -26,12 +121,27 @@
 				en,
 			);
 			mainGroup = 3D5B81CD1489727200396E91;
+			productRefGroup = 3D5B81E01489731300396E91 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				3D5B81DE1489731300396E91 /* carrizo */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3D5B81DB1489731300396E91 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3D5B81EA1489734100396E91 /* carrizo.cpp in Sources */,
+				3D5BA9B8148C4D4D00396E91 /* cObject.cpp in Sources */,
+				3D5BA9BB148C4E5500396E91 /* rendModel.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
 		3D5B81D41489727200396E91 /* Debug */ = {
@@ -46,6 +156,61 @@
 			};
 			name = Release;
 		};
+		3D5B81E81489731300396E91 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/X11/lib,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		3D5B81E91489731300396E91 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/X11/lib,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -54,6 +219,15 @@
 			buildConfigurations = (
 				3D5B81D41489727200396E91 /* Debug */,
 				3D5B81D51489727200396E91 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3D5B81E71489731300396E91 /* Build configuration list for PBXNativeTarget "carrizo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3D5B81E81489731300396E91 /* Debug */,
+				3D5B81E91489731300396E91 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
