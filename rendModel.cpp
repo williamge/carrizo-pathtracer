@@ -104,35 +104,38 @@ BVHnode * rendModel::constructBVHSub(renderTriangle *tri_list, std::vector<int> 
     for (int i = 0; i < index_list.size(); i++)
     {
         bbox curr_bound = bounds_list[index_list[i]];
-        if (curr_bound.low.data[dim] < node->bounds.low.data[dim] + split)
+        if (curr_bound.low.data[dim] <= node->bounds.low.data[dim] + split)
         {
             left_index.push_back(i);
         }
-        if (curr_bound.high.data[dim] > node->bounds.low.data[dim] + split)
+        if (curr_bound.high.data[dim] >= node->bounds.low.data[dim] + split)
         {
             right_index.push_back(i);
         }
     }    
-    if (left_index.size() == index_list.size())
+    if (left_index.size() == index_list.size() || right_index.size() == index_list.size())
     {
         node->left = NULL;
         node->right = NULL;
-        node->tri_list = left_index;
+        node->tri_list = index_list;
     }
     else
     {
-        node->left = constructBVHSub(tri_list, left_index, bounds_list);
-        
-        if (right_index.size() == index_list.size())
+        if (left_index.size() > 0)
         {
-            free(node->left);
-            node->left = NULL;
-            node->right = NULL;
-            node->tri_list = right_index;            
+            node->left = constructBVHSub(tri_list, left_index, bounds_list);         
         }
         else
         {
+            node->left = NULL;
+        }
+        if (right_index.size() > 0)
+        {
             node->right = constructBVHSub(tri_list, right_index, bounds_list);
+        }
+        else
+        {
+            node->right = NULL;
         }
     }
     
