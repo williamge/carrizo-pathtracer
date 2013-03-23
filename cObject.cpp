@@ -17,6 +17,10 @@ rendModel cObject::addToRender()
 
 cObject::cObject(const char *filename)
 {
+	/*
+	TODO: big ol todo right here, see that filename argument? so far that does nothing,
+	 that should be changed so it reads that filename and does smart stuff with it.
+	*/
     triangles = new objectTriangle[2];
 	triangle_count = 2;
 	

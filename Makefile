@@ -1,7 +1,8 @@
-CC = g++
+CC = clang++
 CFLAGS = -g
 LIBS = -lm -L/usr/X11/lib -lpthread -lX11
-OBJECTS = carrizo.o
+INCLUDE = -I/usr/X11R6/include
+OBJECTS = carrizo.o cObject.o rendModel.o vecmat.o
 EXEC = carrizo
 
 
@@ -11,7 +12,7 @@ $(EXEC): $(OBJECTS)
 	$(CC) -o $@ $^ $(LIBS) 
 	
 %.o: %.cpp
-	$(CC) -c $< $(CFLAGS)
+	$(CC) $(CFLAGS) -c $< $(INCLUDE)
 	
 clean:
 	rm -f $(EXEC) $(OBJECTS)
