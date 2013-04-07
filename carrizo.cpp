@@ -10,12 +10,36 @@
 
 using namespace cimg_library;
 
+/*
+* Terminology:
+	* cObject is the type of object used internally by the program for 
+	non-rendering purposes (i.e. placement, importing)
 
+	* rendModel.cpp contains the methods for turning a cObject in to
+	an object that can be used to render. These render objects are
+	made up of more specialized structures to make the rendering process
+	easier to develop.
+
+	* Each render model has its own Bounding Volume Hierarchy to speed up ray 
+	intersection. Each render model should also be a part of a bigger BVH to speed up 
+	ray intersection even further (so rays are intersected with a render model bounding 
+	box first, then the bounding boxes inside the render model, for efficiency).
+	TODO: add in a more top level BVH to handle this.
+
+*/
+
+/* Adds the cObject pointed to by "obj" to the list of objects for the 
+	current scene
+ */
 void cPathtracer::addObject(cObject *obj)
 {
     objects.push_back(obj);
 }
 
+/*
+	Simply intersects each render model in the scene with the current ray, 
+	to trace the ray.
+*/
 void cPathtracer::intersectScene(Ray& ray)
 {
 	
@@ -25,6 +49,15 @@ void cPathtracer::intersectScene(Ray& ray)
 	}
 }
 
+/*
+	"traceRay(Ray)" is to trace a ray in the scene, it calls 
+	"intersectScene(Ray&)" to do the heavy lifting.
+
+	"traceRay(Ray)" handles the more general parts of tracing a ray, like 
+	how to shade the corresponding pixel while "intersectScene(Ray&)" 
+	is used to actually trace the ray in the scene.
+
+*/
 col3 cPathtracer::traceRay(Ray ray)
 {
 	intersectScene(ray);
@@ -36,6 +69,11 @@ col3 cPathtracer::traceRay(Ray ray)
 	return col3(0,0,0);
 }
 
+/*
+	The almighty render function, takes in the width and height for the 
+	picture and renders the current scene, displaying it onscreen with 
+	CImg.
+*/
 void cPathtracer::render(int width, int height)
 {
 	image.width = width;

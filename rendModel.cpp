@@ -12,7 +12,12 @@
 #include "cObject.h"
 #include <iostream>
 
+/*
 
+Ttility functions for finding the minimum and maximum of two numbers.
+TODO: put this somewhere where it would make more sense to be.
+
+*/
 float min(const float a, const float b)
 {
     if (a > b)
@@ -31,7 +36,12 @@ float max(const float a, const float b)
     return b;
 }
 
+/*
 
+Creates a Bounding Volume Hierarchy node, doing the actual processing as 
+opposed to "constructBVH(...)"
+
+*/
 BVHnode * rendModel::constructBVHSub(renderTriangle *tri_list, std::vector<int> index_list, bbox *bounds_list)
 {
     BVHnode *node = new BVHnode;
@@ -63,13 +73,15 @@ BVHnode * rendModel::constructBVHSub(renderTriangle *tri_list, std::vector<int> 
         node->bounds.high.y = max(node->bounds.high.y, bounds_list[index_list[i]].high.y);
         node->bounds.high.z = max(node->bounds.high.z, bounds_list[index_list[i]].high.z);
     }
+
+    //determine the axis to split the current volume by, represented by "dim"
     
-    float split; //((node->bounds.high.x - node->bounds.low.x)/2,
-                //(node->bounds.high.y - node->bounds.low.y)/2,
-                //(node->bounds.high.z - node->bounds.low.z)/2);
+    float split;
     
     int dim;
     
+
+    //determine the biggest splits to split the volume by
     if (node->bounds.high.x - node->bounds.low.x > node->bounds.high.y - node->bounds.low.y)
     {
         if (node->bounds.high.x - node->bounds.low.x > node->bounds.high.z - node->bounds.low.z)
@@ -98,9 +110,11 @@ BVHnode * rendModel::constructBVHSub(renderTriangle *tri_list, std::vector<int> 
     
     split = 0.5 * split;
     
+    //store each child volume in either the left or right node, like a binary tree
     std::vector<int> left_index;
     std::vector<int> right_index;
     
+    //determine which node to store the remaining bounding boxes in
     for (int i = 0; i < index_list.size(); i++)
     {
         bbox curr_bound = bounds_list[index_list[i]];
@@ -113,6 +127,8 @@ BVHnode * rendModel::constructBVHSub(renderTriangle *tri_list, std::vector<int> 
             right_index.push_back(i);
         }
     }    
+
+    //check to see if the BVH changed anything, stop right here if it didn't
     if (left_index.size() == index_list.size() || right_index.size() == index_list.size())
     {
         node->left = NULL;
@@ -144,6 +160,17 @@ BVHnode * rendModel::constructBVHSub(renderTriangle *tri_list, std::vector<int> 
     return node;    
 }
 
+/*
+
+Top level method of creating a BVH object for the scene, returning the 
+root node to the constructed BVH.
+
+*"tri_list" is a pointer to the list of triangles to place in to the BVH
+*"tri_count" is the number of triangles in the scene
+*"bounds_list" is a pointer to the list of bounding boxes for the scene,
+    having been constructed by the "rendModel" constructor
+
+*/
 BVHnode * rendModel::constructBVH(renderTriangle *tri_list, int tri_count, bbox *bounds_list)
 {
     std::vector<int> remaining_tri;
@@ -156,6 +183,14 @@ BVHnode * rendModel::constructBVH(renderTriangle *tri_list, int tri_count, bbox 
     return constructBVHSub(tri_list, remaining_tri, bounds_list);
 }
 
+/*
+
+The constructor for a rendModel, takes in a list of triangles and their 
+count, creates corresponding renderTriangles, creates bounding boxes for
+the triangles, and then creates useful information for the triangle 
+such as uv coordinates and the normal.
+
+*/
 rendModel::rendModel(objectTriangle *tris, int tri_count)
 {
 	triangles = new renderTriangle[tri_count];
@@ -170,6 +205,7 @@ rendModel::rendModel(objectTriangle *tris, int tri_count)
 		point3 p2 = tris[i].vertices[1];
 		point3 p3 = tris[i].vertices[2];
         
+        //bounding boxes are defined by two points on opposite sides of the box
         bounding_boxes[i].low.x = min(p1.x, min(p2.x,p3.x));
         bounding_boxes[i].low.y = min(p1.y, min(p2.y,p3.y));
         bounding_boxes[i].low.z = min(p1.z, min(p2.z,p3.z));
@@ -192,7 +228,14 @@ rendModel::rendModel(objectTriangle *tris, int tri_count)
     root = constructBVH(triangles, triangle_count, bounding_boxes);
 }
 
+/*
 
+Object defined method to intersect a ray with the model, traversing the BVH for the model 
+in a smart way.
+
+TODO: actually make it traverse in a smart way instead of going through each triangle.
+
+*/
 bool rendModel::intersect(Ray& ray)
 {
 	int hit_triangle = -1;
@@ -237,7 +280,7 @@ bool rendModel::intersect(Ray& ray)
 	
 	if (hit_triangle > -1)
 	{
-		//set material in or somethin bro
+		//TODO: set material in or something else
 		return true;
 	}
 	return false;

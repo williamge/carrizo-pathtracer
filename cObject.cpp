@@ -10,6 +10,12 @@
 #include "rendModel.h"
 #include "cObject.h"
 
+/* 
+
+Takes the cObject object and turns it in to a returned rendModel 
+to be rendered.
+
+*/
 rendModel cObject::addToRender()
 {
     return rendModel (triangles, triangle_count);
