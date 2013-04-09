@@ -49,7 +49,9 @@
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "194"
-         endingLineNumber = "194">
+         endingLineNumber = "194"
+         landmarkName = "rendModel::rendModel(objectTriangle *tris, int tri_count)"
+         landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -62,8 +64,8 @@
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "37"
          endingLineNumber = "37"
-         landmarkName = "rendModel::constructBVHSub(renderTriangle *tri_list, std::vector&lt;int&gt; index_list, bbox *bounds_list)"
-         landmarkType = "5">
+         landmarkName = "max(const float a, const float b)"
+         landmarkType = "7">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -119,6 +121,19 @@
          startingLineNumber = "106"
          endingLineNumber = "106"
          landmarkName = "rendModel::constructBVHSub(renderTriangle *tri_list, std::vector&lt;int&gt; index_list, bbox *bounds_list)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "rendModel.cpp"
+         timestampString = "387237977.395012"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "263"
+         endingLineNumber = "263"
+         landmarkName = "rendModel::intersect(Ray&amp; ray)"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>
