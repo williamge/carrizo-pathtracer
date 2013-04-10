@@ -16,4 +16,5 @@ So far it can create and traverse BVH structures, and computer intersections for
 - Ray intersection
 
 ###Next steps to take
+- Unit tests
 - Hook up the asset importer so there's something to see

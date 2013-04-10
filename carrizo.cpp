@@ -127,8 +127,8 @@ int main(int argc, const char* argv[])
 	
 	/* prototype start *
 	
-	-cObject *model1 ("filename");
-	-pt.addObject(model1);
+	cObject *model1 ("filename");
+	pt.addObject(model1);
 	model1.translate(...)
 	model1.rotate(...);
 	model1.scale(...);
