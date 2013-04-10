@@ -155,8 +155,6 @@ BVHnode * rendModel::constructBVHSub(renderTriangle *tri_list, std::vector<int> 
         }
     }
     
-
-    
     return node;    
 }
 
@@ -229,18 +227,110 @@ rendModel::rendModel(objectTriangle *tris, int tri_count)
 }
 
 /*
+ Private utility function for bounding box - ray intersections, returns true if there's a proper intersection, 
+ false otherwise.
+ 
+ Branchless AABB-ray test from 
+    http://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm
+  
+ */
+bool rendModel::boxIntersection(bbox b, Ray ray, vec3 inv_dir)
+{
+    double tx1 = (b.low.x - ray.o.x) * inv_dir.x;
+    double tx2 = (b.high.x - ray.o.x) * inv_dir.x;
+    
+    double tmin = min(tx1, tx2);
+    double tmax = max(tx1, tx2);
+    
+    double ty1 = (b.low.y - ray.o.y) * inv_dir.y;
+    double ty2 = (b.high.y - ray.o.y) * inv_dir.y;
+    
+    tmin = max(tmin, min(ty1,ty2));
+    tmax = min(tmax, max(ty1,ty2));
+    
+    double tz1 = (b.low.z - ray.o.z) * inv_dir.z;
+    double tz2 = (b.high.z - ray.o.z) * inv_dir.z;
+    
+    tmin = max(tmin, min(tz1, tz2));
+    tmax = min(tmax, max(tz1, tz2));
+    
+    return (tmax >= max(0.0, tmin));
+}
+
+/*
 
 Object defined method to intersect a ray with the model, traversing the BVH for the model 
 in a smart way.
-
-TODO: actually make it traverse in a smart way instead of going through each triangle.
 
 */
 bool rendModel::intersect(Ray& ray)
 {
 	int hit_triangle = -1;
-	for (int i = 0; i < triangle_count; i++)
-	{
+    
+    //bvh traversal
+    
+    if (!root)
+    {
+        return false;
+    }
+    
+    //this looks like it should fail from divide by zero, but for reasons it doesn't, enjoy!
+    vec3 inv_dir (1.0 / ray.d.x, 1.0 / ray.d.y, 1.0 / ray.d.z);
+    
+    
+    /*
+     gameplan: start from root BVHnode, add each child node (left and right), each time taking one node 
+     from this stack and checking if the ray intersects with it, if ti does then we care about that 
+     node, otherwise we discard it and move along, adding the triangles we'll need to check to a vector 
+     to be checked at the end.     
+     */
+    
+    std::vector<int> tri_list;
+    
+    BVHnode * curr_node;
+    std::vector<BVHnode *> node_stack;
+    node_stack.push_back(root);
+    
+
+    while (node_stack.size() > 0)
+    {
+        //hey why do we go through all of this instead of starting from the front?
+        //well because std::vector wants you do pop from the back, apparently it's faster
+        //so here we are, taking nodes from the back of the list always
+        curr_node = node_stack[node_stack.size() - 1];
+        node_stack.pop_back();
+
+        if (boxIntersection(curr_node->bounds, ray, inv_dir))
+        {
+            //add all the triangles (if the node has them) to a vector for later
+            if (curr_node->tri_list.size() > 0)
+            {
+                for (int tri=0; tri < curr_node->tri_list.size(); tri++)
+                {
+                    tri_list.push_back(curr_node->tri_list[tri]);
+                }
+            }
+            
+            if (curr_node->left)
+            {
+                node_stack.push_back(curr_node->left);
+            }
+            if (curr_node->right)
+            {
+                node_stack.push_back(curr_node->right);
+            }
+        }
+    }
+
+    
+    
+    int i;
+    
+    //tri_list being the vector of triangles to be processed, filled in from the above BVH traversal
+    for (int tri=0; tri < tri_list.size(); tri++)
+    {
+        i = tri_list[tri]; //take the index of the current triangle
+
 		float lengt = triangles[i].normal * triangles[i].normal;
         
 		float t1 = -triangles[i].u * triangles[i].a;

@@ -24,6 +24,7 @@ using namespace cimg_library;
 	intersection. Each render model should also be a part of a bigger BVH to speed up 
 	ray intersection even further (so rays are intersected with a render model bounding 
 	box first, then the bounding boxes inside the render model, for efficiency).
+ 
 	TODO: add in a more top level BVH to handle this.
 
 */

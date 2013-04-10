@@ -27,9 +27,10 @@ cObject::cObject(const char *filename)
 	TODO: big ol todo right here, see that filename argument? so far that does nothing,
 	 that should be changed so it reads that filename and does smart stuff with it.
 	*/
-    triangles = new objectTriangle[2];
-	triangle_count = 2;
+    triangles = new objectTriangle[3];
+	triangle_count = 3;
 	
+    //left
 	objectTriangle triangle1;
 	triangle1.vertices[0] = point3(-0.1, 0.1, -0.25);
 	triangle1.vertices[2] = point3(0.0, 0.1, -0.25);
@@ -37,13 +38,21 @@ cObject::cObject(const char *filename)
 	
 	triangles[0] = triangle1;
 	
-	
+	//right top
 	objectTriangle triangle2;
 	triangle2.vertices[0] = point3(-0.2, 0.1, -1.55);
 	triangle2.vertices[2] = point3(0.3, 0.1, -1.50);
 	triangle2.vertices[1]= point3(0.2, -0.1, -1.53);
 	
 	triangles[1] = triangle2;
+    
+    //right bottom
+    objectTriangle triangle3;
+	triangle3.vertices[0] = point3(-0.1, -0.15, -1.55);
+	triangle3.vertices[2] = point3(0.4, -0.1, -1.50);
+	triangle3.vertices[1]= point3(0.3, -0.3, -1.0);
+	
+	triangles[2] = triangle3;
 }
 void cObject::translate()
 {

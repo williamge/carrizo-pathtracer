@@ -22,7 +22,7 @@ struct objecttriangle_t;
 typedef struct objecttriangle_t objectTriangle;
 
 struct bbox {
-	point3 low, high;
+    point3 low, high;
 };
 
 typedef struct BVHnode_t {
@@ -37,6 +37,7 @@ class rendModel
 {
 private:
     BVHnode *root;
+    static bool boxIntersection(bbox b, Ray r, vec3 inv_dir);
 public:
     renderTriangle *triangles;
     int triangle_count;
