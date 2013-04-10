@@ -7,4 +7,13 @@ Right now, nothing really, what will it be one day? A nice pathtracer, basically
 
 ##What it does
 
-Nothing right now really, it's quite incomplete. I think BVH traversal and creation is implemented but I have to test it further, then adding importing model support.
+So far it can create and traverse BVH structures, and computer intersections for triangles, but there's nothing set up to load objects or to shade them.
+
+###List of things implemented
+- Basic backend for rendering
+- BVH creation
+- BVH traversal
+- Ray intersection
+
+###Next steps to take
+- Hook up the asset importer so there's something to see
