@@ -186,22 +186,34 @@ BVHnode * rendModel::constructBVH(renderTriangle *tri_list, int tri_count, bbox 
 The constructor for a rendModel, takes in a list of triangles and their 
 count, creates corresponding renderTriangles, creates bounding boxes for
 the triangles, and then creates useful information for the triangle 
-such as uv coordinates and the normal.
+such as uv coordinates (which double as the intersection plane) and the normal.
 
 */
-rendModel::rendModel(objectTriangle *tris, int tri_count)
+rendModel::rendModel(cObject * source_object)
 {
-	triangles = new renderTriangle[tri_count];
-	triangle_count = tri_count;
+    //rendModel(objectTriangle *tris, int tri_count);
+	triangles = new renderTriangle[source_object->triangle_count];
+	triangle_count = source_object->triangle_count;
     
-    struct bbox *bounding_boxes = new struct bbox[tri_count];
+    struct bbox *bounding_boxes = new struct bbox[triangle_count];
     
 	
-	for (int i=0;i<tri_count;i++)
+	for (int i=0;i<triangle_count;i++)
 	{
-		point3 p1 = tris[i].vertices[0];
-		point3 p2 = tris[i].vertices[1];
-		point3 p3 = tris[i].vertices[2];
+		point3 p1 = source_object->triangles[i].vertices[0];
+		point3 p2 = source_object->triangles[i].vertices[1];
+		point3 p3 = source_object->triangles[i].vertices[2];
+        
+        //apply transformations to each point
+        p1.apply(source_object->scale_vector);
+        p2.apply(source_object->scale_vector);
+        p3.apply(source_object->scale_vector);
+        
+        //TODO: implement rotate transformation
+        
+        p1 + source_object->translate_vector;
+        p2 + source_object->translate_vector;
+        p3 + source_object->translate_vector;
         
         //bounding boxes are defined by two points on opposite sides of the box
         bounding_boxes[i].low.x = min(p1.x, min(p2.x,p3.x));

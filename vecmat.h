@@ -21,7 +21,8 @@ typedef struct vec3_t
     vec3_t();
 	
     void normalize();
-    vec3_t vecCross (const vec3_t b);
+    vec3_t vecCross (const vec3_t b); //returns the cross product of two vectors
+    void apply(const vec3_t b); //applies vector b to the 'this' vector by multiplying each component in 'this' to its counterpart in b
 	
 } vec3;
 
@@ -32,14 +33,17 @@ typedef vec3 col3;
 
 
 
-
+//standard vector addition
 vec3 operator + (const vec3 a, const vec3 b);
 vec3 operator + (const float a, const vec3 b);
 vec3 operator + (const vec3 a, const float b);
+//standard vector subtraction
 vec3 operator - (const vec3 a, const vec3 b);
 vec3 operator - (const vec3 a, const float b);
 vec3 operator - (const vec3 a) ;
+//vector dot product
 float operator * (const vec3 a, const vec3 b);
+//vector-scalar multiplication
 vec3 operator * (const float a, const vec3 b);
 vec3 operator * (const vec3 b, const float a);
 

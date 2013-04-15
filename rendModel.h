@@ -11,6 +11,7 @@
 
 #include <vector>
 #include "vecmat.h"
+#include "cObject.h"
 
 struct renderTriangle_t;
 typedef struct renderTriangle_t renderTriangle;
@@ -41,7 +42,8 @@ private:
 public:
     renderTriangle *triangles;
     int triangle_count;
-    rendModel(objectTriangle *tris, int tri_count);
+    rendModel(cObject * sourceObject);
+    //rendModel(objectTriangle *tris, int tri_count);
     BVHnode * constructBVHSub(renderTriangle *tri_list, std::vector<int> index_list, bbox *bounds_list);
     BVHnode * constructBVH(renderTriangle *tri_list, int tri_count, bbox *bounds_list);
     bool intersect(Ray& ray);

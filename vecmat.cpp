@@ -24,6 +24,13 @@
         return n;
     }
 
+    void vec3_t::apply (const vec3_t b)
+    {
+        data[0] = data[0]*b.data[0];
+        data[1] = data[1]*b.data[1];
+        data[2] = data[2]*b.data[2];
+    }
+
 
 vec3 operator + (const vec3 a, const vec3 b){ return vec3(a.data[0]+b.data[0], a.data[1]+b.data[1], a.data[2]+b.data[2]);}
 vec3 operator + (const float a, const vec3 b){ return vec3(a+b.data[0], a+b.data[1], a+b.data[2]);}
