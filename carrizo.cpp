@@ -41,28 +41,33 @@ void cPathtracer::addObject(cObject *obj)
 	Simply intersects each render model in the scene with the current ray, 
 	to trace the ray.
 */
-void cPathtracer::intersectScene(Ray& ray)
+void cPathtracer::intersectScene(Ray * ray)
 {
 	
 	for (int i = 0; i < render_models.size(); i++)
 	{
-		render_models[0].intersect(ray);
+		render_models[0].intersect(*ray);
 	}
 }
 
-/*
-	"traceRay(Ray)" is to trace a ray in the scene, it calls 
-	"intersectScene(Ray&)" to do the heavy lifting.
-
-	"traceRay(Ray)" handles the more general parts of tracing a ray, like 
-	how to shade the corresponding pixel while "intersectScene(Ray&)" 
-	is used to actually trace the ray in the scene.
-
-*/
-col3 cPathtracer::traceRay(Ray ray)
+/* The regular default shader for a ray in the scene, takes in ray, returns the colour for that ray 
+ */
+col3 cPathtracer::regularShader(Ray ray)
 {
-	intersectScene(ray);
-	if (ray.intersection.hit)
+    if (ray.intersection.hit)
+	{
+		return (0.5 * ray.intersection.normal + 0.5);
+		//return ray.intersection.normal;
+	}
+	return col3(0,0,0);
+}
+
+/* The normals shader for a ray in the scene, shading each ray with the normal vector of the surface it hits with the x value 
+ as red, y as blue, z as green. Takes in ray, returns the colour for that ray 
+ */
+col3 cPathtracer::normalsShader(Ray ray)
+{
+    if (ray.intersection.hit)
 	{
 		return (0.5 * ray.intersection.normal + 0.5);
 		//return ray.intersection.normal;
@@ -80,6 +85,8 @@ void cPathtracer::render(int width, int height)
 	image.width = width;
 	image.height = height;
 	image.buffer = new CImg<float> (width, height, 1, 3);
+    image.normalsBuffer = new CImg<float> (width, height, 1, 3);
+    
 	for (int i = 0; i < objects.size(); i++)
 	{
 		render_models.push_back( objects[i]->addToRender() );
@@ -88,8 +95,6 @@ void cPathtracer::render(int width, int height)
 	point3 origin;
 	vec3 p_direction = vec3(0.0,0.0,-1.0) - origin;
 	printf("p_direction: %f %f %f\n",p_direction.x,p_direction.y,p_direction.z);
-	
-	//Ray ray;
 	
 	int fov = 60;	
 	float factor = 1.0/((double(height)/2)/tan(fov*M_PI/360.0));
@@ -102,15 +107,33 @@ void cPathtracer::render(int width, int height)
 		rayt.d = p_direction;
 		rayt.d.x = (-double(width)/2.0 + i)*factor;
 		rayt.d.y = -(-double(height)/2.0 + j)*factor;
-		rayt.intersection.hit = false;
-		col3 col = traceRay(rayt);
+		rayt.intersection.hit = false;        
+        
+        intersectScene(&rayt);
+        col3 regularCol = regularShader(rayt);
+        col3 normalsCol = normalsShader(rayt);
 		
-		(*image.buffer)(i,j,0,0) = col.r;
-		(*image.buffer)(i,j,0,1) = col.g;
-		(*image.buffer)(i,j,0,2) = col.b;
+		(*image.buffer)(i,j,0,0) = regularCol.r;
+		(*image.buffer)(i,j,0,1) = regularCol.g;
+		(*image.buffer)(i,j,0,2) = regularCol.b;
+        
+        (*image.normalsBuffer)(i,j,0,0) = normalsCol.r;
+        (*image.normalsBuffer)(i,j,0,1) = normalsCol.g;
+        (*image.normalsBuffer)(i,j,0,2) = normalsCol.b;
 		
 	}
-	image.buffer->display();
+    
+    CImgDisplay regularDisp (*image.buffer, "Regular Shader");
+    CImgDisplay normalsDisp (*image.normalsBuffer, "Normals Shader");
+    
+    image.buffer->display(regularDisp);
+    image.normalsBuffer->display(normalsDisp);
+    
+    /*
+     This just keeps the windows from closing by themselves, apparently they don't set up a wait queue on their
+     own if you create the display window yourself, one day there will probably be something good to put in there anyway.
+     */
+    while (!regularDisp.is_closed() && !normalsDisp.is_closed()){regularDisp.wait();};
 }
 
 cPathtracer::cPathtracer()

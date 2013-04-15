@@ -62,14 +62,18 @@ class cPathtracer{
 		
 		struct{
 			cimg_library::CImg<float> *buffer;
-			int width, height;			
+            cimg_library::CImg<float> *normalsBuffer;
+			int width, height;
 		} image;
 		
 		std::vector<cObject *> objects;
 		std::vector<rendModel> render_models;
 		
 		col3 traceRay(Ray ray);
-		void intersectScene(Ray& ray);
+		void intersectScene(Ray* ray);
+    
+        col3 regularShader(Ray ray);
+        col3 normalsShader(Ray ray);
 	
 	public:
 		cPathtracer();
