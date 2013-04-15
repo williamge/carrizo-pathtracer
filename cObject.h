@@ -13,6 +13,8 @@
 
 class rendModel;
 
+enum {CTRIANGLE, CBOX};
+
 typedef struct objecttriangle_t{
 	point3 vertices[3];
 	
@@ -23,13 +25,21 @@ class cObject
 private:
 	objectTriangle *triangles;
 	int triangle_count;
+    vec3 translate_vector;
+    vec3 rotate_vector;
+    vec3 scale_vector;
+    
+    void makeCTRIANGLE();
 public:
+    cObject(int option);
     cObject(const char *filename);
     void translate();
     void rotate();
     void scale();
     void assignMaterial();	
     rendModel addToRender();
+    
+    friend class rendModel;
 };
 
 #endif
