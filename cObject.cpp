@@ -28,11 +28,96 @@ void cObject::makeCTRIANGLE()
     triangle_count = 1;
     
     objectTriangle triangle;
-    triangle.vertices[0] = point3(0, 0.5, 0.0);
+    triangle.vertices[0] = point3(0.0, 0.5, 0.0);
     triangle.vertices[1] = point3(-0.5, -0.5, 0.0);
     triangle.vertices[2] = point3(0.5, -0.5, 0.0);
     
     triangles[0] = triangle;
+}
+
+void cObject::makeCBOX()
+{
+    triangles = new objectTriangle[12];
+    triangle_count = 12;
+    
+    //front side
+    objectTriangle triangle1;
+    triangle1.vertices[0] = point3(-0.5, 0.5, 0.5); //top left
+    triangle1.vertices[1] = point3(-0.5, -0.5, 0.5); //bottom left
+    triangle1.vertices[2] = point3(0.5, 0.5, 0.5); //top right
+    
+    objectTriangle triangle2;
+    triangle2.vertices[0] = point3(0.5, 0.5, 0.5); //top right
+    triangle2.vertices[1] = point3(-0.5, -0.5, 0.5); //bottom left
+    triangle2.vertices[2] = point3(0.5, -0.5, 0.5); //bottom right
+    
+    //back side
+    objectTriangle triangle3;
+    triangle3.vertices[0] = point3(0.5, 0.5, -0.5); //top left
+    triangle3.vertices[1] = point3(-0.5, -0.5, -0.5); //bottom left
+    triangle3.vertices[2] = point3(-0.5, 0.5, -0.5); //top right
+    
+    objectTriangle triangle4;
+    triangle4.vertices[0] = point3(0.5, 0.5, -0.5); //top right
+    triangle4.vertices[1] = point3(0.5, -0.5, -0.5); //bottom left 
+    triangle4.vertices[2] = point3(-0.5, -0.5, -0.5); //bottom right
+    
+    //bottom side
+    objectTriangle triangle5;
+    triangle5.vertices[0] = point3(-0.5, -0.5, 0.5); //close left
+    triangle5.vertices[1] = point3(-0.5, -0.5, -0.5); //far left
+    triangle5.vertices[2] = point3(0.5, -0.5, -0.5); //far right
+    
+    objectTriangle triangle6;
+    triangle6.vertices[0] = point3(0.5, -0.5, -0.5); //far right
+    triangle6.vertices[1] = point3(-0.5, -0.5, 0.5); //close left
+    triangle6.vertices[2] = point3(0.5, -0.5, 0.5); //close right
+    
+    //top side
+    objectTriangle triangle7;
+    triangle7.vertices[0] = point3(-0.5, 0.5, 0.5); //close left
+    triangle7.vertices[1] = point3(-0.5, 0.5, -0.5); //far left
+    triangle7.vertices[2] = point3(0.5, 0.5, -0.5); //far right
+    
+    objectTriangle triangle8;
+    triangle8.vertices[0] = point3(0.5, 0.5, -0.5); //far right
+    triangle8.vertices[1] = point3(-0.5, 0.5, 0.5); //close left
+    triangle8.vertices[2] = point3(0.5, 0.5, 0.5); //close right
+    
+    //left side
+    objectTriangle triangle9;
+    triangle9.vertices[0] = point3(-0.5, -0.5, -0.5); //far bottom
+    triangle9.vertices[1] = point3(-0.5, 0.5, -0.5); //far top
+    triangle9.vertices[2] = point3(-0.5, 0.5, 0.5); //close top
+    
+    objectTriangle triangle10;
+    triangle10.vertices[0] = point3(-0.5, -0.5, -0.5); //far bottom
+    triangle10.vertices[1] = point3(-0.5, 0.5, 0.5); //close top
+    triangle10.vertices[2] = point3(-0.5, -0.5, 0.5); //close bottom
+    
+    //right side
+    objectTriangle triangle11;
+    triangle11.vertices[0] = point3(0.5, -0.5, -0.5); //far bottom
+    triangle11.vertices[1] = point3(0.5, 0.5, -0.5); //far top
+    triangle11.vertices[2] = point3(0.5, 0.5, 0.5); //close top
+    
+    objectTriangle triangle12;
+    triangle12.vertices[0] = point3(0.5, -0.5, -0.5); //far bottom
+    triangle12.vertices[1] = point3(0.5, 0.5, 0.5); //close top
+    triangle12.vertices[2] = point3(0.5, -0.5, 0.5); //close bottom
+    
+    triangles[0] = triangle1;
+    triangles[1] = triangle2;
+    triangles[2] = triangle3;
+    triangles[3] = triangle4;
+    triangles[4] = triangle5;
+    triangles[5] = triangle6;
+    triangles[6] = triangle7;
+    triangles[7] = triangle8;
+    triangles[8] = triangle9;
+    triangles[9] = triangle10;
+    triangles[10] = triangle11;
+    triangles[11] = triangle12;
 }
 
 /*
@@ -48,6 +133,8 @@ cObject::cObject(int option)
     {
         case CTRIANGLE:
             makeCTRIANGLE();
+        case CBOX:
+            makeCBOX();
     }
 }
 
@@ -70,9 +157,9 @@ cObject::cObject(const char *filename)
 	
     //left
 	objectTriangle triangle1;
-	triangle1.vertices[0] = point3(-0.1, 0.1, -0.25);
+	triangle1.vertices[1] = point3(-0.1, 0.1, -0.25);
 	triangle1.vertices[2] = point3(0.0, 0.1, -0.25);
-	triangle1.vertices[1] = point3(-0.1, -0.1, -0.25);
+	triangle1.vertices[0] = point3(-0.1, -0.1, -0.25);
 	
 	triangles[0] = triangle1;
 	
@@ -92,17 +179,19 @@ cObject::cObject(const char *filename)
 	
 	triangles[2] = triangle3;
 }
-void cObject::translate()
+void cObject::translate(vec3 trans_vec)
 {
-    
+    translate_vector = trans_vec;
 }
-void cObject::rotate()
+void cObject::rotate(vec3 rotate_vec)
 {
-    
+    rotate_vector = rotate_vec;
 }
-void cObject::scale(){
-    
+void cObject::scale(vec3 scale_vec)
+{
+    scale_vector = scale_vec;
 }
-void cObject::assignMaterial(){
+void cObject::assignMaterial()
+{
     
 }

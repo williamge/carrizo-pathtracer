@@ -30,12 +30,13 @@ private:
     vec3 scale_vector;
     
     void makeCTRIANGLE();
+    void makeCBOX();
 public:
     cObject(int option);
     cObject(const char *filename);
-    void translate();
-    void rotate();
-    void scale();
+    void translate(vec3 trans_vec);
+    void rotate(vec3 rotate_vec);
+    void scale(vec3 scale_vec);
     void assignMaterial();	
     rendModel addToRender();
     

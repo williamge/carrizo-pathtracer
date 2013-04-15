@@ -186,7 +186,7 @@ BVHnode * rendModel::constructBVH(renderTriangle *tri_list, int tri_count, bbox 
 The constructor for a rendModel, takes in a list of triangles and their 
 count, creates corresponding renderTriangles, creates bounding boxes for
 the triangles, and then creates useful information for the triangle 
-such as uv coordinates (which double as the intersection plane) and the normal.
+such as uv coordinates for the intersection plane and the normal.
 
 */
 rendModel::rendModel(cObject * source_object)
@@ -368,15 +368,28 @@ bool rendModel::intersect(Ray& ray)
 		if (v < 0 || u+v > 1){continue;}
 		
 		if ( intersect_t > 0.0 
-			&& (!ray.intersection.hit || ray.intersection.t_value > intersect_t)
-			&& (ray.d * tnormal < 0.0)){
+			&& (!ray.intersection.hit || ray.intersection.t_value > intersect_t))
+        {
             
             hit_triangle = i;
             
             ray.intersection.t_value = intersect_t;
             ray.intersection.point = point;
-            ray.intersection.normal = tnormal;
-            ray.intersection.hit = true;	
+            /*
+             If the dot product is less than 0 then we're hitting the front-face, if it's higher than 0 then we're 
+             hitting the back-face. I don't want to only hit front-faces because there's no real reason to do it that 
+             way in a pathtracer, so if we hit that side let's reverse the normal so we can treat that triangle as a 
+             front-face instead and get correct shading.
+             */
+            if (ray.d * tnormal < 0.0)
+            {
+                ray.intersection.normal = tnormal;
+            }
+            else
+            {
+                ray.intersection.normal = -tnormal;
+            }
+            ray.intersection.hit = true;
 		}
 	}
 	

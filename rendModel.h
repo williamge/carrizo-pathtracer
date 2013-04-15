@@ -36,14 +36,13 @@ typedef struct BVHnode_t {
 
 class rendModel
 {
-private:
+private:    
     BVHnode *root;
     static bool boxIntersection(bbox b, Ray r, vec3 inv_dir);
 public:
     renderTriangle *triangles;
     int triangle_count;
     rendModel(cObject * sourceObject);
-    //rendModel(objectTriangle *tris, int tri_count);
     BVHnode * constructBVHSub(renderTriangle *tri_list, std::vector<int> index_list, bbox *bounds_list);
     BVHnode * constructBVH(renderTriangle *tri_list, int tri_count, bbox *bounds_list);
     bool intersect(Ray& ray);

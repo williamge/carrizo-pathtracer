@@ -1,4 +1,5 @@
 #include "carrizo.h"
+#define cimg_use_png
 #include "CImg.h"
 #include "rendModel.h"
 #include "cObject.h"
@@ -46,7 +47,7 @@ void cPathtracer::intersectScene(Ray * ray)
 	
 	for (int i = 0; i < render_models.size(); i++)
 	{
-		render_models[0].intersect(*ray);
+		render_models[i].intersect(*ray);
 	}
 }
 
@@ -57,7 +58,6 @@ col3 cPathtracer::regularShader(Ray ray)
     if (ray.intersection.hit)
 	{
 		return (0.5 * ray.intersection.normal + 0.5);
-		//return ray.intersection.normal;
 	}
 	return col3(0,0,0);
 }
@@ -70,7 +70,6 @@ col3 cPathtracer::normalsShader(Ray ray)
     if (ray.intersection.hit)
 	{
 		return (0.5 * ray.intersection.normal + 0.5);
-		//return ray.intersection.normal;
 	}
 	return col3(0,0,0);
 }
@@ -92,11 +91,13 @@ void cPathtracer::render(int width, int height)
 		render_models.push_back( objects[i]->addToRender() );
 	}
 	
-	point3 origin;
-	vec3 p_direction = vec3(0.0,0.0,-1.0) - origin;
+	point3 origin = point3(-0.5, 0.2, 1.0);
+	vec3 p_direction = vec3(0.0,0.0,0.0) - origin;
+    p_direction.normalize();
+    
 	printf("p_direction: %f %f %f\n",p_direction.x,p_direction.y,p_direction.z);
 	
-	int fov = 60;	
+	int fov = 60;
 	float factor = 1.0/((double(height)/2)/tan(fov*M_PI/360.0));
 		
 	cimg_forXY(*(image.buffer), i,j)
@@ -105,9 +106,9 @@ void cPathtracer::render(int width, int height)
 		rayt.o = origin;
 		
 		rayt.d = p_direction;
-		rayt.d.x = (-double(width)/2.0 + i)*factor;
-		rayt.d.y = -(-double(height)/2.0 + j)*factor;
-		rayt.intersection.hit = false;        
+		rayt.d.x += (-double(width)/2.0 + i)*factor;
+		rayt.d.y += -(-double(height)/2.0 + j)*factor;
+		rayt.intersection.hit = false;
         
         intersectScene(&rayt);
         col3 regularCol = regularShader(rayt);
@@ -133,7 +134,7 @@ void cPathtracer::render(int width, int height)
      This just keeps the windows from closing by themselves, apparently they don't set up a wait queue on their
      own if you create the display window yourself, one day there will probably be something good to put in there anyway.
      */
-    while (!regularDisp.is_closed() && !normalsDisp.is_closed()){regularDisp.wait();};
+    while (!regularDisp.is_closed() && !normalsDisp.is_closed()){ regularDisp.wait(); }
 }
 
 cPathtracer::cPathtracer()
@@ -147,6 +148,11 @@ int main(int argc, const char* argv[])
 	
 	cObject *model1 = new cObject("filename.ext");
     pt.addObject(model1);
+     
+    cObject *model2 = new cObject(CBOX);
+    model2->translate(vec3(0.0,0.0,0.0));
+    model2->scale(vec3 (0.2,0.2,0.2));
+    pt.addObject(model2);
 	
 	/* prototype start *
 	

@@ -7,7 +7,7 @@ Right now, nothing really, what will it be one day? A nice pathtracer, basically
 
 ##What it does
 
-So far it can create and traverse BVH structures, and computer intersections for triangles, but there's nothing set up to load objects or to shade them.
+So far it can create and traverse BVH structures, and compute intersections for triangles, but there's nothing set up to load objects or to shade them.
 
 ###List of things implemented
 - Basic backend for rendering
