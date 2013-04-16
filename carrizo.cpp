@@ -1,5 +1,4 @@
 #include "carrizo.h"
-#define cimg_use_png
 #include "CImg.h"
 #include "rendModel.h"
 #include "cObject.h"
@@ -129,6 +128,9 @@ void cPathtracer::render(int width, int height)
     
     image.buffer->display(regularDisp);
     image.normalsBuffer->display(normalsDisp);
+    
+    image.buffer->normalize(0, 255);
+    image.buffer->save_png("output.png");
     
     /*
      This just keeps the windows from closing by themselves, apparently they don't set up a wait queue on their

@@ -5,6 +5,7 @@
 #ifndef CARRIZO_H
 #define CARRIZO_H
 
+#define cimg_use_png
 
 #include "CImg.h"
 #include "vecmat.h"
