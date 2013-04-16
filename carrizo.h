@@ -63,7 +63,7 @@ class cPathtracer{
 		
 		struct{
 			cimg_library::CImg<float> *buffer;
-            cimg_library::CImg<float> *normalsBuffer;
+            cimg_library::CImg<float> *normals_buffer;
 			int width, height;
 		} image;
 		

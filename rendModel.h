@@ -29,7 +29,7 @@ struct bbox {
 typedef struct BVHnode_t {
     BVHnode_t *left;
     BVHnode_t *right;
-    std::vector<int> tri_list;
+    std::vector<int> triangle_list;
     struct bbox bounds;
 } BVHnode;
 
@@ -43,8 +43,8 @@ public:
     renderTriangle *triangles;
     int triangle_count;
     rendModel(cObject * sourceObject);
-    BVHnode * constructBVHSub(renderTriangle *tri_list, std::vector<int> index_list, bbox *bounds_list);
-    BVHnode * constructBVH(renderTriangle *tri_list, int tri_count, bbox *bounds_list);
+    BVHnode * constructBVHSub(renderTriangle *triangle_list, std::vector<int> index_list, bbox *bounds_list);
+    BVHnode * constructBVH(renderTriangle *triangle_list, int triangle_count, bbox *bounds_list);
     bool intersect(Ray& ray);
 };
 

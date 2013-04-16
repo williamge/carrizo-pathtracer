@@ -42,7 +42,7 @@ Creates a Bounding Volume Hierarchy node, doing the actual processing as
 opposed to "constructBVH(...)"
 
 */
-BVHnode * rendModel::constructBVHSub(renderTriangle *tri_list, std::vector<int> index_list, bbox *bounds_list)
+BVHnode * rendModel::constructBVHSub(renderTriangle *triangle_list, std::vector<int> index_list, bbox *bounds_list)
 {
     BVHnode *node = new BVHnode;
     node->bounds.low.x = bounds_list[index_list[0]].low.x;
@@ -55,9 +55,9 @@ BVHnode * rendModel::constructBVHSub(renderTriangle *tri_list, std::vector<int> 
     
     if (index_list.size() == 1)
     {
-        std::vector<int> tri_list_;
-        tri_list_.push_back( index_list[0] );
-        node->tri_list = tri_list_;
+        std::vector<int> triangle_list_;
+        triangle_list_.push_back( index_list[0] );
+        node->triangle_list = triangle_list_;
         node->left = NULL;
         node->right = NULL;
         return node;
@@ -133,13 +133,13 @@ BVHnode * rendModel::constructBVHSub(renderTriangle *tri_list, std::vector<int> 
     {
         node->left = NULL;
         node->right = NULL;
-        node->tri_list = index_list;
+        node->triangle_list = index_list;
     }
     else
     {
         if (left_index.size() > 0)
         {
-            node->left = constructBVHSub(tri_list, left_index, bounds_list);         
+            node->left = constructBVHSub(triangle_list, left_index, bounds_list);         
         }
         else
         {
@@ -147,7 +147,7 @@ BVHnode * rendModel::constructBVHSub(renderTriangle *tri_list, std::vector<int> 
         }
         if (right_index.size() > 0)
         {
-            node->right = constructBVHSub(tri_list, right_index, bounds_list);
+            node->right = constructBVHSub(triangle_list, right_index, bounds_list);
         }
         else
         {
@@ -169,16 +169,16 @@ root node to the constructed BVH.
     having been constructed by the "rendModel" constructor
 
 */
-BVHnode * rendModel::constructBVH(renderTriangle *tri_list, int tri_count, bbox *bounds_list)
+BVHnode * rendModel::constructBVH(renderTriangle *triangle_list, int triangle_count, bbox *bounds_list)
 {
-    std::vector<int> remaining_tri;
+    std::vector<int> remaining_triangles;
     
-    for (int i = 0; i < tri_count; i++)
+    for (int i = 0; i < triangle_count; i++)
     {
-        remaining_tri.push_back(i);
+        remaining_triangles.push_back(i);
     }
     
-    return constructBVHSub(tri_list, remaining_tri, bounds_list);
+    return constructBVHSub(triangle_list, remaining_triangles, bounds_list);
 }
 
 /*
@@ -297,7 +297,7 @@ bool rendModel::intersect(Ray& ray)
      to be checked at the end.     
      */
     
-    std::vector<int> tri_list;
+    std::vector<int> triangle_list;
     
     BVHnode * curr_node;
     std::vector<BVHnode *> node_stack;
@@ -315,11 +315,11 @@ bool rendModel::intersect(Ray& ray)
         if (boxIntersection(curr_node->bounds, ray, inv_dir))
         {
             //add all the triangles (if the node has them) to a vector for later
-            if (curr_node->tri_list.size() > 0)
+            if (curr_node->triangle_list.size() > 0)
             {
-                for (int tri=0; tri < curr_node->tri_list.size(); tri++)
+                for (int tri=0; tri < curr_node->triangle_list.size(); tri++)
                 {
-                    tri_list.push_back(curr_node->tri_list[tri]);
+                    triangle_list.push_back(curr_node->triangle_list[tri]);
                 }
             }
             
@@ -339,9 +339,9 @@ bool rendModel::intersect(Ray& ray)
     int i;
     
     //tri_list being the vector of triangles to be processed, filled in from the above BVH traversal
-    for (int tri=0; tri < tri_list.size(); tri++)
+    for (int tri=0; tri < triangle_list.size(); tri++)
     {
-        i = tri_list[tri]; //take the index of the current triangle
+        i = triangle_list[tri]; //take the index of the current triangle
 
 		float lengt = triangles[i].normal * triangles[i].normal;
         

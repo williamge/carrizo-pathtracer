@@ -83,7 +83,7 @@ void cPathtracer::render(int width, int height)
 	image.width = width;
 	image.height = height;
 	image.buffer = new CImg<float> (width, height, 1, 3);
-    image.normalsBuffer = new CImg<float> (width, height, 1, 3);
+    image.normals_buffer = new CImg<float> (width, height, 1, 3);
     
 	for (int i = 0; i < objects.size(); i++)
 	{
@@ -117,17 +117,17 @@ void cPathtracer::render(int width, int height)
 		(*image.buffer)(i,j,0,1) = regularCol.g;
 		(*image.buffer)(i,j,0,2) = regularCol.b;
         
-        (*image.normalsBuffer)(i,j,0,0) = normalsCol.r;
-        (*image.normalsBuffer)(i,j,0,1) = normalsCol.g;
-        (*image.normalsBuffer)(i,j,0,2) = normalsCol.b;
+        (*image.normals_buffer)(i,j,0,0) = normalsCol.r;
+        (*image.normals_buffer)(i,j,0,1) = normalsCol.g;
+        (*image.normals_buffer)(i,j,0,2) = normalsCol.b;
 		
 	}
     
     CImgDisplay regularDisp (*image.buffer, "Regular Shader");
-    CImgDisplay normalsDisp (*image.normalsBuffer, "Normals Shader");
+    CImgDisplay normalsDisp (*image.normals_buffer, "Normals Shader");
     
     image.buffer->display(regularDisp);
-    image.normalsBuffer->display(normalsDisp);
+    image.normals_buffer->display(normalsDisp);
     
     image.buffer->normalize(0, 255);
     image.buffer->save_png("output.png");
