@@ -77,9 +77,7 @@ BVHnode * rendModel::constructBVHSub(renderTriangle *triangle_list, std::vector<
     //determine the axis to split the current volume by, represented by "dim"
     
     float split;
-    
-    int dim;
-    
+    int dim;    
 
     //determine the biggest splits to split the volume by
     if (node->bounds.high.x - node->bounds.low.x > node->bounds.high.y - node->bounds.low.y)
@@ -122,11 +120,12 @@ BVHnode * rendModel::constructBVHSub(renderTriangle *triangle_list, std::vector<
         {
             left_index.push_back(i);
         }
-        if (curr_bound.high.data[dim] >= node->bounds.low.data[dim] + split)
+        else if (curr_bound.high.data[dim] >= node->bounds.low.data[dim] + split)
         {
             right_index.push_back(i);
         }
     }    
+    //TODO: make sure that is supposed to be an else if and not an if up above
 
     //check to see if the BVH changed anything, stop right here if it didn't
     if (left_index.size() == index_list.size() || right_index.size() == index_list.size())

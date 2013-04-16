@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
-#include "../rendModel.h"
+#include "rendModel.h"
+#include "../rendModel.cpp"
 
 TEST(TestMin, normal) {
 	EXPECT_EQ(1.0,min(1.0, 2.0));
