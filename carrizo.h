@@ -58,7 +58,8 @@ class cPathtracer{
 	private:
 		struct {
 			point3 origin;
-			point3 lookat;
+			point3 look_at;
+            float fov;
 		} camera;
 		
 		struct{
@@ -71,8 +72,8 @@ class cPathtracer{
 		std::vector<cObject *> objects;
 		std::vector<rendModel> render_models;
 		
-		col3 traceRay(Ray ray);
 		void intersectScene(Ray* ray);
+        void shadePixel(int i, int j, vec3 &direction_vector, vec3 &x_unit, vec3 &y_unit, float factor_);
     
         col3 regularShader(Ray ray);
         col3 normalsShader(Ray ray);
@@ -80,8 +81,10 @@ class cPathtracer{
 	
 	public:
 		cPathtracer();
-		void render(int, int);
+		void render();
         void addObject(cObject *obj);
+        void setCamera(point3 origin, point3 look_at, float fov);
+        void setDimensions(int width, int height);
 			
 };
 
