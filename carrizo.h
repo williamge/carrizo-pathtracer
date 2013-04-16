@@ -64,6 +64,7 @@ class cPathtracer{
 		struct{
 			cimg_library::CImg<float> *buffer;
             cimg_library::CImg<float> *normals_buffer;
+            cimg_library::CImg<float> *depth_buffer;
 			int width, height;
 		} image;
 		
@@ -75,6 +76,7 @@ class cPathtracer{
     
         col3 regularShader(Ray ray);
         col3 normalsShader(Ray ray);
+        col3 depthShader(Ray ray);
 	
 	public:
 		cPathtracer();

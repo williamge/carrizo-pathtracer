@@ -73,6 +73,15 @@ col3 cPathtracer::normalsShader(Ray ray)
 	return col3(0,0,0);
 }
 
+col3 cPathtracer::depthShader(Ray ray)
+{
+    if (ray.intersection.hit)
+    {
+        return col3 (ray.intersection.t_value,ray.intersection.t_value,ray.intersection.t_value);
+    }
+    return col3(0.0, 0.0, 0.0);
+}
+
 /*
 	The almighty render function, takes in the width and height for the 
 	picture and renders the current scene, displaying it onscreen with 
@@ -84,6 +93,7 @@ void cPathtracer::render(int width, int height)
 	image.height = height;
 	image.buffer = new CImg<float> (width, height, 1, 3);
     image.normals_buffer = new CImg<float> (width, height, 1, 3);
+    image.depth_buffer = new CImg<float> (width, height, 1, 3);
     
 	for (int i = 0; i < objects.size(); i++)
 	{
@@ -128,24 +138,31 @@ void cPathtracer::render(int width, int height)
 		rayt.intersection.hit = false;
         
         intersectScene(&rayt);
-        col3 regularCol = regularShader(rayt);
-        col3 normalsCol = normalsShader(rayt);
+        col3 regular_col = regularShader(rayt);
+        col3 normals_col = normalsShader(rayt);
+        col3 depth_col = depthShader(rayt);
 		
-		(*image.buffer)(i,j,0,0) = regularCol.r;
-		(*image.buffer)(i,j,0,1) = regularCol.g;
-		(*image.buffer)(i,j,0,2) = regularCol.b;
+		(*image.buffer)(i,j,0,0) = regular_col.r;
+		(*image.buffer)(i,j,0,1) = regular_col.g;
+		(*image.buffer)(i,j,0,2) = regular_col.b;
         
-        (*image.normals_buffer)(i,j,0,0) = normalsCol.r;
-        (*image.normals_buffer)(i,j,0,1) = normalsCol.g;
-        (*image.normals_buffer)(i,j,0,2) = normalsCol.b;
+        (*image.normals_buffer)(i,j,0,0) = normals_col.r;
+        (*image.normals_buffer)(i,j,0,1) = normals_col.g;
+        (*image.normals_buffer)(i,j,0,2) = normals_col.b;
+    
+        (*image.depth_buffer)(i,j,0,0) = depth_col.r;
+        (*image.depth_buffer)(i,j,0,1) = depth_col.g;
+        (*image.depth_buffer)(i,j,0,2) = depth_col.b;
 		
 	}
     
-    CImgDisplay regularDisp (*image.buffer, "Regular Shader");
-    CImgDisplay normalsDisp (*image.normals_buffer, "Normals Shader");
+    CImgDisplay regular_display (*image.buffer, "Regular Shader");
+    CImgDisplay normals_display (*image.normals_buffer, "Normals Shader");
+    CImgDisplay depth_display (*image.depth_buffer, "Depth Shader");
     
-    image.buffer->display(regularDisp);
-    image.normals_buffer->display(normalsDisp);
+    image.buffer->display(regular_display, true);
+    image.normals_buffer->display(normals_display, true);
+    image.depth_buffer->display(depth_display, true);
     
     image.buffer->normalize(0, 255);
     image.buffer->save_png("output.png");
@@ -154,7 +171,7 @@ void cPathtracer::render(int width, int height)
      This just keeps the windows from closing by themselves, apparently they don't set up a wait queue on their
      own if you create the display window yourself, one day there will probably be something good to put in there anyway.
      */
-    while (!regularDisp.is_closed() && !normalsDisp.is_closed()){ regularDisp.wait(); }
+    while (!regular_display.is_closed() && !normals_display.is_closed() && !depth_display.is_closed()){ regular_display.wait(); }
 }
 
 cPathtracer::cPathtracer()
@@ -171,7 +188,7 @@ int main(int argc, const char* argv[])
      
     cObject *model2 = new cObject(CBOX);
     model2->translate(vec3(0.0,0.0,0.0));
-    model2->scale(vec3 (0.2,0.2,0.2));
+    model2->scale(vec3 (0.2,0.25,1.0));
     pt.addObject(model2);
 	
 	/* prototype start *
