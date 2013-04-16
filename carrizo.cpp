@@ -91,13 +91,30 @@ void cPathtracer::render(int width, int height)
 	}
 	
 	point3 origin = point3(-0.5, 0.2, 1.0);
-	vec3 p_direction = vec3(0.0,0.0,0.0) - origin;
+    
+    //p_direction starts with a point to point the camera at, then we make it the camera's direction vector
+	vec3 p_direction = vec3(0.0,0.0,0.0);
+    p_direction = p_direction - origin; //TODO: write a -= operator for vec3
     p_direction.normalize();
     
 	printf("p_direction: %f %f %f\n",p_direction.x,p_direction.y,p_direction.z);
+    
+    vec3 x_unit;
+    vec3 y_unit;
+    
+    
+    vec3 up_vector = vec3 (0.0,1.0,0.0);
+    if (up_vector == p_direction)
+    {
+        up_vector = vec3(0.0, 0.0, -1.0);
+    }
+    
+    x_unit = p_direction.vecCross(up_vector);
+    
+    y_unit = x_unit.vecCross(p_direction);
 	
 	int fov = 60;
-	float factor = 1.0/((double(height)/2)/tan(fov*M_PI/360.0));
+	float factor = 1.0/((double(height)/2)/tan( fov * M_PI/360.0));
 		
 	cimg_forXY(*(image.buffer), i,j)
 	{
@@ -105,8 +122,9 @@ void cPathtracer::render(int width, int height)
 		rayt.o = origin;
 		
 		rayt.d = p_direction;
-		rayt.d.x += (-double(width)/2.0 + i)*factor;
-		rayt.d.y += -(-double(height)/2.0 + j)*factor;
+        rayt.d += ((-double(width)/2.0 + i)*factor) * x_unit;
+        rayt.d += (-(-double(height)/2.0 + j)*factor) * y_unit;
+        
 		rayt.intersection.hit = false;
         
         intersectScene(&rayt);

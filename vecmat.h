@@ -23,6 +23,9 @@ typedef struct vec3_t
     void normalize();
     vec3_t vecCross (const vec3_t b); //returns the cross product of two vectors
     void apply(const vec3_t b); //applies vector b to the 'this' vector by multiplying each component in 'this' to its counterpart in b
+    
+    //vector compound assignment
+    vec3_t& operator += (const vec3_t b);
 	
 } vec3;
 
@@ -31,7 +34,7 @@ typedef vec3 col3;
 
 
 
-
+//TODO: these should probably pass in references to the parameters for speed
 
 //standard vector addition
 vec3 operator + (const vec3 a, const vec3 b);
@@ -47,5 +50,6 @@ float operator * (const vec3 a, const vec3 b);
 vec3 operator * (const float a, const vec3 b);
 vec3 operator * (const vec3 b, const float a);
 
+bool operator == (const vec3 a, const vec3 b);
 
 #endif

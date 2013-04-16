@@ -41,4 +41,10 @@ vec3 operator - (const vec3 a) { return vec3(-a.data[0],-a.data[1],-a.data[2]);}
 float operator * (const vec3 a, const vec3 b){ return (a.data[0]*b.data[0] + a.data[1]*b.data[1] + a.data[2]*b.data[2]);}
 vec3 operator * (const float a, const vec3 b){ return vec3(a*b.data[0], a*b.data[1], a*b.data[2]);}
 vec3 operator * (const vec3 b, const float a){ return vec3(a*b.data[0], a*b.data[1], a*b.data[2]);}
- 
+
+vec3& vec3::operator+= (const vec3 b) {data[0] += b.data[0]; data[1] += b.data[1]; data[2] += b.data[2]; return *this;}
+
+bool operator == (const vec3 a, const vec3 b)
+{
+    return (a.data[0] == b.data[0] && a.data[1] == b.data[1] && a.data[2] == b.data[2]);
+}
