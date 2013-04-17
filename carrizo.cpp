@@ -1,7 +1,9 @@
 #include <cstdio>
 #include <cmath>
-#include "carrizo.h"
+
 #include "CImg.h"
+
+#include "carrizo.h"
 #include "rendModel.h"
 #include "cObject.h"
 #include "vecmat.h"

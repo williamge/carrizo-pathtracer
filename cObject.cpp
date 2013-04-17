@@ -7,12 +7,13 @@
 //
 
 #include <iostream>
-#include "rendModel.h"
-#include "cObject.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+
+#include "rendModel.h"
+#include "cObject.h"
 
 /* 
  Takes the cObject object and turns it in to a returned rendModel 
@@ -28,21 +29,21 @@ rendModel cObject::addToRender()
  */
 void cObject::makeCTRIANGLE()
 {
-    triangles = new objectTriangle[1];
-    triangle_count = 1;
+    triangles_ = new objectTriangle[1];
+    triangle_count_ = 1;
     
     objectTriangle triangle;
     triangle.vertices[0] = point3(0.0, 0.5, 0.0);
     triangle.vertices[1] = point3(-0.5, -0.5, 0.0);
     triangle.vertices[2] = point3(0.5, -0.5, 0.0);
     
-    triangles[0] = triangle;
+    triangles_[0] = triangle;
 }
 
 void cObject::makeCBOX()
 {
-    triangles = new objectTriangle[12];
-    triangle_count = 12;
+    triangles_ = new objectTriangle[12];
+    triangle_count_ = 12;
     
     //front side
     objectTriangle triangle1;
@@ -110,24 +111,24 @@ void cObject::makeCBOX()
     triangle12.vertices[1] = point3(0.5, 0.5, 0.5); //close top
     triangle12.vertices[2] = point3(0.5, -0.5, 0.5); //close bottom
     
-    triangles[0] = triangle1;
-    triangles[1] = triangle2;
-    triangles[2] = triangle3;
-    triangles[3] = triangle4;
-    triangles[4] = triangle5;
-    triangles[5] = triangle6;
-    triangles[6] = triangle7;
-    triangles[7] = triangle8;
-    triangles[8] = triangle9;
-    triangles[9] = triangle10;
-    triangles[10] = triangle11;
-    triangles[11] = triangle12;
+    triangles_[0] = triangle1;
+    triangles_[1] = triangle2;
+    triangles_[2] = triangle3;
+    triangles_[3] = triangle4;
+    triangles_[4] = triangle5;
+    triangles_[5] = triangle6;
+    triangles_[6] = triangle7;
+    triangles_[7] = triangle8;
+    triangles_[8] = triangle9;
+    triangles_[9] = triangle10;
+    triangles_[10] = triangle11;
+    triangles_[11] = triangle12;
 }
 
 void cObject::makeCTESTOBJECT()
 {
-    triangles = new objectTriangle[3];
-	triangle_count = 3;
+    triangles_ = new objectTriangle[3];
+	triangle_count_ = 3;
 	
     //left
 	objectTriangle triangle1;
@@ -135,7 +136,7 @@ void cObject::makeCTESTOBJECT()
 	triangle1.vertices[2] = point3(0.0, 0.1, -1.3);
 	triangle1.vertices[0] = point3(-0.1, -0.1, -1.3);
 	
-	triangles[0] = triangle1;
+	triangles_[0] = triangle1;
 	
 	//right top
 	objectTriangle triangle2;
@@ -143,7 +144,7 @@ void cObject::makeCTESTOBJECT()
 	triangle2.vertices[2] = point3(0.3, 0.1, -1.50);
 	triangle2.vertices[1]= point3(0.2, -0.1, -1.53);
 	
-	triangles[1] = triangle2;
+	triangles_[1] = triangle2;
     
     //right bottom
     objectTriangle triangle3;
@@ -151,7 +152,7 @@ void cObject::makeCTESTOBJECT()
 	triangle3.vertices[2] = point3(0.4, -0.1, -1.50);
 	triangle3.vertices[1]= point3(0.3, -0.3, -1.0);
 	
-	triangles[2] = triangle3;
+	triangles_[2] = triangle3;
 
 }
 
@@ -160,9 +161,9 @@ void cObject::makeCTESTOBJECT()
  */
 cObject::cObject(int option)
 {
-    translate_vector = vec3 (0.0, 0.0, 0.0);
-    rotate_vector = vec3(0.0, 0.0, 0.0);
-    scale_vector = vec3(1.0, 1.0, 1.0);
+    translate_vector_ = vec3 (0.0, 0.0, 0.0);
+    rotate_vector_ = vec3(0.0, 0.0, 0.0);
+    scale_vector_ = vec3(1.0, 1.0, 1.0);
     
     switch (option)
     {
@@ -185,9 +186,9 @@ cObject::cObject(int option)
  */
 cObject::cObject(const char *filename)
 {
-    translate_vector = vec3 (0.0, 0.0, 0.0);
-    rotate_vector = vec3(0.0, 0.0, 0.0);
-    scale_vector = vec3(1.0, 1.0, 1.0);
+    translate_vector_ = vec3 (0.0, 0.0, 0.0);
+    rotate_vector_ = vec3(0.0, 0.0, 0.0);
+    scale_vector_ = vec3(1.0, 1.0, 1.0);
     
     printf("Loading object from file [assimp]\n");
 
@@ -229,13 +230,13 @@ cObject::cObject(const char *filename)
                 temp_triangles.push_back(current_triangle);
             }
         }
-        triangles = new objectTriangle[temp_triangles.size()];
+        triangles_ = new objectTriangle[temp_triangles.size()];
         for (unsigned int i = 0; i < temp_triangles.size(); i++)
         {
-            triangles[i] = temp_triangles[i];
+            triangles_[i] = temp_triangles[i];
         }
-        triangle_count = temp_triangles.size();
-        printf("    Triangle count: %d\n", triangle_count);
+        triangle_count_ = temp_triangles.size();
+        printf("    Triangle count: %d\n", triangle_count_);
         printf("Finished making cObject from file [assimp]\n");
     }
     else
@@ -246,15 +247,15 @@ cObject::cObject(const char *filename)
 }
 void cObject::translate(vec3 trans_vec)
 {
-    translate_vector = trans_vec;
+    translate_vector_ = trans_vec;
 }
 void cObject::rotate(vec3 rotate_vec)
 {
-    rotate_vector = rotate_vec;
+    rotate_vector_ = rotate_vec;
 }
 void cObject::scale(vec3 scale_vec)
 {
-    scale_vector = scale_vec;
+    scale_vector_ = scale_vec;
 }
 void cObject::assignMaterial()
 {

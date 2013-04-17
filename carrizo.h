@@ -7,9 +7,12 @@
 
 #define cimg_use_png
 
-#include "CImg.h"
-#include "vecmat.h"
 #include <vector>
+
+#include "CImg.h"
+
+#include "vecmat.h"
+
 
 class cObject;
 class rendModel;

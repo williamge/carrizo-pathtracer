@@ -6,12 +6,14 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
+#include <iostream>
+#include <algorithm>
+
 #include "vecmat.h"
 #include "rendModel.h"
 #include "carrizo.h"
 #include "cObject.h"
-#include <iostream>
-#include <algorithm> 
+
 
 /*
  Given a bounding box and a point, boundsUnion expands the bounding box to include the 
@@ -47,9 +49,7 @@ BVHnode * rendModel::constructBVHSub(renderTriangle *triangle_list, std::vector<
     
     if (index_list.size() == 1)
     {
-        std::vector<int> triangle_list_;
-        triangle_list_.push_back( index_list[0] );
-        node->triangle_list = triangle_list_;
+        node->triangle_list = index_list;
         node->left = NULL;
         node->right = NULL;
         return node;
@@ -177,28 +177,30 @@ rendModel::rendModel(cObject * source_object)
 {
     printf("Creating rendModel\n");
     
-	triangles = new renderTriangle[source_object->triangle_count];
-	triangle_count = source_object->triangle_count;
+	triangles_ = new renderTriangle[source_object->triangle_count_];
+	triangle_count_ = source_object->triangle_count_;
     
-    struct bbox *bounding_boxes = new struct bbox[triangle_count];
+    struct bbox *bounding_boxes = new struct bbox[triangle_count_];
     
 	
-	for (int i=0;i<triangle_count;i++)
+	for (int i=0;i<triangle_count_;i++)
 	{
-		point3 p1 = source_object->triangles[i].vertices[0];
-		point3 p2 = source_object->triangles[i].vertices[1];
-		point3 p3 = source_object->triangles[i].vertices[2];
+		point3 p1 = source_object->triangles_[i].vertices[0];
+		point3 p2 = source_object->triangles_[i].vertices[1];
+		point3 p3 = source_object->triangles_[i].vertices[2];
+        
+        //TODO: make this more OOP friendly (i.e. source_object.getScaleVector() instead)
         
         //apply transformations to each point
-        p1.apply(source_object->scale_vector);
-        p2.apply(source_object->scale_vector);
-        p3.apply(source_object->scale_vector);
+        p1.apply(source_object->scale_vector_);
+        p2.apply(source_object->scale_vector_);
+        p3.apply(source_object->scale_vector_);
         
         //TODO: implement rotate transformation
         
-        p1 + source_object->translate_vector;
-        p2 + source_object->translate_vector;
-        p3 + source_object->translate_vector;
+        p1 + source_object->translate_vector_;
+        p2 + source_object->translate_vector_;
+        p3 + source_object->translate_vector_;
         
         //bounding boxes are defined by two points on opposite sides of the box
         bounding_boxes[i].low.x = std::min(p1.x, std::min(p2.x,p3.x));
@@ -212,19 +214,19 @@ rendModel::rendModel(cObject * source_object)
         bounding_boxes[i].centroid = 0.5 * (bounding_boxes[i].high + bounding_boxes[i].low);
         
 		
-		triangles[i].a = p1;
-		triangles[i].normal = (p2 - p1).vecCross(p3 - p1);
-		float nlength = triangles[i].normal * triangles[i].normal;
+		triangles_[i].a = p1;
+		triangles_[i].normal = (p2 - p1).vecCross(p3 - p1);
+		float nlength = triangles_[i].normal * triangles_[i].normal;
 		
-		triangles[i].u = (p3 - p1).vecCross(triangles[i].normal)
+		triangles_[i].u = (p3 - p1).vecCross(triangles_[i].normal)
 	    	* (1.0 / nlength);
-		triangles[i].v = triangles[i].normal.vecCross(p2 - p1)
+		triangles_[i].v = triangles_[i].normal.vecCross(p2 - p1)
     		* (1.0 / nlength);
 	}
     
     printf("    Creating BVH for rendModel\n");    
-    root = constructBVH(triangles, triangle_count, bounding_boxes);
-    if (!root)
+    root_ = constructBVH(triangles_, triangle_count_, bounding_boxes);
+    if (!root_)
     {
         exit(EXIT_FAILURE);
         //is this correct? can a rendmodel have no bvhnode? TODO: figure it out perhaps!
@@ -232,12 +234,12 @@ rendModel::rendModel(cObject * source_object)
     printf("    Finished creating BVH\n");
     
     printf("rendModel bounds: \n    low: %f, %f, %f \n      high: %f, %f, %f\n",
-           root->bounds.low.x,
-           root->bounds.low.y,
-           root->bounds.low.z,
-           root->bounds.high.x,
-           root->bounds.high.y,
-           root->bounds.high.z);
+           root_->bounds.low.x,
+           root_->bounds.low.y,
+           root_->bounds.low.z,
+           root_->bounds.high.x,
+           root_->bounds.high.y,
+           root_->bounds.high.z);
 }
 
 /*
@@ -297,7 +299,7 @@ bool rendModel::intersect(Ray& ray)
     
     BVHnode* curr_node;
     std::vector<BVHnode *> node_stack;
-    node_stack.push_back(root);
+    node_stack.push_back(root_);
     
     while (node_stack.size() > 0)
     {
@@ -335,15 +337,15 @@ bool rendModel::intersect(Ray& ray)
     {
         i = triangle_list[tri]; //take the index of the current triangle
 
-		float lengt = triangles[i].normal * triangles[i].normal;
+		float lengt = triangles_[i].normal * triangles_[i].normal;
         
-		float t1 = -triangles[i].u * triangles[i].a;
-		float t2 = -triangles[i].v * triangles[i].a;
+		float t1 = -triangles_[i].u * triangles_[i].a;
+		float t2 = -triangles_[i].v * triangles_[i].a;
 		
-		vec3 tnormal = triangles[i].normal *  (1.0/ sqrt(lengt));
+		vec3 tnormal = triangles_[i].normal *  (1.0/ sqrt(lengt));
 		
 		float denom = ray.d * tnormal;
-		float numer = (triangles[i].a - ray.o) * tnormal;
+		float numer = (triangles_[i].a - ray.o) * tnormal;
 		
 		if (denom == 0 || numer == 0)
 		{
@@ -354,9 +356,9 @@ bool rendModel::intersect(Ray& ray)
 		
 		vec3 point = ray.o + intersect_t * ray.d;
 		
-		float u = triangles[i].u * point + t1;
+		float u = triangles_[i].u * point + t1;
 		if (u < 0){ continue;}
-		float v = triangles[i].v * point + t2;
+		float v = triangles_[i].v * point + t2;
 		if (v < 0 || u+v > 1){continue;}
 		
 		if ( intersect_t > 0.0 

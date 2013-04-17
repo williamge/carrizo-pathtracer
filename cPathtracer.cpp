@@ -6,11 +6,12 @@
 //
 //
 
+#include <chrono>
+
 #include "cPathtracer.h"
 #include "cObject.h"
 #include "rendModel.h"
 
-#include <chrono>
 
 using namespace cimg_library;
 
@@ -38,7 +39,7 @@ using namespace cimg_library;
  */
 void cPathtracer::addObject(cObject *obj)
 {
-    objects.push_back(obj);
+    objects_.push_back(obj);
 }
 
 /*
@@ -48,9 +49,9 @@ void cPathtracer::addObject(cObject *obj)
 void cPathtracer::intersectScene(Ray * ray)
 {
 	
-	for (int i = 0; i < render_models.size(); i++)
+	for (int i = 0; i < render_models_.size(); i++)
 	{
-		render_models[i].intersect(*ray);
+		render_models_[i].intersect(*ray);
 	}
 }
 
@@ -63,11 +64,11 @@ void cPathtracer::intersectScene(Ray * ray)
 void cPathtracer::shadePixel(int i, int j, vec3 &direction_vector, vec3 &x_unit, vec3 &y_unit, float factor_)
 {
     Ray rayt;
-    rayt.o = camera.origin;
+    rayt.o = camera_.origin;
     
     rayt.d = direction_vector;
-    rayt.d += ((-double(image.width)/2.0 + i)*factor_) * x_unit;
-    rayt.d += (-(-double(image.height)/2.0 + j)*factor_) * y_unit;
+    rayt.d += ((-double(image_.width)/2.0 + i)*factor_) * x_unit;
+    rayt.d += (-(-double(image_.height)/2.0 + j)*factor_) * y_unit;
     
     rayt.intersection.hit = false;
     
@@ -76,19 +77,19 @@ void cPathtracer::shadePixel(int i, int j, vec3 &direction_vector, vec3 &x_unit,
     col3 normals_col = normalsShader(rayt);
     col3 depth_col = depthShader(rayt);
     
-    (*image.buffer)(i,j,0,0) = regular_col.r;
-    (*image.buffer)(i,j,0,1) = regular_col.g;
-    (*image.buffer)(i,j,0,2) = regular_col.b;
+    (*image_.buffer)(i,j,0,0) = regular_col.r;
+    (*image_.buffer)(i,j,0,1) = regular_col.g;
+    (*image_.buffer)(i,j,0,2) = regular_col.b;
     
-    (*image.normals_buffer)(i,j,0,0) = normals_col.r;
-    (*image.normals_buffer)(i,j,0,1) = normals_col.g;
-    (*image.normals_buffer)(i,j,0,2) = normals_col.b;
+    (*image_.normals_buffer)(i,j,0,0) = normals_col.r;
+    (*image_.normals_buffer)(i,j,0,1) = normals_col.g;
+    (*image_.normals_buffer)(i,j,0,2) = normals_col.b;
     
-    (*image.depth_buffer)(i,j,0,0) = depth_col.r;
-    (*image.depth_buffer)(i,j,0,1) = depth_col.g;
-    (*image.depth_buffer)(i,j,0,2) = depth_col.b;
+    (*image_.depth_buffer)(i,j,0,0) = depth_col.r;
+    (*image_.depth_buffer)(i,j,0,1) = depth_col.g;
+    (*image_.depth_buffer)(i,j,0,2) = depth_col.b;
     
-    if (i % 20  == 0 && j + 1 >= image.height)
+    if (i % 20  == 0 && j + 1 >= image_.height)
     {
         printf("Done line %i\n", i);
         fflush(stdout);
@@ -138,17 +139,17 @@ col3 cPathtracer::depthShader(Ray ray)
 void cPathtracer::render()
 {
     //TODO: examine moving this to its own function
-	for (int i = 0; i < objects.size(); i++)
+	for (int i = 0; i < objects_.size(); i++)
 	{
-		render_models.push_back( objects[i]->addToRender() );
+		render_models_.push_back( objects_[i]->addToRender() );
 	}
     
     //timing start
     auto start_time = std::chrono::high_resolution_clock::now();
     
     //p_direction starts with a point to point the camera at, then we make it the camera's direction vector
-	vec3 p_direction = camera.look_at;
-    p_direction = p_direction - camera.origin; //TODO: write a -= operator for vec3
+	vec3 p_direction = camera_.look_at;
+    p_direction = p_direction - camera_.origin; //TODO: write a -= operator for vec3
     p_direction.normalize();
     
 	printf("p_direction: %f %f %f\n",p_direction.x,p_direction.y,p_direction.z);
@@ -166,9 +167,9 @@ void cPathtracer::render()
     y_unit = x_unit.vecCross(p_direction);
 	
     //factor for "sensor" screen derived from fov, each ray for the render uses this number to set the fov
-	float factor = 1.0/((double(image.height)/2)/tan( camera.fov * M_PI/360.0));
+	float factor = 1.0/((double(image_.height)/2)/tan( camera_.fov * M_PI/360.0));
     
-	cimg_forXY(*(image.buffer), i,j)
+	cimg_forXY(*(image_.buffer), i,j)
 	{
 		shadePixel(i, j, p_direction, x_unit, y_unit, factor);
 	}
@@ -178,16 +179,16 @@ void cPathtracer::render()
     printf("Render time: %f seconds\n",std::chrono::duration_cast<std::chrono::milliseconds>(end_time-start_time).count() * 0.001);
     
     //done rendering so far, just display and save the render
-    CImgDisplay regular_display (*image.buffer, "Regular Shader");
-    CImgDisplay normals_display (*image.normals_buffer, "Normals Shader");
-    CImgDisplay depth_display (*image.depth_buffer, "Depth Shader");
+    CImgDisplay regular_display (*image_.buffer, "Regular Shader");
+    CImgDisplay normals_display (*image_.normals_buffer, "Normals Shader");
+    CImgDisplay depth_display (*image_.depth_buffer, "Depth Shader");
     
-    image.buffer->display(regular_display, true);
-    image.normals_buffer->display(normals_display, true);
-    image.depth_buffer->display(depth_display, true);
+    image_.buffer->display(regular_display, true);
+    image_.normals_buffer->display(normals_display, true);
+    image_.depth_buffer->display(depth_display, true);
     
-    image.buffer->normalize(0, 255);
-    image.buffer->save_png("output.png");
+    image_.buffer->normalize(0, 255);
+    image_.buffer->save_png("output.png");
 }
 
 /*
@@ -195,17 +196,17 @@ void cPathtracer::render()
  */
 void cPathtracer::setDimensions(int width, int height)
 {
-    image.width = width;
-	image.height = height;
+    image_.width = width;
+	image_.height = height;
     
-    if (image.buffer) {delete image.buffer;}
-    image.buffer = new CImg<float> (image.width, image.height, 1, 3);
+    if (image_.buffer) {delete image_.buffer;}
+    image_.buffer = new CImg<float> (image_.width, image_.height, 1, 3);
     
-    if (image.normals_buffer) {delete image.normals_buffer;}
-    image.normals_buffer = new CImg<float> (image.width, image.height, 1, 3);
+    if (image_.normals_buffer) {delete image_.normals_buffer;}
+    image_.normals_buffer = new CImg<float> (image_.width, image_.height, 1, 3);
     
-    if (image.depth_buffer) {delete image.depth_buffer;}
-    image.depth_buffer = new CImg<float> (image.width, image.height, 1, 3);
+    if (image_.depth_buffer) {delete image_.depth_buffer;}
+    image_.depth_buffer = new CImg<float> (image_.width, image_.height, 1, 3);
 }
 
 /*
@@ -213,14 +214,14 @@ void cPathtracer::setDimensions(int width, int height)
  */
 void cPathtracer::setCamera( point3 origin, point3 look_at, float fov)
 {
-    camera.origin = origin;
-    camera.look_at = look_at;
-    camera.fov = fov;
+    camera_.origin = origin;
+    camera_.look_at = look_at;
+    camera_.fov = fov;
 }
 
 cPathtracer::cPathtracer()
 {
-    image.buffer = NULL;
-    image.normals_buffer = NULL;
-    image.depth_buffer = NULL;
+    image_.buffer = NULL;
+    image_.normals_buffer = NULL;
+    image_.depth_buffer = NULL;
 }

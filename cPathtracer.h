@@ -10,12 +10,13 @@
 #define __carrizo_pathtracer__cPathtracer__
 
 #include <iostream>
+#include <vector>
 #define cimg_use_png
 
 #include "CImg.h"
+
 #include "vecmat.h"
 #include "carrizo.h"
-#include <vector>
 
 class cPathtracer{
 private:
@@ -23,17 +24,17 @@ private:
         point3 origin;
         point3 look_at;
         float fov;
-    } camera;
+    } camera_;
     
     struct{
         cimg_library::CImg<float> *buffer;
         cimg_library::CImg<float> *normals_buffer;
         cimg_library::CImg<float> *depth_buffer;
         int width, height;
-    } image;
+    } image_;
     
-    std::vector<cObject *> objects;
-    std::vector<rendModel> render_models;
+    std::vector<cObject *> objects_;
+    std::vector<rendModel> render_models_;
     
     void intersectScene(Ray* ray);
     void shadePixel(int i, int j, vec3 &direction_vector, vec3 &x_unit, vec3 &y_unit, float factor_);

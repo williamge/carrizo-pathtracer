@@ -10,6 +10,7 @@
 #define carrizo_pathtracer_rendModel_h
 
 #include <vector>
+
 #include "vecmat.h"
 #include "cObject.h"
 
@@ -37,12 +38,12 @@ typedef struct BVHnode_t {
 class rendModel
 {
 private:    
-    BVHnode *root;
+    BVHnode *root_;
     bbox boundsUnion(bbox box, point3 point);
     static bool boxIntersection(const bbox& b, const Ray& r, const vec3& inv_dir);
 public:
-    renderTriangle *triangles;
-    int triangle_count;
+    renderTriangle *triangles_;
+    unsigned int triangle_count_;
     rendModel(cObject * sourceObject);
     BVHnode * constructBVHSub(renderTriangle *triangle_list, std::vector<int> index_list, bbox *bounds_list);
     BVHnode * constructBVH(renderTriangle *triangle_list, int triangle_count, bbox *bounds_list);

@@ -23,11 +23,11 @@ typedef struct objecttriangle_t{
 class cObject
 {
 private:
-	objectTriangle *triangles; //why do we only count objectTriangle? should probably make a polygon thing too or something
-	unsigned int triangle_count;
-    vec3 translate_vector;
-    vec3 rotate_vector;
-    vec3 scale_vector;
+	objectTriangle *triangles_; //why do we only count objectTriangle? should probably make a polygon thing too or something
+	unsigned int triangle_count_;
+    vec3 translate_vector_;
+    vec3 rotate_vector_;
+    vec3 scale_vector_;
     
     void makeCTRIANGLE();
     void makeCBOX();
