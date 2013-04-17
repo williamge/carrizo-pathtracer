@@ -3,11 +3,11 @@
 
 ##What it is
 
-Right now, nothing really, what will it be one day? A nice pathtracer written in C++, basically a raytracer that doesn't stop at the first bounce or so arbitrarily but considers the path of each ray of light to better model the lighting.
+A nice pathtracer written in C++, basically a raytracer that doesn't stop at the first bounce or so arbitrarily but considers the path of each ray of light to better model the lighting.
 
 ##What it does
 
-So far it can create and traverse BVH structures, and compute intersections for triangles, but there's nothing set up to load objects or to shade them.
+So far it can create and traverse BVH structures, compute intersections for triangles, import models by file, and then shade them from their vector normals and depth, not actually shading them mind you but creating images shaded with those two things.
 
 ###File listing and Installation Notes
 - **/image log/** : A listing of pictures rendered by the program over time
@@ -20,14 +20,19 @@ So far it can create and traverse BVH structures, and compute intersections for 
 - **UML - Class.png** : A UML Class diagram for the project, right now it is a bit out of date.
 - **vecmat.[cpp/h]** : Vector math definitions for the project, simple stuff like defining a 3D vector and the equivalent operations.
 
-The project uses the *CImg* library for image processing tasks, a copy of this library is included with the project. *CImg* requires the pthread library and *X11* or *GDI* to be available for the compilation of the program. *libpng* and *zlib* is required for saving and loading image files. *cmath* is required by the program, for obvious math reasons.
+The project uses the *CImg* library for image processing tasks, a copy of this library is included with the project. *CImg* requires the pthread library and *X11* or *GDI* to be available for the compilation of the program. *libpng* and *zlib* is required for saving and loading image files. 
+
+The *Open Asset Importing Library* is used to import 3D assets into the program, it must be linked and included to the program, a copy is not supplied.
+
+*cmath* is required by the program, for obvious math reasons.
 
 ###List of things implemented
 - Basic backend for rendering
 - BVH creation
 - BVH traversal
 - Ray intersection
+- Importing models/assets by file
 
 ###Next steps to take
 - Unit tests
-- Hook up the asset importer so there's something to see
+- Materials and shading
