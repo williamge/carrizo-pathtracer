@@ -15,3 +15,7 @@ The same scene but with the depth rendered instead of the normal vectors, just t
 ![image](https://bitbucket.org/williamg/carrizo-pathtracer/raw/fe551aeb723d491d333e429c071eb08874360e37/image%20log/2013-04-17-01.png)
 
 Importing models by file was implemented. This model is made up of about 12k triangles.
+
+![image](https://bitbucket.org/williamg/carrizo-pathtracer/raw/b98d310205fbe6b77795c59e364c90ba8c5db4f0/image%20log/2013-04-17-02.png)
+
+The same day I also remembered that vertex normals were a thing and decided to interpolate them so there's some nice smoothing on low-poly models.
