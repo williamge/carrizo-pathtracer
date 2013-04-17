@@ -13,7 +13,7 @@
 
 class rendModel;
 
-enum {CTRIANGLE, CBOX};
+enum {CTRIANGLE, CBOX, CTESTOBJECT};
 
 typedef struct objecttriangle_t{
 	point3 vertices[3];
@@ -23,14 +23,15 @@ typedef struct objecttriangle_t{
 class cObject
 {
 private:
-	objectTriangle *triangles;
-	int triangle_count;
+	objectTriangle *triangles; //why do we only count objectTriangle? should probably make a polygon thing too or something
+	unsigned int triangle_count;
     vec3 translate_vector;
     vec3 rotate_vector;
     vec3 scale_vector;
     
     void makeCTRIANGLE();
     void makeCBOX();
+    void makeCTESTOBJECT();
 public:
     cObject(int option);
     cObject(const char *filename);
