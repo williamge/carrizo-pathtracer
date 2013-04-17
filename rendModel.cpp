@@ -11,47 +11,39 @@
 #include "carrizo.h"
 #include "cObject.h"
 #include <iostream>
+#include <algorithm> 
 
 /*
-
-Ttility functions for finding the minimum and maximum of two numbers.
-TODO: put this somewhere where it would make more sense to be.
-
+ Given a bounding box and a point, boundsUnion expands the bounding box to include the 
+ point if necessary, then returns the new box.
 */
-float min(const float a, const float b)
+bbox rendModel::boundsUnion(bbox box, point3 point)
 {
-    if (a > b)
-    {
-        return b;
-    }
-    return a;
-}
-
-float max(const float a, const float b)
-{
-    if (a > b)
-    {
-        return a;
-    }
-    return b;
+    box.low.x = std::min(box.low.x, point.x);
+    box.low.y = std::min(box.low.y, point.y);
+    box.low.z = std::min(box.low.z, point.z);
+    
+    box.high.x = std::max(box.high.x, point.x);
+    box.high.y = std::max(box.high.y, point.y);
+    box.high.z = std::max(box.high.z, point.z);
+    
+    return box;
 }
 
 /*
-
 Creates a Bounding Volume Hierarchy node, doing the actual processing as 
 opposed to "constructBVH(...)"
-
 */
 BVHnode * rendModel::constructBVHSub(renderTriangle *triangle_list, std::vector<int> index_list, bbox *bounds_list)
 {
     BVHnode *node = new BVHnode;
-    node->bounds.low.x = bounds_list[index_list[0]].low.x;
-    node->bounds.low.y = bounds_list[index_list[0]].low.y;
-    node->bounds.low.z = bounds_list[index_list[0]].low.z;
     
-    node->bounds.high.x = bounds_list[index_list[0]].high.x;
-    node->bounds.high.y = bounds_list[index_list[0]].high.y;
-    node->bounds.high.z = bounds_list[index_list[0]].high.z;
+    bbox centroid_bounds; //bounding box for the centroids of primitives in the index_list
+    centroid_bounds.low = bounds_list[index_list[0]].centroid;
+    centroid_bounds.high = bounds_list[index_list[0]].centroid;
+    
+    node->bounds.low = bounds_list[index_list[0]].low;
+    node->bounds.high = bounds_list[index_list[0]].high;
     
     if (index_list.size() == 1)
     {
@@ -65,48 +57,45 @@ BVHnode * rendModel::constructBVHSub(renderTriangle *triangle_list, std::vector<
     
     for (int i = 0; i < index_list.size(); i++)
     {
-        node->bounds.low.x = min(node->bounds.low.x, bounds_list[index_list[i]].low.x);
-        node->bounds.low.y = min(node->bounds.low.y, bounds_list[index_list[i]].low.y);
-        node->bounds.low.z = min(node->bounds.low.z, bounds_list[index_list[i]].low.z);
+        centroid_bounds = boundsUnion(centroid_bounds, bounds_list[index_list[i]].centroid);
         
-        node->bounds.high.x = max(node->bounds.high.x, bounds_list[index_list[i]].high.x);
-        node->bounds.high.y = max(node->bounds.high.y, bounds_list[index_list[i]].high.y);
-        node->bounds.high.z = max(node->bounds.high.z, bounds_list[index_list[i]].high.z);
+        node->bounds = boundsUnion(node->bounds, bounds_list[index_list[i]].low);
+        node->bounds = boundsUnion(node->bounds, bounds_list[index_list[i]].high);
     }
 
     //determine the axis to split the current volume by, represented by "dim"
-    
+
     float split;
     int dim;    
 
     //determine the biggest splits to split the volume by
-    if (node->bounds.high.x - node->bounds.low.x > node->bounds.high.y - node->bounds.low.y)
+    if (centroid_bounds.high.x - centroid_bounds.low.x > centroid_bounds.high.y - centroid_bounds.low.y)
     {
-        if (node->bounds.high.x - node->bounds.low.x > node->bounds.high.z - node->bounds.low.z)
+        if (centroid_bounds.high.x - centroid_bounds.low.x > centroid_bounds.high.z - centroid_bounds.low.z)
         {
             dim = 0;
-            split = node->bounds.high.x - node->bounds.low.x;
+            split = centroid_bounds.low.x + centroid_bounds.high.x;
         }
         else
         {   dim = 2;
-            split = node->bounds.high.z - node->bounds.low.z;
+            split = centroid_bounds.low.z + centroid_bounds.high.z;
         }
     }
     else
     {
-        if (node->bounds.high.y - node->bounds.low.y > node->bounds.high.z - node->bounds.low.z)
+        if (centroid_bounds.high.y - centroid_bounds.low.y > centroid_bounds.high.z - centroid_bounds.low.z)
         {
             dim = 1;
-            split = node->bounds.high.y - node->bounds.low.y;
+            split = centroid_bounds.low.y + centroid_bounds.high.y;
         }
         else
         {
             dim = 2;
-            split = node->bounds.high.z - node->bounds.low.z;
+            split = centroid_bounds.low.z + centroid_bounds.high.z;
         }
     }
     
-    split = 0.5 * split;
+    split *= 0.5;
     
     //store each child volume in either the left or right node, like a binary tree
     std::vector<int> left_index;
@@ -116,42 +105,38 @@ BVHnode * rendModel::constructBVHSub(renderTriangle *triangle_list, std::vector<
     for (int i = 0; i < index_list.size(); i++)
     {
         bbox curr_bound = bounds_list[index_list[i]];
-        if (curr_bound.low.data[dim] <= node->bounds.low.data[dim] + split)
-        {
-            left_index.push_back(i);
-        }
-        else if (curr_bound.high.data[dim] >= node->bounds.low.data[dim] + split)
-        {
-            right_index.push_back(i);
-        }
-    }    
-    //TODO: make sure that is supposed to be an else if and not an if up above
 
-    //check to see if the BVH changed anything, stop right here if it didn't
-    if (left_index.size() == index_list.size() || right_index.size() == index_list.size())
-    {
-        node->left = NULL;
-        node->right = NULL;
-        node->triangle_list = index_list;
-    }
-    else
-    {
-        if (left_index.size() > 0)
+        point3 triangle_centroid = curr_bound.low + curr_bound.high;
+        triangle_centroid = triangle_centroid * 0.5;
+        
+        if (triangle_centroid.data[dim] < split)
         {
-            node->left = constructBVHSub(triangle_list, left_index, bounds_list);         
+            left_index.push_back(index_list[i]);
         }
         else
         {
-            node->left = NULL;
+            right_index.push_back(index_list[i]);
+        }
+    }
+    
+    node->left = NULL;
+    node->right = NULL;    
+    
+    if (centroid_bounds.low.data[dim] == centroid_bounds.high.data[dim])
+    {
+        node->triangle_list = index_list;
+    }
+    else
+    {        
+        if (left_index.size() > 0)
+        {
+            node->left = constructBVHSub(triangle_list, left_index, bounds_list);         
         }
         if (right_index.size() > 0)
         {
             node->right = constructBVHSub(triangle_list, right_index, bounds_list);
         }
-        else
-        {
-            node->right = NULL;
-        }
+
     }
     
     return node;    
@@ -190,7 +175,8 @@ such as uv coordinates for the intersection plane and the normal.
 */
 rendModel::rendModel(cObject * source_object)
 {
-    //rendModel(objectTriangle *tris, int tri_count);
+    printf("Creating rendModel\n");
+    
 	triangles = new renderTriangle[source_object->triangle_count];
 	triangle_count = source_object->triangle_count;
     
@@ -215,13 +201,15 @@ rendModel::rendModel(cObject * source_object)
         p3 + source_object->translate_vector;
         
         //bounding boxes are defined by two points on opposite sides of the box
-        bounding_boxes[i].low.x = min(p1.x, min(p2.x,p3.x));
-        bounding_boxes[i].low.y = min(p1.y, min(p2.y,p3.y));
-        bounding_boxes[i].low.z = min(p1.z, min(p2.z,p3.z));
+        bounding_boxes[i].low.x = std::min(p1.x, std::min(p2.x,p3.x));
+        bounding_boxes[i].low.y = std::min(p1.y, std::min(p2.y,p3.y));
+        bounding_boxes[i].low.z = std::min(p1.z, std::min(p2.z,p3.z));
         
-        bounding_boxes[i].high.x = max(p1.x, max(p2.x,p3.x));
-        bounding_boxes[i].high.y = max(p1.y, max(p2.y,p3.y));
-        bounding_boxes[i].high.z = max(p1.z, max(p2.z,p3.z));
+        bounding_boxes[i].high.x = std::max(p1.x, std::max(p2.x,p3.x));
+        bounding_boxes[i].high.y = std::max(p1.y, std::max(p2.y,p3.y));
+        bounding_boxes[i].high.z = std::max(p1.z, std::max(p2.z,p3.z));
+        
+        bounding_boxes[i].centroid = 0.5 * (bounding_boxes[i].high + bounding_boxes[i].low);
         
 		
 		triangles[i].a = p1;
@@ -234,7 +222,22 @@ rendModel::rendModel(cObject * source_object)
     		* (1.0 / nlength);
 	}
     
+    printf("    Creating BVH for rendModel\n");    
     root = constructBVH(triangles, triangle_count, bounding_boxes);
+    if (!root)
+    {
+        exit(EXIT_FAILURE);
+        //is this correct? can a rendmodel have no bvhnode? TODO: figure it out perhaps!
+    }
+    printf("    Finished creating BVH\n");
+    
+    printf("rendModel bounds: \n    low: %f, %f, %f \n      high: %f, %f, %f\n",
+           root->bounds.low.x,
+           root->bounds.low.y,
+           root->bounds.low.z,
+           root->bounds.high.x,
+           root->bounds.high.y,
+           root->bounds.high.z);
 }
 
 /*
@@ -245,27 +248,27 @@ rendModel::rendModel(cObject * source_object)
     http://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm
   
  */
-bool rendModel::boxIntersection(bbox b, Ray ray, vec3 inv_dir)
+bool rendModel::boxIntersection(const bbox& b, const Ray& ray, const vec3& inv_dir)
 {
     double tx1 = (b.low.x - ray.o.x) * inv_dir.x;
     double tx2 = (b.high.x - ray.o.x) * inv_dir.x;
     
-    double tmin = min(tx1, tx2);
-    double tmax = max(tx1, tx2);
+    double tmin = std::min(tx1, tx2);
+    double tmax = std::max(tx1, tx2);
     
     double ty1 = (b.low.y - ray.o.y) * inv_dir.y;
     double ty2 = (b.high.y - ray.o.y) * inv_dir.y;
     
-    tmin = max(tmin, min(ty1,ty2));
-    tmax = min(tmax, max(ty1,ty2));
+    tmin = std::max(tmin, std::min(ty1,ty2));
+    tmax = std::min(tmax, std::max(ty1,ty2));
     
     double tz1 = (b.low.z - ray.o.z) * inv_dir.z;
     double tz2 = (b.high.z - ray.o.z) * inv_dir.z;
     
-    tmin = max(tmin, min(tz1, tz2));
-    tmax = min(tmax, max(tz1, tz2));
+    tmin = std::max(tmin, std::min(tz1, tz2));
+    tmax = std::min(tmax, std::max(tz1, tz2));
     
-    return (tmax >= max(0.0, tmin));
+    return (tmax >= std::max(0.0, tmin));
 }
 
 /*
@@ -280,14 +283,8 @@ bool rendModel::intersect(Ray& ray)
     
     //bvh traversal
     
-    if (!root)
-    {
-        return false;
-    }
-    
     //this looks like it should fail from divide by zero, but for reasons it doesn't, enjoy!
-    vec3 inv_dir (1.0 / ray.d.x, 1.0 / ray.d.y, 1.0 / ray.d.z);
-    
+    vec3 inv_dir (1.0 / ray.d.x, 1.0 / ray.d.y, 1.0 / ray.d.z);    
     
     /*
      gameplan: start from root BVHnode, add each child node (left and right), each time taking one node 
@@ -298,11 +295,10 @@ bool rendModel::intersect(Ray& ray)
     
     std::vector<int> triangle_list;
     
-    BVHnode * curr_node;
+    BVHnode* curr_node;
     std::vector<BVHnode *> node_stack;
     node_stack.push_back(root);
     
-
     while (node_stack.size() > 0)
     {
         //hey why do we go through all of this instead of starting from the front?
@@ -314,12 +310,9 @@ bool rendModel::intersect(Ray& ray)
         if (boxIntersection(curr_node->bounds, ray, inv_dir))
         {
             //add all the triangles (if the node has them) to a vector for later
-            if (curr_node->triangle_list.size() > 0)
+            for (int tri=0; tri < curr_node->triangle_list.size(); tri++)
             {
-                for (int tri=0; tri < curr_node->triangle_list.size(); tri++)
-                {
-                    triangle_list.push_back(curr_node->triangle_list[tri]);
-                }
+                triangle_list.push_back(curr_node->triangle_list[tri]);
             }
             
             if (curr_node->left)
@@ -380,6 +373,7 @@ bool rendModel::intersect(Ray& ray)
              way in a pathtracer, so if we hit that side let's reverse the normal so we can treat that triangle as a 
              front-face instead and get correct shading.
              */
+            
             if (ray.d * tnormal < 0.0)
             {
                 ray.intersection.normal = tnormal;
