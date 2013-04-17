@@ -10,6 +10,8 @@
 #include "cObject.h"
 #include "rendModel.h"
 
+#include <chrono>
+
 using namespace cimg_library;
 
 /*
@@ -85,6 +87,12 @@ void cPathtracer::shadePixel(int i, int j, vec3 &direction_vector, vec3 &x_unit,
     (*image.depth_buffer)(i,j,0,0) = depth_col.r;
     (*image.depth_buffer)(i,j,0,1) = depth_col.g;
     (*image.depth_buffer)(i,j,0,2) = depth_col.b;
+    
+    if (i % 20  == 0 && j + 1 >= image.height)
+    {
+        printf("Done line %i\n", i);
+        fflush(stdout);
+    }
 }
 
 /* The regular default shader for a ray in the scene, takes in ray, returns the colour for that ray
@@ -135,6 +143,9 @@ void cPathtracer::render()
 		render_models.push_back( objects[i]->addToRender() );
 	}
     
+    //timing start
+    auto start_time = std::chrono::high_resolution_clock::now();
+    
     //p_direction starts with a point to point the camera at, then we make it the camera's direction vector
 	vec3 p_direction = camera.look_at;
     p_direction = p_direction - camera.origin; //TODO: write a -= operator for vec3
@@ -162,6 +173,10 @@ void cPathtracer::render()
 		shadePixel(i, j, p_direction, x_unit, y_unit, factor);
 	}
     
+    auto end_time = std::chrono::high_resolution_clock::now();
+    
+    printf("Render time: %f seconds\n",std::chrono::duration_cast<std::chrono::milliseconds>(end_time-start_time).count() * 0.001);
+    
     //done rendering so far, just display and save the render
     CImgDisplay regular_display (*image.buffer, "Regular Shader");
     CImgDisplay normals_display (*image.normals_buffer, "Normals Shader");
@@ -173,7 +188,6 @@ void cPathtracer::render()
     
     image.buffer->normalize(0, 255);
     image.buffer->save_png("output.png");
-    
 }
 
 /*
