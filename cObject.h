@@ -17,6 +17,7 @@ enum {CTRIANGLE, CBOX, CTESTOBJECT};
 
 typedef struct objecttriangle_t{
 	point3 vertices[3];
+    vec3 vertex_normal[3];
 	
 } objectTriangle;
 

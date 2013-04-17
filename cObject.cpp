@@ -227,6 +227,19 @@ cObject::cObject(const char *filename)
                       current_mesh->mVertices[ face.mIndices[2] ].y,
                       current_mesh->mVertices[ face.mIndices[2] ].z);
                 
+                current_triangle.vertex_normal[0] =
+                vec3 (current_mesh->mNormals [ face.mIndices[0] ].x,
+                      current_mesh->mNormals[ face.mIndices[0] ].y,
+                      current_mesh->mNormals[ face.mIndices[0] ].z);
+                current_triangle.vertex_normal[1] =
+                vec3 (current_mesh->mNormals[ face.mIndices[1] ].x,
+                      current_mesh->mNormals[ face.mIndices[1] ].y,
+                      current_mesh->mNormals[ face.mIndices[1] ].z);
+                current_triangle.vertex_normal[2] =
+                vec3 (current_mesh->mNormals[ face.mIndices[2] ].x,
+                      current_mesh->mNormals[ face.mIndices[2] ].y,
+                      current_mesh->mNormals[ face.mIndices[2] ].z);
+                
                 temp_triangles.push_back(current_triangle);
             }
         }

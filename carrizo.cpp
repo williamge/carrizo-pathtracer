@@ -25,9 +25,12 @@ int main(int argc, const char* argv[])
     //pt.addObject(model2);
     
     cObject *model3 = new cObject("/Users/william/Downloads/assimp-master/test/models/NFF/NFF/cone.nff");
+    cObject *model4 = new cObject("/Users/william/Downloads/assimp-master/test/models/OBJ/spider.obj");
     //model3->scale(vec3(10.0, 10.0, 10.0));
-    pt.addObject(model3);
-	
+    //pt.addObject(model3);
+    
+	pt.addObject(model4);
+    
 	/* prototype start *
 	
 	cObject *model1 ("filename");
@@ -42,8 +45,9 @@ int main(int argc, const char* argv[])
 	* prototype end */
 	
 	pt.setDimensions(640,480);
-    //pt.setCamera( point3(-0.5, 0.5, 1.0), point3(0.0,0.0,0.0), 60.0);
-    pt.setCamera( point3(30.0, 30.0, 30.0), point3(0.0,0.0,0.0), 60.0);
+    //pt.setCamera( point3(-0.5, 0.5, 1.0), point3(0.0,0.0,0.0), 60.0); //test scene
+    //pt.setCamera( point3(30.0, 30.0, 30.0), point3(0.0,0.0,0.0), 60.0); //cone
+    pt.setCamera( point3(200.0, 200.0, 200.0), point3(0.0,0.0,0.0), 55.0); //spider
 	pt.render();
 	return 1;
 }

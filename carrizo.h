@@ -35,6 +35,7 @@ typedef struct renderTriangle_t{
 	point3 a;
 	vec3 u, v;
 	vec3 normal; //or vec3 normal[3] to interpolate along normals
+    vec3 vertex_normals[3];
 	//material *mat;
 } renderTriangle;
 

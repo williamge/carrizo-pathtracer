@@ -222,6 +222,10 @@ rendModel::rendModel(cObject * source_object)
 	    	* (1.0 / nlength);
 		triangles_[i].v = triangles_[i].normal.vecCross(p2 - p1)
     		* (1.0 / nlength);
+        
+        triangles_[i].vertex_normals[0] = source_object->triangles_[i].vertex_normal[0];
+        triangles_[i].vertex_normals[1] = source_object->triangles_[i].vertex_normal[1];
+        triangles_[i].vertex_normals[2] = source_object->triangles_[i].vertex_normal[2];
 	}
     
     printf("    Creating BVH for rendModel\n");    
@@ -369,20 +373,27 @@ bool rendModel::intersect(Ray& ray)
             
             ray.intersection.t_value = intersect_t;
             ray.intersection.point = point;
+
+            //interpolate the normal for the point from the vertex normals
+            vec3 vertex1_normal = triangles_[i].vertex_normals[0];
+            vec3 vertex2_normal = triangles_[i].vertex_normals[1];
+            vec3 vertex3_normal = triangles_[i].vertex_normals[2];
+            ray.intersection.normal = (1.0 - (u + v)) * vertex1_normal + vertex2_normal * u + vertex3_normal * v;
+            ray.intersection.normal.normalize();
+            
             /*
-             If the dot product is less than 0 then we're hitting the front-face, if it's higher than 0 then we're 
-             hitting the back-face. I don't want to only hit front-faces because there's no real reason to do it that 
-             way in a pathtracer, so if we hit that side let's reverse the normal so we can treat that triangle as a 
+             If the dot product is less than 0 then we're hitting the front-face, if it's higher than 0 then we're
+             hitting the back-face. I don't want to only hit front-faces because there's no real reason to do it that
+             way in a pathtracer, so if we hit that side let's reverse the normal so we can treat that triangle as a
              front-face instead and get correct shading.
              */
-            
             if (ray.d * tnormal < 0.0)
             {
-                ray.intersection.normal = tnormal;
+                ray.intersection.normal = ray.intersection.normal;
             }
             else
             {
-                ray.intersection.normal = -tnormal;
+                ray.intersection.normal = -ray.intersection.normal;
             }
             ray.intersection.hit = true;
 		}
