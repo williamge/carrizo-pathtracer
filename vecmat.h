@@ -37,19 +37,19 @@ typedef vec3 col3;
 //TODO: these should probably pass in references to the parameters for speed
 
 //standard vector addition
-vec3 operator + (const vec3 a, const vec3 b);
-vec3 operator + (const float a, const vec3 b);
-vec3 operator + (const vec3 a, const float b);
+vec3 operator + (const vec3& a, const vec3& b);
+vec3 operator + (const float& a, const vec3& b);
+vec3 operator + (const vec3& a, const float& b);
 //standard vector subtraction
-vec3 operator - (const vec3 a, const vec3 b);
-vec3 operator - (const vec3 a, const float b);
-vec3 operator - (const vec3 a) ;
+vec3 operator - (const vec3& a, const vec3& b);
+vec3 operator - (const vec3& a, const float& b);
+vec3 operator - (const vec3& a) ;
 //vector dot product
-float operator * (const vec3 a, const vec3 b);
+float operator * (const vec3 &a, const vec3 &b);
 //vector-scalar multiplication
-vec3 operator * (const float a, const vec3 b);
-vec3 operator * (const vec3 b, const float a);
+vec3 operator * (const float& a, const vec3& b);
+vec3 operator * (const vec3& b, const float& a);
 
-bool operator == (const vec3 a, const vec3 b);
+bool operator == (const vec3& a, const vec3& b);
 
 #endif
