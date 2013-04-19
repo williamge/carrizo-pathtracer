@@ -14,6 +14,7 @@
 #include "rendModel.h"
 #include "carrizo.h"
 #include "cObject.h"
+#include "material.h"
 
 
 /*
@@ -297,6 +298,10 @@ bool rendModel::boxIntersection(const bbox& b, const Ray& ray, const vec3& inv_d
     return (tmax >= std::max(0.0, tmin));
 }
 
+/* Traverses the BVH with root node "start" by ray "ray". The resulting triangles to be 
+ intersected are stored in "triangle_list_out", which must be defined and passed to bvhTraversal 
+ by the caller of the function.
+ */
 void rendModel::bvhTraversal(BVHnode* start, Ray &ray, std::vector<int> &triangle_list_out)
 {
     /*

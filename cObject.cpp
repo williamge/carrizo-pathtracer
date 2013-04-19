@@ -15,6 +15,7 @@
 
 #include "rendModel.h"
 #include "cObject.h"
+#include "material.h"
 
 /* 
  Takes the cObject object and turns it in to a returned rendModel 
