@@ -13,15 +13,27 @@
 
 #include "vecmat.h"
 #include "cObject.h"
+#include "ray.h"
 
-struct renderTriangle_t;
-typedef struct renderTriangle_t renderTriangle;
-
-struct ray_t;
-typedef struct ray_t Ray;
-
-struct objecttriangle_t;
-typedef struct objecttriangle_t objectTriangle;
+/*
+ -don't group the triangles, one triangle set per object, materials are per triangle
+ as any other way of identifying what they should look like either uses an index in the triangle
+ (which takes as much space as a pointer to a material) or wouldn't work well with a kd-tree
+ 
+ 3*4*3 + 3*12 + 4 = 76
+ u,v and normal = 12 + 12 + 12
+ 
+ ray triangle interesection takes u, v and normal, which are 3*3*4 bytes,
+ 
+ 3 vertices, 3 vertex normals, u v and normal = 112 bytes = aligned */
+typedef struct renderTriangle_t{
+	//point3 vertices[3];
+	point3 a;
+	vec3 u, v;
+	vec3 normal;
+    vec3 vertex_normals[3];
+	//material *mat;
+} renderTriangle;
 
 struct bbox {
     point3 low, high, centroid;
