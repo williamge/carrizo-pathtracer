@@ -22,8 +22,16 @@
 #define M_PI 3.14159
 #endif
 
+const int MAX_PASS_NUMBER = 32;
+
 class rendModel;
 class cObject;
+
+typedef struct camera_vectors_t {
+    vec3 direction_vector;
+    vec3 x_unit;
+    vec3 y_unit;
+} camera_vectors;
 
 class cPathtracer{
 private:
@@ -43,12 +51,18 @@ private:
     std::vector<cObject*> objects_;
     std::vector<rendModel> render_models_;
     
+    unsigned int pass_number_;
+    
     void intersectScene(Ray* ray);
-    void shadePixel(int i, int j, vec3 &direction_vector, vec3 &x_unit, vec3 &y_unit, double factor_);
+    static void setImage(cimg_library::CImg<double> *image, int i, int j, col3& colour, unsigned int pass_number);
+    void shadePixel(int i, int j, camera_vectors &render_vectors, double factor);
     
     col3 regularShader(Ray ray);
     col3 normalsShader(Ray ray);
     col3 depthShader(Ray ray);
+    
+    bool readyObjects();
+    void renderPass(camera_vectors &render_vectors);
 	
 public:
     cPathtracer();
