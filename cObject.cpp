@@ -237,29 +237,29 @@ void cObject::makeCTESTOBJECT()
 	
 	//right top
 	objectTriangle triangle2;
-	vertices_[0] = point3(-0.2, 0.1, -1.55);
-	vertices_[2] = point3(0.3, 0.1, -1.50);
-	vertices_[1] = point3(0.2, -0.1, -1.53);
+	vertices_[3] = point3(-0.2, 0.1, -1.55);
+	vertices_[5] = point3(0.3, 0.1, -1.50);
+	vertices_[4] = point3(0.2, -0.1, -1.53);
     
     triangle2.vertices[0] = 3;
 	triangle2.vertices[2] = 4;
 	triangle2.vertices[1] = 5;
 	
-    triangle1.vertex_normals = false;
+    triangle2.vertex_normals = false;
     
 	triangles_[1] = triangle2;
     
     //right bottom
     objectTriangle triangle3;
-	vertices_[0] = point3(-0.1, -0.15, -1.55);
-	vertices_[2] = point3(0.4, -0.1, -1.50);
-	vertices_[1] = point3(0.3, -0.3, -1.0);
+	vertices_[6] = point3(-0.1, -0.15, -1.55);
+	vertices_[8] = point3(0.4, -0.1, -1.50);
+	vertices_[7] = point3(0.3, -0.3, -1.0);
     
     triangle3.vertices[0] = 6;
 	triangle3.vertices[2] = 7;
 	triangle3.vertices[1] =  8;
     
-    triangle1.vertex_normals = false;
+    triangle3.vertex_normals = false;
 	
 	triangles_[2] = triangle3;
     
