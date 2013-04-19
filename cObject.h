@@ -18,6 +18,7 @@ enum {CTRIANGLE, CBOX, CTESTOBJECT};
 typedef struct objecttriangle_t{
 	unsigned int vertices[3];
     unsigned int vertex_normal[3];
+    bool vertex_normals;
 	
 } objectTriangle;
 
@@ -47,10 +48,19 @@ public:
     void assignMaterial();	
     rendModel addToRender();
     
-    //for interfacing with other classes
+    point3 getVertex(unsigned int vertex);
+    vec3 getVertexNormal(unsigned int vertex);
     
+    unsigned int getNumTriangle();
     
-    friend class rendModel;
+    vec3 getTranslate();
+    vec3 getRotate();
+    vec3 getScale();
+    
+    objectTriangle * begin() {return &triangles_[0];}
+    objectTriangle * end() {return &triangles_[triangle_count_];}
+    
+
 };
 
 #endif

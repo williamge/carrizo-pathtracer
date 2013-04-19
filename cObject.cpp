@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include <assert.h>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -45,9 +46,7 @@ void cObject::makeCTRIANGLE()
     triangle.vertices[1] = 1;
     triangle.vertices[2] = 2;
     
-    triangle.vertex_normal[0] = 0;
-    triangle.vertex_normal[1] = 0;
-    triangle.vertex_normal[2] = 0;
+    triangle.vertex_normals = false;
     
     triangles_[0] = triangle;
 }
@@ -115,14 +114,14 @@ void cObject::makeCBOX()
     triangle1.vertices[1] = 1; //bottom left
     triangle1.vertices[2] = 2; //top right
     
-    triangle1.vertex_normal[0] = triangle1.vertex_normal[1] = triangle1.vertex_normal[2] = -1;
+    triangle1.vertex_normals = false;
     
     objectTriangle triangle2;
     triangle2.vertices[0] = 3; //top right
     triangle2.vertices[1] = 4; //bottom left
     triangle2.vertices[2] = 5; //bottom right
     
-    triangle2.vertex_normal[0] = triangle1.vertex_normal[1] = triangle1.vertex_normal[2] = -1;
+    triangle2.vertex_normals = false;
     
     //back side
     objectTriangle triangle3;
@@ -130,14 +129,14 @@ void cObject::makeCBOX()
     triangle3.vertices[1] = 7; //bottom left
     triangle3.vertices[2] = 8; //top right
     
-    triangle3.vertex_normal[0] = triangle1.vertex_normal[1] = triangle1.vertex_normal[2] = -1;
+    triangle3.vertex_normals = false;
     
     objectTriangle triangle4;
     triangle4.vertices[0] = 9; //top right
     triangle4.vertices[1] = 10; //bottom left
     triangle4.vertices[2] = 11; //bottom right
     
-    triangle4.vertex_normal[0] = triangle1.vertex_normal[1] = triangle1.vertex_normal[2] = -1;
+    triangle4.vertex_normals = false;
     
     //bottom side
     objectTriangle triangle5;
@@ -145,14 +144,14 @@ void cObject::makeCBOX()
     triangle5.vertices[1] = 13; //far left
     triangle5.vertices[2] = 14; //far right
     
-    triangle5.vertex_normal[0] = triangle1.vertex_normal[1] = triangle1.vertex_normal[2] = -1;
+    triangle5.vertex_normals = false;
     
     objectTriangle triangle6;
     triangle6.vertices[0] = 15; //far right
     triangle6.vertices[1] = 16; //close left
     triangle6.vertices[2] = 17; //close right
     
-    triangle6.vertex_normal[0] = triangle1.vertex_normal[1] = triangle1.vertex_normal[2] = -1;
+    triangle6.vertex_normals = false;
     
     //top side
     objectTriangle triangle7;
@@ -160,14 +159,14 @@ void cObject::makeCBOX()
     triangle7.vertices[1] = 19; //far left
     triangle7.vertices[2] = 20; //far right
     
-    triangle7.vertex_normal[0] = triangle1.vertex_normal[1] = triangle1.vertex_normal[2] = -1;
+    triangle7.vertex_normals = false;
     
     objectTriangle triangle8;
     triangle8.vertices[0] = 21; //far right
     triangle8.vertices[1] = 22; //close left
     triangle8.vertices[2] = 23; //close right
     
-    triangle8.vertex_normal[0] = triangle1.vertex_normal[1] = triangle1.vertex_normal[2] = -1;
+    triangle8.vertex_normals = false;
     
     //left side
     objectTriangle triangle9;
@@ -175,14 +174,14 @@ void cObject::makeCBOX()
     triangle9.vertices[1] = 25; //far top
     triangle9.vertices[2] = 26; //close top
     
-    triangle9.vertex_normal[0] = triangle1.vertex_normal[1] = triangle1.vertex_normal[2] = -1;
+    triangle9.vertex_normals = false;
     
     objectTriangle triangle10;
     triangle10.vertices[0] = 27; //far bottom
     triangle10.vertices[1] = 28; //close top
     triangle10.vertices[2] = 29; //close bottom
     
-    triangle10.vertex_normal[0] = triangle1.vertex_normal[1] = triangle1.vertex_normal[2] = -1;
+    triangle10.vertex_normals = false;
     
     //right side
     objectTriangle triangle11;
@@ -190,14 +189,14 @@ void cObject::makeCBOX()
     triangle11.vertices[1] = 31; //far top
     triangle11.vertices[2] = 32; //close top
     
-    triangle11.vertex_normal[0] = triangle1.vertex_normal[1] = triangle1.vertex_normal[2] = -1;
+    triangle11.vertex_normals = false;
     
     objectTriangle triangle12;
     triangle12.vertices[0] = 33; //far bottom
     triangle12.vertices[1] = 34; //close top
     triangle12.vertices[2] = 35; //close bottom
     
-    triangle12.vertex_normal[0] = triangle1.vertex_normal[1] = triangle1.vertex_normal[2] = -1;
+    triangle12.vertex_normals = false;
     
     triangles_[0] = triangle1;
     triangles_[1] = triangle2;
@@ -232,7 +231,7 @@ void cObject::makeCTESTOBJECT()
 	triangle1.vertices[2] = 1;
 	triangle1.vertices[0] = 2;
 	
-    triangle1.vertex_normal[0] = triangle1.vertex_normal[1] = triangle1.vertex_normal[2] = -1;
+    triangle1.vertex_normals = false;
     
 	triangles_[0] = triangle1;
 	
@@ -246,7 +245,7 @@ void cObject::makeCTESTOBJECT()
 	triangle2.vertices[2] = 4;
 	triangle2.vertices[1] = 5;
 	
-    triangle1.vertex_normal[0] = triangle1.vertex_normal[1] = triangle1.vertex_normal[2] = -1;
+    triangle1.vertex_normals = false;
     
 	triangles_[1] = triangle2;
     
@@ -260,7 +259,7 @@ void cObject::makeCTESTOBJECT()
 	triangle3.vertices[2] = 7;
 	triangle3.vertices[1] =  8;
     
-    triangle1.vertex_normal[0] = triangle1.vertex_normal[1] = triangle1.vertex_normal[2] = -1;
+    triangle1.vertex_normals = false;
 	
 	triangles_[2] = triangle3;
     
@@ -360,6 +359,8 @@ cObject::cObject(const char *filename)
                 current_triangle.vertices[2] =
                     current_triangle.vertex_normal[2] = face.mIndices[2] + vertex_offset;
                 
+                current_triangle.vertex_normals = true;
+                
                 temp_triangles.push_back(current_triangle);
             }
         }
@@ -407,7 +408,40 @@ void cObject::scale(vec3 scale_vec)
 {
     scale_vector_ = scale_vec;
 }
+
 void cObject::assignMaterial()
 {
     
+}
+
+point3 cObject::getVertex(unsigned int vertex)
+{
+    assert(vertex < vertices_count_);
+    return vertices_[vertex];    
+}
+
+vec3 cObject::getVertexNormal(unsigned int vertex)
+{
+    assert(vertex < vertices_count_);
+    return vertex_normals_[vertex];
+}
+
+vec3 cObject::getTranslate()
+{
+    return translate_vector_;
+}
+
+vec3 cObject::getRotate()
+{
+    return rotate_vector_;
+}
+
+vec3 cObject::getScale()
+{
+    return scale_vector_;
+}
+
+unsigned int cObject::getNumTriangle()
+{
+    return triangle_count_;
 }

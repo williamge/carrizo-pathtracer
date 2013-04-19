@@ -177,29 +177,33 @@ rendModel::rendModel(cObject * source_object)
 {
     printf("Creating rendModel\n");
     
-	triangles_ = new renderTriangle[source_object->triangle_count_];
-	triangle_count_ = source_object->triangle_count_;
+    triangle_count_ = source_object->getNumTriangle();
+	triangles_ = new renderTriangle[triangle_count_];
+	
     
     struct bbox *bounding_boxes = new struct bbox[triangle_count_];
 	
-	for (int i=0;i<triangle_count_;i++)
+    int i=0;
+	for (auto &source_triangle : *source_object)
 	{
-		point3 p1 = source_object->vertices_[source_object->triangles_[i].vertices[0]];
-		point3 p2 = source_object->vertices_[source_object->triangles_[i].vertices[1]];
-		point3 p3 = source_object->vertices_[source_object->triangles_[i].vertices[2]];
-        
-        //TODO: make this more OOP friendly (i.e. source_object.getScaleVector() instead)
+		point3 p1 = source_object->getVertex(source_triangle.vertices[0]);
+		point3 p2 = source_object->getVertex(source_triangle.vertices[1]);
+		point3 p3 = source_object->getVertex(source_triangle.vertices[2]);
         
         //apply transformations to each point
-        p1.apply(source_object->scale_vector_);
-        p2.apply(source_object->scale_vector_);
-        p3.apply(source_object->scale_vector_);
+        
+        vec3 scale_vector = source_object->getScale();
+        p1.apply(scale_vector);
+        p2.apply(scale_vector);
+        p3.apply(scale_vector);
         
         //TODO: implement rotate transformation
         
-        p1 + source_object->translate_vector_;
-        p2 + source_object->translate_vector_;
-        p3 + source_object->translate_vector_;
+        vec3 translate_vector = source_object->getTranslate();
+        
+        p1 += translate_vector;
+        p2 += translate_vector;
+        p3 += translate_vector;
         
         //bounding boxes are defined by two points on opposite sides of the box
         bounding_boxes[i].low.x = std::min(p1.x, std::min(p2.x,p3.x));
@@ -222,25 +226,23 @@ rendModel::rendModel(cObject * source_object)
 		triangles_[i].v = triangles_[i].normal.vecCross(p2 - p1)
     		* (1.0 / nlength);
         
-        //-1 is the code for not using vertex normals
-        if (-1 != source_object->triangles_[i].vertex_normal[0])
+        if (source_triangle.vertex_normals) //does it have vertex normals?
         {
             triangles_[i].vertex_normals[0] =
-                source_object->vertex_normals_[source_object->triangles_[i].vertex_normal[0]];
+                source_object->getVertexNormal(source_triangle.vertex_normal[0]); 
             
             triangles_[i].vertex_normals[1] =
-                source_object->vertex_normals_[source_object->triangles_[i].vertex_normal[1]];
+                source_object->getVertexNormal(source_triangle.vertex_normal[1]);
             
             triangles_[i].vertex_normals[2] =
-                source_object->vertex_normals_[source_object->triangles_[i].vertex_normal[2]];
+                source_object->getVertexNormal(source_triangle.vertex_normal[2]);
         }
         else
         {
             triangles_[i].vertex_normals[0] = triangles_[i].vertex_normals[1] =
                 triangles_[i].vertex_normals[2] = triangles_[i].normal;
         }
-        
-
+        i++;
 	}
     
     printf("    Creating BVH for rendModel\n");    
