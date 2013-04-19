@@ -16,14 +16,19 @@ class rendModel;
 enum {CTRIANGLE, CBOX, CTESTOBJECT};
 
 typedef struct objecttriangle_t{
-	point3 vertices[3];
-    vec3 vertex_normal[3];
+	unsigned int vertices[3];
+    unsigned int vertex_normal[3];
 	
 } objectTriangle;
 
 class cObject
 {
 private:
+    //stuff to replace that other stuff
+    point3 *vertices_;
+    unsigned int vertices_count_;
+    vec3 *vertex_normals_;
+    
 	objectTriangle *triangles_; //why do we only count objectTriangle? should probably make a polygon thing too or something
 	unsigned int triangle_count_;
     vec3 translate_vector_;
@@ -41,6 +46,9 @@ public:
     void scale(vec3 scale_vec);
     void assignMaterial();	
     rendModel addToRender();
+    
+    //for interfacing with other classes
+    
     
     friend class rendModel;
 };

@@ -181,13 +181,12 @@ rendModel::rendModel(cObject * source_object)
 	triangle_count_ = source_object->triangle_count_;
     
     struct bbox *bounding_boxes = new struct bbox[triangle_count_];
-    
 	
 	for (int i=0;i<triangle_count_;i++)
 	{
-		point3 p1 = source_object->triangles_[i].vertices[0];
-		point3 p2 = source_object->triangles_[i].vertices[1];
-		point3 p3 = source_object->triangles_[i].vertices[2];
+		point3 p1 = source_object->vertices_[source_object->triangles_[i].vertices[0]];
+		point3 p2 = source_object->vertices_[source_object->triangles_[i].vertices[1]];
+		point3 p3 = source_object->vertices_[source_object->triangles_[i].vertices[2]];
         
         //TODO: make this more OOP friendly (i.e. source_object.getScaleVector() instead)
         
@@ -223,9 +222,25 @@ rendModel::rendModel(cObject * source_object)
 		triangles_[i].v = triangles_[i].normal.vecCross(p2 - p1)
     		* (1.0 / nlength);
         
-        triangles_[i].vertex_normals[0] = source_object->triangles_[i].vertex_normal[0];
-        triangles_[i].vertex_normals[1] = source_object->triangles_[i].vertex_normal[1];
-        triangles_[i].vertex_normals[2] = source_object->triangles_[i].vertex_normal[2];
+        //-1 is the code for not using vertex normals
+        if (-1 != source_object->triangles_[i].vertex_normal[0])
+        {
+            triangles_[i].vertex_normals[0] =
+                source_object->vertex_normals_[source_object->triangles_[i].vertex_normal[0]];
+            
+            triangles_[i].vertex_normals[1] =
+                source_object->vertex_normals_[source_object->triangles_[i].vertex_normal[1]];
+            
+            triangles_[i].vertex_normals[2] =
+                source_object->vertex_normals_[source_object->triangles_[i].vertex_normal[2]];
+        }
+        else
+        {
+            triangles_[i].vertex_normals[0] = triangles_[i].vertex_normals[1] =
+                triangles_[i].vertex_normals[2] = triangles_[i].normal;
+        }
+        
+
 	}
     
     printf("    Creating BVH for rendModel\n");    
