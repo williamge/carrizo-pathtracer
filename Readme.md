@@ -32,6 +32,7 @@ The *Open Asset Importing Library* is used to import 3D assets into the program,
 - BVH traversal
 - Ray intersection
 - Importing models/assets by file
+- Multiple rendering passes
 
 ###Next steps to take
 - Unit tests

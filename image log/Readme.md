@@ -19,3 +19,7 @@ Importing models by file was implemented. This model is made up of about 12k tri
 ![image](https://bitbucket.org/williamg/carrizo-pathtracer/raw/b98d310205fbe6b77795c59e364c90ba8c5db4f0/image%20log/2013-04-17-02.png)
 
 The same day I also remembered that vertex normals were a thing and decided to interpolate them so there's some nice smoothing on low-poly models.
+
+![image](https://bitbucket.org/williamg/carrizo-pathtracer/raw/f253ec0da910c4bedf083f4f6cb2d14508e02465/image%20log/2013-04-19-01.png)
+
+Multiple passes of the image can happen now, as can be seen here with this image that was taken with 32 passes, each pixel's ray having been jittered a bit to reduce aliasing.
