@@ -299,7 +299,7 @@ cObject::cObject(const char *filename)
     rotate_vector_ = vec3(0.0, 0.0, 0.0);
     scale_vector_ = vec3(1.0, 1.0, 1.0);
     
-    printf("Loading object from file [assimp]\n");
+    std::cout << "Loading object from file [assimp]" << std::endl;
 
     Assimp::Importer importer;
     
@@ -347,7 +347,7 @@ cObject::cObject(const char *filename)
                 {
                     //this shouldn't be reachable for a while since assimp is given the
                     //aiProcess_Triangulate flag, so it builds triangles for us
-                    printf("face has %i vertices\n", face.mNumIndices);
+                    std::cout << "face has" << face.mNumIndices << "vertices" << std::endl;
                 }
                 objectTriangle current_triangle;
                 current_triangle.vertices[0] =
@@ -387,12 +387,12 @@ cObject::cObject(const char *filename)
             triangles_[i] = temp_triangles[i];
         }
         
-        printf("    Triangle count: %d\n", triangle_count_);
-        printf("Finished making cObject from file [assimp]\n");
+        std::cout << "    Triangle count: " << triangle_count_ << std::endl;
+        std::cout << "Finished making cObject from file [assimp]" << std::endl;
     }
     else
     {
-        printf("Error loading object [assimp]");
+        std::cout << "Error loading object [assimp]" << std::endl;
         exit(EXIT_FAILURE);
     }
 }

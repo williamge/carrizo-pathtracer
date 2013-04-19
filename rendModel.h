@@ -12,8 +12,9 @@
 #include <vector>
 
 #include "vecmat.h"
-#include "cObject.h"
 #include "ray.h"
+
+class cObject;
 
 /*
  -don't group the triangles, one triangle set per object, materials are per triangle
@@ -51,14 +52,19 @@ class rendModel
 {
 private:    
     BVHnode *root_;
-    bbox boundsUnion(bbox box, point3 point);
-    static bool boxIntersection(const bbox& b, const Ray& r, const vec3& inv_dir);
-public:
     renderTriangle *triangles_;
     unsigned int triangle_count_;
-    rendModel(cObject * sourceObject);
+    
+    bbox boundsUnion(bbox box, point3 point);
+    static bool boxIntersection(const bbox& b, const Ray& r, const vec3& inv_dir);
+    void bvhTraversal(BVHnode* start, Ray &ray, std::vector<int> &triangle_list_out);
+    
     BVHnode * constructBVHSub(renderTriangle *triangle_list, std::vector<int> index_list, bbox *bounds_list);
     BVHnode * constructBVH(renderTriangle *triangle_list, int triangle_count, bbox *bounds_list);
+    
+public:
+
+    rendModel(cObject * sourceObject);
     bool intersect(Ray& ray);
 };
 

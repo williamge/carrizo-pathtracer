@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <assert.h>
 
 #include "vecmat.h"
 #include "rendModel.h"
@@ -169,13 +170,13 @@ BVHnode * rendModel::constructBVH(renderTriangle *triangle_list, int triangle_co
 
 The constructor for a rendModel, takes in a list of triangles and their 
 count, creates corresponding renderTriangles, creates bounding boxes for
-the triangles, and then creates useful information for the triangle 
+the triangles, and then creates useful information for the triangle
 such as uv coordinates for the intersection plane and the normal.
 
 */
 rendModel::rendModel(cObject * source_object)
 {
-    printf("Creating rendModel\n");
+    std::cout << "Creating rendModel" << std::endl;
     
     triangle_count_ = source_object->getNumTriangle();
 	triangles_ = new renderTriangle[triangle_count_];
@@ -245,22 +246,24 @@ rendModel::rendModel(cObject * source_object)
         i++;
 	}
     
-    printf("    Creating BVH for rendModel\n");    
+    std::cout << "    Creating BVH for rendModel" << std::endl;
     root_ = constructBVH(triangles_, triangle_count_, bounding_boxes);
-    if (!root_)
-    {
-        exit(EXIT_FAILURE);
-        //is this correct? can a rendmodel have no bvhnode? TODO: figure it out perhaps!
-    }
-    printf("    Finished creating BVH\n");
     
-    printf("rendModel bounds: \n    low: %f, %f, %f \n      high: %f, %f, %f\n",
-           root_->bounds.low.x,
-           root_->bounds.low.y,
-           root_->bounds.low.z,
-           root_->bounds.high.x,
-           root_->bounds.high.y,
-           root_->bounds.high.z);
+    assert(root_); //is this correct? can a rendmodel have no bvhnode? TODO: figure it out perhaps!
+    
+    std::cout << "    Finished creating BVH" << std::endl;
+    
+    std::cout << "rendModel bounds: " << std::endl;
+    std::cout << "low: "
+        << root_->bounds.low.x << ", "
+        << root_->bounds.low.y << ", "
+        << root_->bounds.low.z << std::endl;
+    std::cout << "      high: "
+        << root_->bounds.high.x << ", "
+        << root_->bounds.high.y << ", "
+        << root_->bounds.high.z << std::endl;
+    
+  
 }
 
 /*
@@ -294,33 +297,23 @@ bool rendModel::boxIntersection(const bbox& b, const Ray& ray, const vec3& inv_d
     return (tmax >= std::max(0.0, tmin));
 }
 
-/*
-
-Object defined method to intersect a ray with the model, traversing the BVH for the model 
-in a smart way.
-
-*/
-bool rendModel::intersect(Ray& ray)
+void rendModel::bvhTraversal(BVHnode* start, Ray &ray, std::vector<int> &triangle_list_out)
 {
-	int hit_triangle = -1;
-    
-    //bvh traversal
-    
-    //this looks like it should fail from divide by zero, but for reasons it doesn't, enjoy!
-    vec3 inv_dir (1.0 / ray.d.x, 1.0 / ray.d.y, 1.0 / ray.d.z);    
-    
     /*
-     gameplan: start from root BVHnode, add each child node (left and right), each time taking one node 
-     from this stack and checking if the ray intersects with it, if ti does then we care about that 
-     node, otherwise we discard it and move along, adding the triangles we'll need to check to a vector 
-     to be checked at the end.     
+     gameplan: start from root BVHnode, add each child node (left and right), each time taking one node
+     from this stack and checking if the ray intersects with it, if ti does then we care about that
+     node, otherwise we discard it and move along, adding the triangles we'll need to check to a vector
+     to be checked at the end.
      */
     
-    std::vector<int> triangle_list;
+    //precomputation, faster for boxIntersection
+    //this looks like it should fail from divide by zero, but for reasons it doesn't, enjoy!
+    //oh also this is just precomputation for something to be done in inv_
+    vec3 inv_dir (1.0 / ray.d.x, 1.0 / ray.d.y, 1.0 / ray.d.z);
     
     BVHnode* curr_node;
     std::vector<BVHnode *> node_stack;
-    node_stack.push_back(root_);
+    node_stack.push_back(start);
     
     while (node_stack.size() > 0)
     {
@@ -329,13 +322,13 @@ bool rendModel::intersect(Ray& ray)
         //so here we are, taking nodes from the back of the list always
         curr_node = node_stack[node_stack.size() - 1];
         node_stack.pop_back();
-
+        
         if (boxIntersection(curr_node->bounds, ray, inv_dir))
         {
             //add all the triangles (if the node has them) to a vector for later
-            for (int tri=0; tri < curr_node->triangle_list.size(); tri++)
+            for (auto &tri : curr_node->triangle_list)
             {
-                triangle_list.push_back(curr_node->triangle_list[tri]);
+                triangle_list_out.push_back(tri);
             }
             
             if (curr_node->left)
@@ -349,20 +342,34 @@ bool rendModel::intersect(Ray& ray)
         }
     }
 
+}
+
+/*
+
+Object defined method to intersect a ray with the model, traversing the BVH for the model 
+in a smart way.
+
+*/
+bool rendModel::intersect(Ray& ray)
+{
+	int hit_triangle = -1;
     
+    std::vector<int> triangle_list;
+    
+    bvhTraversal(root_, ray, triangle_list);
     
     int i;
     
     //tri_list being the vector of triangles to be processed, filled in from the above BVH traversal
-    for (int tri=0; tri < triangle_list.size(); tri++)
+    for (auto &tri : triangle_list)
     {
-        i = triangle_list[tri]; //take the index of the current triangle
+        i = tri; //take the index of the current triangle
 
 		float lengt = triangles_[i].normal * triangles_[i].normal;
         
 		float t1 = -triangles_[i].u * triangles_[i].a;
 		float t2 = -triangles_[i].v * triangles_[i].a;
-		
+        
 		vec3 tnormal = triangles_[i].normal *  (1.0/ sqrt(lengt));
 		
 		float denom = ray.d * tnormal;

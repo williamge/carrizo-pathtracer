@@ -16,13 +16,14 @@
 #include "CImg.h"
 
 #include "vecmat.h"
-#include "carrizo.h"
-#include "rendModel.h"
 #include "ray.h"
 
 #ifndef M_PI
 #define M_PI 3.14159
 #endif
+
+class rendModel;
+class cObject;
 
 class cPathtracer{
 private:

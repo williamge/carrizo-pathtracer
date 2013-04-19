@@ -51,5 +51,6 @@ vec3 operator * (const float& a, const vec3& b);
 vec3 operator * (const vec3& b, const float& a);
 
 bool operator == (const vec3& a, const vec3& b);
+bool operator != (const vec3& a, const vec3& b);
 
 #endif

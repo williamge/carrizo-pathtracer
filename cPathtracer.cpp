@@ -91,8 +91,8 @@ void cPathtracer::shadePixel(int i, int j, vec3 &direction_vector, vec3 &x_unit,
     
     if (i % 20  == 0 && j + 1 >= image_.height)
     {
-        printf("Done line %i\n", i);
-        fflush(stdout);
+        std::cout << "Done line " << i << std::endl;
+        std::cout << std::flush;
     }
 }
 
@@ -152,7 +152,7 @@ void cPathtracer::render()
     p_direction = p_direction - camera_.origin; //TODO: write a -= operator for vec3
     p_direction.normalize();
     
-	printf("p_direction: %f %f %f\n",p_direction.x,p_direction.y,p_direction.z);
+    std::cout << "p_direction: " << p_direction.x << " " << p_direction.y << " " << p_direction.z << std::endl;
     
     vec3 x_unit;
     vec3 y_unit;
@@ -176,7 +176,7 @@ void cPathtracer::render()
     
     auto end_time = std::chrono::high_resolution_clock::now();
     
-    printf("Render time: %f seconds\n",std::chrono::duration_cast<std::chrono::milliseconds>(end_time-start_time).count() * 0.001);
+    std::cout << "Render time: "<< std::chrono::duration_cast<std::chrono::milliseconds>(end_time-start_time).count() * 0.001 <<" seconds" << std::endl;
     
     //done rendering so far, just display and save the render
     CImgDisplay regular_display (*image_.buffer, "Regular Shader");

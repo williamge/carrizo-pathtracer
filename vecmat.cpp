@@ -83,3 +83,10 @@ bool operator == (const vec3& a, const vec3& b)
             && a.data[1] == b.data[1]
             && a.data[2] == b.data[2]);
 }
+
+bool operator != (const vec3& a, const vec3& b)
+{
+    return (a.data[0] != b.data[0]
+            || a.data[1] != b.data[1]
+            || a.data[2] != b.data[2]);
+}
