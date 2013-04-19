@@ -66,7 +66,7 @@ BVHnode * rendModel::constructBVHSub(renderTriangle *triangle_list, std::vector<
 
     //determine the axis to split the current volume by, represented by "dim"
 
-    float split;
+    double split;
     int dim;    
 
     //determine the biggest splits to split the volume by
@@ -220,7 +220,7 @@ rendModel::rendModel(cObject * source_object)
 		
 		triangles_[i].a = p1;
 		triangles_[i].normal = (p2 - p1).vecCross(p3 - p1);
-		float nlength = triangles_[i].normal * triangles_[i].normal;
+		double nlength = triangles_[i].normal * triangles_[i].normal;
 		
 		triangles_[i].u = (p3 - p1).vecCross(triangles_[i].normal)
 	    	* (1.0 / nlength);
@@ -365,28 +365,28 @@ bool rendModel::intersect(Ray& ray)
     {
         i = tri; //take the index of the current triangle
 
-		float lengt = triangles_[i].normal * triangles_[i].normal;
+		double lengt = triangles_[i].normal * triangles_[i].normal;
         
-		float t1 = -triangles_[i].u * triangles_[i].a;
-		float t2 = -triangles_[i].v * triangles_[i].a;
+		double t1 = -triangles_[i].u * triangles_[i].a;
+		double t2 = -triangles_[i].v * triangles_[i].a;
         
 		vec3 tnormal = triangles_[i].normal *  (1.0/ sqrt(lengt));
 		
-		float denom = ray.d * tnormal;
-		float numer = (triangles_[i].a - ray.o) * tnormal;
+		double denom = ray.d * tnormal;
+		double numer = (triangles_[i].a - ray.o) * tnormal;
 		
 		if (denom == 0 || numer == 0)
 		{
 			continue;
 		}
 		
-		float intersect_t = numer/denom;
+		double intersect_t = numer/denom;
 		
 		vec3 point = ray.o + intersect_t * ray.d;
 		
-		float u = triangles_[i].u * point + t1;
+		double u = triangles_[i].u * point + t1;
 		if (u < 0){ continue;}
-		float v = triangles_[i].v * point + t2;
+		double v = triangles_[i].v * point + t2;
 		if (v < 0 || u+v > 1){continue;}
 		
 		if ( intersect_t > 0.0 

@@ -61,7 +61,7 @@ void cPathtracer::intersectScene(Ray * ray)
  "direction_vector", "x_unit", "y_unit", "factor" are all needed but don't belong in the class spec so they get
  passed in with the function call.
  */
-void cPathtracer::shadePixel(int i, int j, vec3 &direction_vector, vec3 &x_unit, vec3 &y_unit, float factor_)
+void cPathtracer::shadePixel(int i, int j, vec3 &direction_vector, vec3 &x_unit, vec3 &y_unit, double factor_)
 {
     Ray rayt;
     rayt.o = camera_.origin;
@@ -167,7 +167,7 @@ void cPathtracer::render()
     y_unit = x_unit.vecCross(p_direction);
 	
     //factor for "sensor" screen derived from fov, each ray for the render uses this number to set the fov
-	float factor = 1.0/((double(image_.height)/2)/tan( camera_.fov * M_PI/360.0));
+	double factor = 1.0/((double(image_.height)/2)/tan( camera_.fov * M_PI/360.0));
     
 	cimg_forXY(*(image_.buffer), i,j)
 	{
@@ -200,19 +200,19 @@ void cPathtracer::setDimensions(int width, int height)
 	image_.height = height;
     
     if (image_.buffer) {delete image_.buffer;}
-    image_.buffer = new CImg<float> (image_.width, image_.height, 1, 3);
+    image_.buffer = new CImg<double> (image_.width, image_.height, 1, 3);
     
     if (image_.normals_buffer) {delete image_.normals_buffer;}
-    image_.normals_buffer = new CImg<float> (image_.width, image_.height, 1, 3);
+    image_.normals_buffer = new CImg<double> (image_.width, image_.height, 1, 3);
     
     if (image_.depth_buffer) {delete image_.depth_buffer;}
-    image_.depth_buffer = new CImg<float> (image_.width, image_.height, 1, 3);
+    image_.depth_buffer = new CImg<double> (image_.width, image_.height, 1, 3);
 }
 
 /*
  Sets the camera for the scene.
  */
-void cPathtracer::setCamera( point3 origin, point3 look_at, float fov)
+void cPathtracer::setCamera( point3 origin, point3 look_at, double fov)
 {
     camera_.origin = origin;
     camera_.look_at = look_at;

@@ -7,17 +7,17 @@ typedef struct vec3_t
 {
 	union{
 		struct{
-			float x,y,z;
+			double x,y,z;
 		};
 		struct {
-			float r,g,b;
+			double r,g,b;
 		};
-		float data[3];
+		double data[3];
 	};
 	
 
     
-    vec3_t(float ax, float ay, float az);
+    vec3_t(double ax, double ay, double az);
     vec3_t();
 	
     void normalize();
@@ -38,17 +38,17 @@ typedef vec3 col3;
 
 //standard vector addition
 vec3 operator + (const vec3& a, const vec3& b);
-vec3 operator + (const float& a, const vec3& b);
-vec3 operator + (const vec3& a, const float& b);
+vec3 operator + (const double& a, const vec3& b);
+vec3 operator + (const vec3& a, const double& b);
 //standard vector subtraction
 vec3 operator - (const vec3& a, const vec3& b);
-vec3 operator - (const vec3& a, const float& b);
+vec3 operator - (const vec3& a, const double& b);
 vec3 operator - (const vec3& a) ;
 //vector dot product
-float operator * (const vec3 &a, const vec3 &b);
+double operator * (const vec3 &a, const vec3 &b);
 //vector-scalar multiplication
-vec3 operator * (const float& a, const vec3& b);
-vec3 operator * (const vec3& b, const float& a);
+vec3 operator * (const double& a, const vec3& b);
+vec3 operator * (const vec3& b, const double& a);
 
 bool operator == (const vec3& a, const vec3& b);
 bool operator != (const vec3& a, const vec3& b);

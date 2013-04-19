@@ -30,21 +30,21 @@ private:
     struct {
         point3 origin;
         point3 look_at;
-        float fov;
+        double fov;
     } camera_;
     
     struct{
-        cimg_library::CImg<float> *buffer;
-        cimg_library::CImg<float> *normals_buffer;
-        cimg_library::CImg<float> *depth_buffer;
+        cimg_library::CImg<double> *buffer;
+        cimg_library::CImg<double> *normals_buffer;
+        cimg_library::CImg<double> *depth_buffer;
         int width, height;
     } image_;
     
-    std::vector<cObject *> objects_;
+    std::vector<cObject*> objects_;
     std::vector<rendModel> render_models_;
     
     void intersectScene(Ray* ray);
-    void shadePixel(int i, int j, vec3 &direction_vector, vec3 &x_unit, vec3 &y_unit, float factor_);
+    void shadePixel(int i, int j, vec3 &direction_vector, vec3 &x_unit, vec3 &y_unit, double factor_);
     
     col3 regularShader(Ray ray);
     col3 normalsShader(Ray ray);
@@ -54,7 +54,7 @@ public:
     cPathtracer();
     void render();
     void addObject(cObject *obj);
-    void setCamera(point3 origin, point3 look_at, float fov);
+    void setCamera(point3 origin, point3 look_at, double fov);
     void setDimensions(int width, int height);
     
 };

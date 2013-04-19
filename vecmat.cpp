@@ -1,6 +1,6 @@
 #include "vecmat.h"	
 
-	vec3::vec3_t(float ax, float ay, float az) {
+	vec3::vec3_t(double ax, double ay, double az) {
 		data[0] = ax; data[1] = ay; data[2] = az;
 	}
 	vec3::vec3_t(){
@@ -9,7 +9,7 @@
 	
 	void vec3::normalize()
 	{
-		float length = 1.0/sqrt(x*x + y*y + z*z);
+		double length = 1.0/sqrt(x*x + y*y + z*z);
 		x *= length;
 		y *= length;
 		z *= length;		
@@ -36,11 +36,11 @@ vec3 operator + (const vec3& a, const vec3& b)
 {
     return vec3(a.data[0]+b.data[0],    a.data[1]+b.data[1],    a.data[2]+b.data[2]);
 }
-vec3 operator + (const float& a, const vec3& b)
+vec3 operator + (const double& a, const vec3& b)
 {
     return vec3(a+b.data[0],    a+b.data[1],    a+b.data[2]);
 }
-vec3 operator + (const vec3& a, const float& b)
+vec3 operator + (const vec3& a, const double& b)
 {
     return vec3(a.data[0]+b,    a.data[1]+b,    a.data[2]+b);
 }
@@ -48,7 +48,7 @@ vec3 operator - (const vec3& a, const vec3& b)
 {
     return vec3(a.data[0]-b.data[0],    a.data[1]-b.data[1],    a.data[2]-b.data[2]);
 }
-vec3 operator - (const vec3& a, const float& b)
+vec3 operator - (const vec3& a, const double& b)
 {
     return vec3(a.data[0]-b,    a.data[1]-b,    a.data[2]-b);
 }
@@ -56,15 +56,15 @@ vec3 operator - (const vec3& a)
 {
     return vec3(-a.data[0],     -a.data[1],     -a.data[2]);
 }
-float operator * (const vec3 &a, const vec3 &b)
+double operator * (const vec3 &a, const vec3 &b)
 {
     return a.data[0]*b.data[0] + a.data[1]*b.data[1] + a.data[2]*b.data[2];
 }
-vec3 operator * (const float& a, const vec3& b)
+vec3 operator * (const double& a, const vec3& b)
 {
     return vec3(a*b.data[0], a*b.data[1], a*b.data[2]);
 }
-vec3 operator * (const vec3& b, const float& a)
+vec3 operator * (const vec3& b, const double& a)
 {
     return vec3(a*b.data[0], a*b.data[1], a*b.data[2]);
 }

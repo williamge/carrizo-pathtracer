@@ -15,7 +15,7 @@ typedef struct ray_t{
 	
 	//with material pointer and no hit, 4 + 4 + 3*4 + 3*4 = 32 bytes, aligned in cache
 	struct {
-		float t_value;
+		double t_value;
 		point3 point;
 		vec3 normal;
 		//material *mat;
