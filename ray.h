@@ -9,6 +9,8 @@
 #ifndef carrizo_pathtracer_ray_h
 #define carrizo_pathtracer_ray_h
 
+using namespace vecmat;
+
 typedef struct ray_t{
 	point3 o;
 	vec3 d;

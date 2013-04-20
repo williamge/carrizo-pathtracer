@@ -11,6 +11,8 @@
 
 #include "vecmat.h"
 
+using namespace vecmat;
+
 class rendModel;
 
 enum {CTRIANGLE, CBOX, CTESTOBJECT};

@@ -10,6 +10,8 @@
 #include "vecmat.h"
 #include "cPathtracer.h"
 
+using namespace vecmat;
+
 void debugSceneTESTOBJECT()
 {
     cPathtracer pt;

@@ -179,7 +179,7 @@ void cPathtracer::renderPass(camera_vectors &render_vectors)
 	
     //factor for "sensor" screen derived from fov, each ray for the render uses this number to set the fov
 	double factor = 1.0/(
-                            ( double(image_.height)/2 ) / tan( camera_.fov * M_PI/360.0 )
+                            ( double(image_.height)/2 ) / tan( camera_.fov * vecmat_constant::pi/360.0 )
                          );
     
 	cimg_forXY(*(image_.buffer), i,j)

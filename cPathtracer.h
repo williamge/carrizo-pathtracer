@@ -18,9 +18,7 @@
 #include "vecmat.h"
 #include "ray.h"
 
-#ifndef M_PI
-#define M_PI 3.14159
-#endif
+using namespace vecmat;
 
 const int MAX_PASS_NUMBER = 32;
 

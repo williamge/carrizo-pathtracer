@@ -14,6 +14,8 @@
 #include "vecmat.h"
 #include "ray.h"
 
+using namespace vecmat;
+
 class cObject;
 
 /*
