@@ -107,6 +107,7 @@ void cPathtracer::shadePixel(int i, int j, camera_vectors &render_vectors, doubl
     rayt.d += ((-double(image_.width)/2.0 + i)*factor) * render_vectors.x_unit;
     rayt.d += (-(-double(image_.height)/2.0 + j)*factor) * render_vectors.y_unit;
     
+    //randomly jitters the pixel's ray across the screen to reduce aliasing
     rayt.d += (factor * (dis(gen) - 0.5) ) * render_vectors.x_unit;
     rayt.d += (factor * (dis(gen) - 0.5) ) * render_vectors.y_unit;
     
@@ -210,7 +211,7 @@ void cPathtracer::render()
     
     //p_direction starts with a point to point the camera at, then we make it the camera's direction vector
 	render_vectors.direction_vector = camera_.look_at;
-    render_vectors.direction_vector = render_vectors.direction_vector - camera_.origin; //TODO: write a -= operator for vec3
+    render_vectors.direction_vector -= camera_.origin;
     render_vectors.direction_vector.normalize();
     
     std::cout << "p_direction: "
@@ -223,9 +224,16 @@ void cPathtracer::render()
     {
         up_vector = vec3(0.0, 0.0, -1.0);
     }
+    else if (render_vectors.direction_vector == vec3(0.0, -1.0, 0.0))
+    {
+        up_vector = vec3(0.0, 0.0, -1.0);
+    }
     
     render_vectors.x_unit = render_vectors.direction_vector.vecCross(up_vector);
     render_vectors.y_unit = render_vectors.x_unit.vecCross(render_vectors.direction_vector);
+    
+    render_vectors.x_unit.normalize();
+    render_vectors.y_unit.normalize();
     
     for (pass_number_ = 1; pass_number_ < MAX_PASS_NUMBER+1; pass_number_++)
     {
@@ -241,10 +249,11 @@ void cPathtracer::render()
         depth_display.display(*image_.depth_buffer);
     }
     
-    sleep(10); //ALSO GET RID OF THIS WHEN DONE TESTING/DEBUGGING
+    //sleep(10); //ALSO GET RID OF THIS WHEN DONE TESTING/DEBUGGING
     
     image_.buffer->normalize(0, 255);
     image_.buffer->save_png("output.png");
+    std::cout << "Rendering done" <<std::endl;
 }
 
 /*
@@ -255,13 +264,13 @@ void cPathtracer::setDimensions(int width, int height)
     image_.width = width;
 	image_.height = height;
     
-    if (image_.buffer) {delete image_.buffer;}
+    if (image_.buffer != nullptr) {delete image_.buffer;}
     image_.buffer = new CImg<double> (image_.width, image_.height, 1, 3);
     
-    if (image_.normals_buffer) {delete image_.normals_buffer;}
+    if (image_.normals_buffer != nullptr) {delete image_.normals_buffer;}
     image_.normals_buffer = new CImg<double> (image_.width, image_.height, 1, 3);
     
-    if (image_.depth_buffer) {delete image_.depth_buffer;}
+    if (image_.depth_buffer != nullptr) {delete image_.depth_buffer;}
     image_.depth_buffer = new CImg<double> (image_.width, image_.height, 1, 3);
 }
 
@@ -277,7 +286,7 @@ void cPathtracer::setCamera( point3 origin, point3 look_at, double fov)
 
 cPathtracer::cPathtracer()
 {
-    image_.buffer = NULL;
-    image_.normals_buffer = NULL;
-    image_.depth_buffer = NULL;
+    image_.buffer = nullptr;
+    image_.normals_buffer = nullptr;
+    image_.depth_buffer = nullptr;
 }

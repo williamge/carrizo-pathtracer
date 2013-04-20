@@ -33,7 +33,7 @@ void cObject::makeCTRIANGLE()
 {
     vertices_ = new point3[3];
     vertices_count_ = 3;
-    vertex_normals_ = new vec3[1];
+    vertex_normals_ = nullptr;
     
     triangles_ = new objectTriangle[1];
     triangle_count_ = 1;
@@ -59,7 +59,7 @@ void cObject::makeCBOX()
     
     vertices_ = new point3[36];
     vertices_count_ = 36;
-    vertex_normals_ = new vec3[6];
+    vertex_normals_ = nullptr;
     
     vertices_[0] = point3(-0.5, 0.5, 0.5);
     vertices_[1] = point3(-0.5, -0.5, 0.5);
@@ -220,7 +220,7 @@ void cObject::makeCTESTOBJECT()
     
     vertices_ = new point3[9];
     vertices_count_ = 9;
-    vertex_normals_ = NULL;
+    vertex_normals_ = nullptr;
 	
     //left
 	objectTriangle triangle1;
@@ -299,6 +299,10 @@ cObject::cObject(const char *filename)
     translate_vector_ = vec3 (0.0, 0.0, 0.0);
     rotate_vector_ = vec3(0.0, 0.0, 0.0);
     scale_vector_ = vec3(1.0, 1.0, 1.0);
+    
+    vertices_ = vertex_normals_ = nullptr;
+    vertices_count_ = 0;
+    triangles_ = nullptr;
     
     std::cout << "Loading object from file [assimp]" << std::endl;
 
@@ -396,6 +400,10 @@ cObject::cObject(const char *filename)
         std::cout << "Error loading object [assimp]" << std::endl;
         exit(EXIT_FAILURE);
     }
+    
+    assert(triangles_ != nullptr);
+    assert(vertex_normals_ != nullptr);
+    assert(vertices_ != nullptr);
 }
 void cObject::translate(vec3 trans_vec)
 {

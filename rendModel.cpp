@@ -52,8 +52,8 @@ BVHnode * rendModel::constructBVHSub(renderTriangle *triangle_list, std::vector<
     if (index_list.size() == 1)
     {
         node->triangle_list = index_list;
-        node->left = NULL;
-        node->right = NULL;
+        node->left = nullptr;
+        node->right = nullptr;
         return node;
     }
     
@@ -121,8 +121,8 @@ BVHnode * rendModel::constructBVHSub(renderTriangle *triangle_list, std::vector<
         }
     }
     
-    node->left = NULL;
-    node->right = NULL;    
+    node->left = nullptr;
+    node->right = nullptr;
     
     if (centroid_bounds.low.data[dim] == centroid_bounds.high.data[dim])
     {
@@ -250,7 +250,7 @@ rendModel::rendModel(cObject * source_object)
     std::cout << "    Creating BVH for rendModel" << std::endl;
     root_ = constructBVH(triangles_, triangle_count_, bounding_boxes);
     
-    assert(root_); //is this correct? can a rendmodel have no bvhnode? TODO: figure it out perhaps!
+    assert(root_ != nullptr); //is this correct? can a rendmodel have no bvhnode? TODO: figure it out perhaps!
     
     std::cout << "    Finished creating BVH" << std::endl;
     
@@ -336,11 +336,11 @@ void rendModel::bvhTraversal(BVHnode* start, Ray &ray, std::vector<int> &triangl
                 triangle_list_out.push_back(tri);
             }
             
-            if (curr_node->left)
+            if (curr_node->left != nullptr)
             {
                 node_stack.push_back(curr_node->left);
             }
-            if (curr_node->right)
+            if (curr_node->right != nullptr)
             {
                 node_stack.push_back(curr_node->right);
             }

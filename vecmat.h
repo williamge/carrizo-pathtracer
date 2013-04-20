@@ -26,15 +26,12 @@ typedef struct vec3_t
     
     //vector compound assignment
     vec3_t& operator += (const vec3_t b);
+    vec3_t& operator -= (const vec3_t b);
 	
 } vec3;
 
 typedef vec3 point3;
 typedef vec3 col3;
-
-
-
-//TODO: these should probably pass in references to the parameters for speed
 
 //standard vector addition
 vec3 operator + (const vec3& a, const vec3& b);

@@ -71,8 +71,6 @@ void debugSceneSpider()
      * prototype end */
 	
 	pt.setDimensions(640,480);
-    //pt.setCamera( point3(-0.5, 0.5, 1.0), point3(0.0,0.0,0.0), 60.0); //test scene
-    //pt.setCamera( point3(30.0, 30.0, 30.0), point3(0.0,0.0,0.0), 60.0); //cone
     pt.setCamera( point3(200.0, 200.0, 200.0), point3(0.0,0.0,0.0), 55.0); //spider
 	pt.render();
 }
