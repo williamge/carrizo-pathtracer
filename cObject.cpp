@@ -21,9 +21,10 @@
  Takes the cObject object and turns it in to a returned rendModel 
  to be rendered.
 */
-rendModel* cObject::addToRender()
+std::shared_ptr<rendModel> cObject::addToRender()
 {
-    return new rendModel (this);
+    std::shared_ptr<rendModel> new_rendmodel (new rendModel(this));
+    return new_rendmodel;
 }
 
 /*

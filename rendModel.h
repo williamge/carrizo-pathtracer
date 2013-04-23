@@ -43,8 +43,8 @@ typedef struct bbox_t {
 } bounding_box;
 
 typedef struct BVHnode_t {
-    BVHnode_t *left;
-    BVHnode_t *right;
+    std::shared_ptr<BVHnode_t> left;
+    std::shared_ptr<BVHnode_t> right;
     std::vector<int> triangle_list;
     bounding_box bounds;
 } BVHnode;
@@ -53,15 +53,15 @@ typedef struct BVHnode_t {
 class rendModel
 {
 private:    
-    BVHnode *root_;
+    std::shared_ptr<BVHnode> root_;
     std::vector<renderTriangle> triangles_;
     
     static bounding_box boundsUnion(bounding_box box, point3 point);
     static bool boxIntersection(const bounding_box& b, const Ray& r, const vec3& inv_dir);
-    static void bvhTraversal(BVHnode* start, Ray &ray, std::vector<int> &triangle_list_out);
+    static void bvhTraversal(std::shared_ptr<BVHnode> start, Ray &ray, std::vector<int> &triangle_list_out);
     
-    BVHnode * constructBVHSub(const std::vector<int> &index_list, const std::vector<bounding_box> &bounds_list);
-    BVHnode * constructBVH(const std::vector<bounding_box> &bounds_list);
+    std::shared_ptr<BVHnode> constructBVHSub(const std::vector<int> &index_list, const std::vector<bounding_box> &bounds_list);
+    std::shared_ptr<BVHnode> constructBVH(const std::vector<bounding_box> &bounds_list);
     
 public:
 

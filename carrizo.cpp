@@ -16,12 +16,12 @@ void debugSceneTESTOBJECT()
 {
     cPathtracer pt;
 	
-	cObject *model1 = new cObject(CTESTOBJECT);
+	cObject model1(CTESTOBJECT);
     pt.addObject(model1);
     
-    cObject *model2 = new cObject(CBOX);
-    model2->translate(vec3(0.0,0.0,0.0));
-    model2->scale(vec3 (0.2,0.25,1.0));
+    cObject model2 (CBOX);
+    model2.translate(vec3(0.0,0.0,0.0));
+    model2.scale(vec3 (0.2,0.25,1.0));
     pt.addObject(model2);
     
 	pt.setDimensions(640,480);
@@ -34,9 +34,9 @@ void debugSceneCone()
 {
     cPathtracer pt;
 
-    cObject *model3 = new cObject("/Users/william/Downloads/assimp-master/test/models/NFF/NFF/cone.nff");
+    cObject model3 ("/Users/william/Downloads/assimp-master/test/models/NFF/NFF/cone.nff");
 
-    model3->scale(vec3(10.0, 10.0, 10.0));
+    model3.scale(vec3(10.0, 10.0, 10.0));
     pt.addObject(model3);
     
 	
@@ -50,13 +50,13 @@ void debugSceneSpider()
 {
     cPathtracer pt;
 	
-    cObject *spider_obj = new cObject("/Users/william/Downloads/assimp-master/test/models/OBJ/spider.obj");
+    cObject spider_obj ("/Users/william/Downloads/assimp-master/test/models/OBJ/spider.obj");
     
 	pt.addObject(spider_obj);
     
-    cObject *floor_obj = new cObject(CBOX);
-    floor_obj->scale(vec3 (250.0, 1.0, 250.0));
-    floor_obj->translate(vec3(0.0, -43.3, 0.0));
+    cObject floor_obj (CBOX);
+    floor_obj.scale(vec3 (250.0, 1.0, 250.0));
+    floor_obj.translate(vec3(0.0, -43.3, 0.0));
     pt.addObject(floor_obj);
     
 	/* prototype start *

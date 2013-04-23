@@ -38,10 +38,10 @@ bounding_box rendModel::boundsUnion(bounding_box box, point3 point)
 Creates a Bounding Volume Hierarchy node, doing the actual processing as 
 opposed to "constructBVH(...)"
 */
-BVHnode * rendModel::constructBVHSub(const std::vector<int> &index_list,const std::vector<bounding_box> &bounds_list)
+std::shared_ptr<BVHnode> rendModel::constructBVHSub(const std::vector<int> &index_list,const std::vector<bounding_box> &bounds_list)
 {
-    BVHnode *node = new BVHnode;
-    node->left = node->right = nullptr;
+    std::shared_ptr<BVHnode> node (new BVHnode);
+    //node->left = node->right = nullptr;
     
     bounding_box centroid_bounds; //bounding box for the centroids of primitives in the index_list
     centroid_bounds.low = bounds_list[index_list[0]].centroid;
@@ -151,7 +151,7 @@ root node to the constructed BVH.
     having been constructed by the "rendModel" constructor
 
 */
-BVHnode * rendModel::constructBVH(const std::vector<bounding_box> &bounds_list)
+std::shared_ptr<BVHnode>rendModel::constructBVH(const std::vector<bounding_box> &bounds_list)
 {
     std::vector<int> remaining_triangles;
     
@@ -180,6 +180,7 @@ rendModel::rendModel(cObject * const source_object)
     
     triangles_.resize(source_object->getNumTriangle());
 	
+    //TODO: extract this block into a new function
     int i=0;
 	for (auto &source_triangle : *source_object)
 	{
@@ -264,26 +265,6 @@ rendModel::rendModel(cObject * const source_object)
 
 rendModel::~rendModel()
 {
-    std::vector<BVHnode *> bvh_list;
-    bvh_list.push_back(root_);
-    
-    while (!bvh_list.empty())
-    {
-        BVHnode* curr_node;
-        curr_node = bvh_list.back();
-        bvh_list.pop_back();
-        
-        if (curr_node->left)
-        {
-            bvh_list.push_back(curr_node->left);
-        }
-        if (curr_node->right)
-        {
-            bvh_list.push_back(curr_node->right);
-        }
-        
-        delete curr_node;
-    }    
     
 }
 
@@ -322,7 +303,7 @@ bool rendModel::boxIntersection(const bounding_box& b, const Ray& ray, const vec
  intersected are stored in "triangle_list_out", which must be defined and passed to bvhTraversal 
  by the caller of the function.
  */
-void rendModel::bvhTraversal(BVHnode* start, Ray &ray, std::vector<int> &triangle_list_out)
+void rendModel::bvhTraversal(std::shared_ptr<BVHnode> start, Ray &ray, std::vector<int> &triangle_list_out)
 {
     /*
      gameplan: start from root BVHnode, add each child node (left and right), each time taking one node
@@ -336,8 +317,8 @@ void rendModel::bvhTraversal(BVHnode* start, Ray &ray, std::vector<int> &triangl
     //oh also this is just precomputation for something to be done in inv_
     vec3 inv_dir (1.0 / ray.d.x, 1.0 / ray.d.y, 1.0 / ray.d.z);
     
-    BVHnode* curr_node;
-    std::vector<BVHnode *> node_stack;
+    std::shared_ptr<BVHnode> curr_node;
+    std::vector<std::shared_ptr<BVHnode>> node_stack;
     node_stack.push_back(start);
     
     while (!node_stack.empty())

@@ -48,7 +48,7 @@ public:
     void rotate(vec3 rotate_vec);
     void scale(vec3 scale_vec);
     void assignMaterial();	
-    rendModel *addToRender();
+    std::shared_ptr<rendModel> addToRender();
     
     point3 getVertex(unsigned int vertex);
     vec3 getVertexNormal(unsigned int vertex);

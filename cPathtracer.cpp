@@ -45,9 +45,9 @@ std::uniform_real_distribution<double> dis(0.0,1.0);
 /* Adds the cObject pointed to by "obj" to the list of objects for the
  current scene
  */
-void cPathtracer::addObject(cObject *obj)
+void cPathtracer::addObject(cObject &obj)
 {
-    objects_.push_back(obj);
+    objects_.push_back(std::shared_ptr<cObject> (&obj));
 }
 
 /*
@@ -292,10 +292,6 @@ cPathtracer::~cPathtracer()
     delete image_.normals_display;
     delete image_.depth_display;
     
-    for (auto &object : objects_)
-    {
-        delete object;
-    }
 }
 
 cPathtracer::cPathtracer()

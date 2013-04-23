@@ -51,8 +51,8 @@ private:
         int width, height;
     } image_;
     
-    std::vector<cObject*> objects_;
-    std::vector<rendModel*> render_models_;
+    std::vector<std::shared_ptr<cObject>> objects_;
+    std::vector<std::shared_ptr<rendModel>> render_models_;
     
     unsigned int pass_number_;
     
@@ -72,7 +72,7 @@ public:
     cPathtracer();
     
     void render();
-    void addObject(cObject *obj);
+    void addObject(cObject &obj);
     void setCamera(point3 origin, point3 look_at, double fov);
     void setDimensions(int width, int height);
     
