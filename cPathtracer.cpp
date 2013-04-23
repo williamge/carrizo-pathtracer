@@ -47,7 +47,7 @@ std::uniform_real_distribution<double> dis(0.0,1.0);
  */
 void cPathtracer::addObject(cObject &obj)
 {
-    objects_.push_back(std::shared_ptr<cObject> (&obj));
+    objects_.push_back(&obj);
 }
 
 /*

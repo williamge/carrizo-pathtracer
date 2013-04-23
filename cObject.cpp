@@ -356,10 +356,6 @@ cObject::cObject(std::string filename)
     }
 }
 
-cObject::~cObject()
-{
-}
-
 void cObject::translate(vec3 trans_vec)
 {
     translate_vector_ = trans_vec;

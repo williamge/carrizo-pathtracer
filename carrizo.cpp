@@ -58,19 +58,6 @@ void debugSceneSpider()
     floor_obj.scale(vec3 (250.0, 1.0, 250.0));
     floor_obj.translate(vec3(0.0, -43.3, 0.0));
     pt.addObject(floor_obj);
-    
-	/* prototype start *
-     
-     cObject *model1 ("filename");
-     pt.addObject(model1);
-     model1.translate(...)
-     model1.rotate(...);
-     model1.scale(...);
-     model1.assignMaterial(...);
-     
-     * -at render call, add objects to scenary in form of triangles, etc.
-     
-     * prototype end */
 	
 	pt.setDimensions(640,480);
     pt.setCamera( point3(200.0, 200.0, 200.0), point3(0.0,0.0,0.0), 55.0); //spider

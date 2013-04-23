@@ -51,7 +51,7 @@ private:
         int width, height;
     } image_;
     
-    std::vector<std::shared_ptr<cObject>> objects_;
+    std::vector<cObject *> objects_;
     std::vector<std::shared_ptr<rendModel>> render_models_;
     
     unsigned int pass_number_;

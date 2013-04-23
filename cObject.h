@@ -42,7 +42,6 @@ private:
 public:
     cObject(int option);
     cObject(std::string filename);
-    ~cObject();
     
     void translate(vec3 trans_vec);
     void rotate(vec3 rotate_vec);
