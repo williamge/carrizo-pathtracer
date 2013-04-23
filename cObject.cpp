@@ -21,9 +21,9 @@
  Takes the cObject object and turns it in to a returned rendModel 
  to be rendered.
 */
-rendModel cObject::addToRender()
+rendModel* cObject::addToRender()
 {
-    return rendModel (this);
+    return new rendModel (this);
 }
 
 /*
@@ -31,12 +31,7 @@ rendModel cObject::addToRender()
  */
 void cObject::makeCTRIANGLE()
 {
-    vertices_ = new point3[3];
-    vertices_count_ = 3;
-    vertex_normals_ = nullptr;
-    
-    triangles_ = new objectTriangle[1];
-    triangle_count_ = 1;
+    vertices_.resize(3);
     
     vertices_[0] = point3(0.0, 0.5, 0.0);
     vertices_[1] = point3(-0.5, -0.5, 0.0);
@@ -49,17 +44,13 @@ void cObject::makeCTRIANGLE()
     
     triangle.vertex_normals = false;
     
-    triangles_[0] = triangle;
+    triangles_.push_back(triangle);
 }
 
 void cObject::makeCBOX()
 {
-    triangles_ = new objectTriangle[12];
-    triangle_count_ = 12;
     
-    vertices_ = new point3[36];
-    vertices_count_ = 36;
-    vertex_normals_ = nullptr;
+    vertices_.resize(36);
     
     vertices_[0] = point3(-0.5, 0.5, 0.5);
     vertices_[1] = point3(-0.5, -0.5, 0.5);
@@ -199,28 +190,24 @@ void cObject::makeCBOX()
     
     triangle12.vertex_normals = false;
     
-    triangles_[0] = triangle1;
-    triangles_[1] = triangle2;
-    triangles_[2] = triangle3;
-    triangles_[3] = triangle4;
-    triangles_[4] = triangle5;
-    triangles_[5] = triangle6;
-    triangles_[6] = triangle7;
-    triangles_[7] = triangle8;
-    triangles_[8] = triangle9;
-    triangles_[9] = triangle10;
-    triangles_[10] = triangle11;
-    triangles_[11] = triangle12;
+    triangles_.push_back(triangle1);
+    triangles_.push_back(triangle2);
+    triangles_.push_back(triangle3);
+    triangles_.push_back(triangle4);
+    triangles_.push_back(triangle5);
+    triangles_.push_back(triangle6);
+    triangles_.push_back(triangle7);
+    triangles_.push_back(triangle8);
+    triangles_.push_back(triangle9);
+    triangles_.push_back(triangle10);
+    triangles_.push_back(triangle11);
+    triangles_.push_back(triangle12);
 }
 
 void cObject::makeCTESTOBJECT()
 {
-    triangles_ = new objectTriangle[3];
-	triangle_count_ = 3;
     
-    vertices_ = new point3[9];
-    vertices_count_ = 9;
-    vertex_normals_ = nullptr;
+    vertices_.resize(9);
 	
     //left
 	objectTriangle triangle1;
@@ -234,7 +221,7 @@ void cObject::makeCTESTOBJECT()
 	
     triangle1.vertex_normals = false;
     
-	triangles_[0] = triangle1;
+	triangles_.push_back(triangle1);
 	
 	//right top
 	objectTriangle triangle2;
@@ -248,7 +235,7 @@ void cObject::makeCTESTOBJECT()
 	
     triangle2.vertex_normals = false;
     
-	triangles_[1] = triangle2;
+    triangles_.push_back(triangle2);
     
     //right bottom
     objectTriangle triangle3;
@@ -262,7 +249,7 @@ void cObject::makeCTESTOBJECT()
     
     triangle3.vertex_normals = false;
 	
-	triangles_[2] = triangle3;
+	triangles_.push_back(triangle3);
     
 
 }
@@ -293,16 +280,12 @@ cObject::cObject(int option)
 /*
  Load object from filename.
  */
-cObject::cObject(const char *filename)
+cObject::cObject(std::string filename)
 {
     
     translate_vector_ = vec3 (0.0, 0.0, 0.0);
     rotate_vector_ = vec3(0.0, 0.0, 0.0);
     scale_vector_ = vec3(1.0, 1.0, 1.0);
-    
-    vertices_ = vertex_normals_ = nullptr;
-    vertices_count_ = 0;
-    triangles_ = nullptr;
     
     std::cout << "Loading object from file [assimp]" << std::endl;
 
@@ -311,18 +294,7 @@ cObject::cObject(const char *filename)
     const aiScene* p_scene = importer.ReadFile(filename, aiProcess_Triangulate |aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
     
     if (p_scene)
-    {
-        /* These three vectors are for holding all the vertices in the scene from the file 
-         together in one place. Since the scene can be split up in to a number of meshes 
-         in the file, we can't really easily tell how many vertices are in the scene in 
-         total, and cObject doesn't have support for multiple meshes in one cObject nor will 
-         it probably ever.         
-         */
-        std::vector<objectTriangle> temp_triangles;
-        
-        std::vector<point3> temp_vertices_vector;
-        std::vector<point3> temp_vertex_normal_vector;
-        
+    {     
         for (unsigned int i=0; i < p_scene->mNumMeshes; i++)
         {
             const aiMesh* current_mesh = p_scene->mMeshes[i];
@@ -332,15 +304,15 @@ cObject::cObject(const char *filename)
             the number of vertices already in our (future) list and add this offset
             later on to keep it all aligned.
              */
-            unsigned int vertex_offset = temp_vertices_vector.size();
+            unsigned int vertex_offset = vertices_.size();
             
             for (unsigned int j=0; j < current_mesh->mNumVertices; j++)
             {
-                temp_vertices_vector.push_back( vec3(current_mesh->mVertices[j].x,
+                vertices_.push_back( vec3(current_mesh->mVertices[j].x,
                                                      current_mesh->mVertices[j].y,
                                                      current_mesh->mVertices[j].z));
                 
-                temp_vertex_normal_vector.push_back( vec3(current_mesh->mNormals[j].x,
+                vertex_normals_.push_back( vec3(current_mesh->mNormals[j].x,
                                                           current_mesh->mNormals[j].y,
                                                           current_mesh->mNormals[j].z));
             }            
@@ -366,33 +338,14 @@ cObject::cObject(const char *filename)
                 
                 current_triangle.vertex_normals = true;
                 
-                temp_triangles.push_back(current_triangle);
+                triangles_.push_back(current_triangle);
             }
         }
         
         //now since we know how many vertices are actually in the scene/file, 
         //we can roll them in to the lists that cObject works with
-        
-        vertices_count_ = temp_vertices_vector.size();
-        
-        vertices_ = new point3[vertices_count_];
-        vertex_normals_ = new vec3[vertices_count_];
-        
-        for (unsigned int i = 0; i < temp_vertices_vector.size(); i++)
-        {
-            vertices_[i] = temp_vertices_vector[i];
-            vertex_normals_[i] = temp_vertex_normal_vector[i];
-        }
-        
-        triangle_count_ = temp_triangles.size();
-        triangles_ = new objectTriangle[triangle_count_];
-        
-        for (unsigned int i = 0; i < temp_triangles.size(); i++)
-        {
-            triangles_[i] = temp_triangles[i];
-        }
-        
-        std::cout << "    Triangle count: " << triangle_count_ << std::endl;
+                
+        std::cout << "    Triangle count: " << triangles_.size() << std::endl;
         std::cout << "Finished making cObject from file [assimp]" << std::endl;
     }
     else
@@ -400,11 +353,12 @@ cObject::cObject(const char *filename)
         std::cout << "Error loading object [assimp]" << std::endl;
         exit(EXIT_FAILURE);
     }
-    
-    assert(triangles_ != nullptr);
-    assert(vertex_normals_ != nullptr);
-    assert(vertices_ != nullptr);
 }
+
+cObject::~cObject()
+{
+}
+
 void cObject::translate(vec3 trans_vec)
 {
     translate_vector_ = trans_vec;
@@ -425,13 +379,11 @@ void cObject::assignMaterial()
 
 point3 cObject::getVertex(unsigned int vertex)
 {
-    assert(vertex < vertices_count_);
-    return vertices_[vertex];    
+    return vertices_[vertex];
 }
 
 vec3 cObject::getVertexNormal(unsigned int vertex)
 {
-    assert(vertex < vertices_count_);
     return vertex_normals_[vertex];
 }
 
@@ -452,5 +404,5 @@ vec3 cObject::getScale()
 
 unsigned int cObject::getNumTriangle()
 {
-    return triangle_count_;
+    return triangles_.size();
 }

@@ -38,15 +38,15 @@ typedef struct renderTriangle_t{
 	//material *mat;
 } renderTriangle;
 
-struct bbox {
+typedef struct bbox_t {
     point3 low, high, centroid;
-};
+} bounding_box;
 
 typedef struct BVHnode_t {
     BVHnode_t *left;
     BVHnode_t *right;
     std::vector<int> triangle_list;
-    struct bbox bounds;
+    bounding_box bounds;
 } BVHnode;
 
 
@@ -54,19 +54,20 @@ class rendModel
 {
 private:    
     BVHnode *root_;
-    renderTriangle *triangles_;
-    unsigned int triangle_count_;
+    std::vector<renderTriangle> triangles_;
     
-    bbox boundsUnion(bbox box, point3 point);
-    static bool boxIntersection(const bbox& b, const Ray& r, const vec3& inv_dir);
-    void bvhTraversal(BVHnode* start, Ray &ray, std::vector<int> &triangle_list_out);
+    static bounding_box boundsUnion(bounding_box box, point3 point);
+    static bool boxIntersection(const bounding_box& b, const Ray& r, const vec3& inv_dir);
+    static void bvhTraversal(BVHnode* start, Ray &ray, std::vector<int> &triangle_list_out);
     
-    BVHnode * constructBVHSub(renderTriangle *triangle_list, std::vector<int> index_list, bbox *bounds_list);
-    BVHnode * constructBVH(renderTriangle *triangle_list, int triangle_count, bbox *bounds_list);
+    BVHnode * constructBVHSub(const std::vector<int> &index_list, const std::vector<bounding_box> &bounds_list);
+    BVHnode * constructBVH(const std::vector<bounding_box> &bounds_list);
     
 public:
 
-    rendModel(cObject * sourceObject);
+    rendModel(cObject * const sourceObject);
+    ~rendModel();
+    
     bool intersect(Ray& ray);
 };
 

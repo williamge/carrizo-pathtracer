@@ -54,12 +54,12 @@ void cPathtracer::addObject(cObject *obj)
  Simply intersects each render model in the scene with the current ray,
  to trace the ray.
  */
-void cPathtracer::intersectScene(Ray * ray)
+void cPathtracer::intersectScene(Ray &ray)
 {
 	
 	for (int i = 0; i < render_models_.size(); i++)
 	{
-		render_models_[i].intersect(*ray);
+		render_models_[i]->intersect(ray);
 	}
 }
 
@@ -113,7 +113,7 @@ void cPathtracer::shadePixel(int i, int j, camera_vectors &render_vectors, doubl
     
     rayt.intersection.hit = false;
     
-    intersectScene(&rayt);
+    intersectScene(rayt);
     col3 regular_col = regularShader(rayt);
     col3 normals_col = normalsShader(rayt);
     col3 depth_col = depthShader(rayt);
@@ -200,9 +200,9 @@ void cPathtracer::renderPass(camera_vectors &render_vectors)
 void cPathtracer::render()
 {
     //done rendering so far, just display and save the render
-    CImgDisplay regular_display (*image_.buffer, "Regular Shader");
-    CImgDisplay normals_display (*image_.normals_buffer, "Normals Shader");
-    CImgDisplay depth_display (*image_.depth_buffer, "Depth Shader");
+    image_.regular_display = new CImgDisplay(*image_.buffer, "Regular Shader");
+    image_.normals_display = new CImgDisplay(*image_.normals_buffer, "Normals Shader");
+    image_.depth_display = new CImgDisplay(*image_.depth_buffer, "Depth Shader");
     
     readyObjects();
     
@@ -244,12 +244,10 @@ void cPathtracer::render()
         //image_.normals_buffer->display(normals_display, true);
         //image_.depth_buffer->display(depth_display, true);
         
-        regular_display.display(*image_.buffer);
-        normals_display.display(*image_.normals_buffer);
-        depth_display.display(*image_.depth_buffer);
+        image_.regular_display->display(*image_.buffer);
+        image_.normals_display->display(*image_.normals_buffer);
+        image_.depth_display->display(*image_.depth_buffer);
     }
-    
-    //sleep(10); //ALSO GET RID OF THIS WHEN DONE TESTING/DEBUGGING
     
     image_.buffer->normalize(0, 255);
     image_.buffer->save_png("output.png");
@@ -284,9 +282,29 @@ void cPathtracer::setCamera( point3 origin, point3 look_at, double fov)
     camera_.fov = fov;
 }
 
+cPathtracer::~cPathtracer()
+{
+    delete image_.buffer;
+    delete image_.normals_buffer;
+    delete image_.depth_buffer;
+    
+    delete image_.regular_display;
+    delete image_.normals_display;
+    delete image_.depth_display;
+    
+    for (auto &object : objects_)
+    {
+        delete object;
+    }
+}
+
 cPathtracer::cPathtracer()
 {
     image_.buffer = nullptr;
     image_.normals_buffer = nullptr;
     image_.depth_buffer = nullptr;
+    
+    image_.regular_display = nullptr;
+    image_.normals_display = nullptr;
+    image_.depth_display = nullptr;
 }

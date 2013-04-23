@@ -21,7 +21,7 @@
  Given a bounding box and a point, boundsUnion expands the bounding box to include the 
  point if necessary, then returns the new box.
 */
-bbox rendModel::boundsUnion(bbox box, point3 point)
+bounding_box rendModel::boundsUnion(bounding_box box, point3 point)
 {
     box.low.x = std::min(box.low.x, point.x);
     box.low.y = std::min(box.low.y, point.y);
@@ -38,11 +38,12 @@ bbox rendModel::boundsUnion(bbox box, point3 point)
 Creates a Bounding Volume Hierarchy node, doing the actual processing as 
 opposed to "constructBVH(...)"
 */
-BVHnode * rendModel::constructBVHSub(renderTriangle *triangle_list, std::vector<int> index_list, bbox *bounds_list)
+BVHnode * rendModel::constructBVHSub(const std::vector<int> &index_list,const std::vector<bounding_box> &bounds_list)
 {
     BVHnode *node = new BVHnode;
+    node->left = node->right = nullptr;
     
-    bbox centroid_bounds; //bounding box for the centroids of primitives in the index_list
+    bounding_box centroid_bounds; //bounding box for the centroids of primitives in the index_list
     centroid_bounds.low = bounds_list[index_list[0]].centroid;
     centroid_bounds.high = bounds_list[index_list[0]].centroid;
     
@@ -52,8 +53,6 @@ BVHnode * rendModel::constructBVHSub(renderTriangle *triangle_list, std::vector<
     if (index_list.size() == 1)
     {
         node->triangle_list = index_list;
-        node->left = nullptr;
-        node->right = nullptr;
         return node;
     }
     
@@ -106,7 +105,7 @@ BVHnode * rendModel::constructBVHSub(renderTriangle *triangle_list, std::vector<
     //determine which node to store the remaining bounding boxes in
     for (int i = 0; i < index_list.size(); i++)
     {
-        bbox curr_bound = bounds_list[index_list[i]];
+        bounding_box curr_bound = bounds_list[index_list[i]];
 
         point3 triangle_centroid = curr_bound.low + curr_bound.high;
         triangle_centroid = triangle_centroid * 0.5;
@@ -121,9 +120,6 @@ BVHnode * rendModel::constructBVHSub(renderTriangle *triangle_list, std::vector<
         }
     }
     
-    node->left = nullptr;
-    node->right = nullptr;
-    
     if (centroid_bounds.low.data[dim] == centroid_bounds.high.data[dim])
     {
         node->triangle_list = index_list;
@@ -132,11 +128,11 @@ BVHnode * rendModel::constructBVHSub(renderTriangle *triangle_list, std::vector<
     {        
         if (left_index.size() > 0)
         {
-            node->left = constructBVHSub(triangle_list, left_index, bounds_list);         
+            node->left = constructBVHSub(left_index, bounds_list);         
         }
         if (right_index.size() > 0)
         {
-            node->right = constructBVHSub(triangle_list, right_index, bounds_list);
+            node->right = constructBVHSub(right_index, bounds_list);
         }
 
     }
@@ -155,16 +151,16 @@ root node to the constructed BVH.
     having been constructed by the "rendModel" constructor
 
 */
-BVHnode * rendModel::constructBVH(renderTriangle *triangle_list, int triangle_count, bbox *bounds_list)
+BVHnode * rendModel::constructBVH(const std::vector<bounding_box> &bounds_list)
 {
     std::vector<int> remaining_triangles;
     
-    for (int i = 0; i < triangle_count; i++)
+    for (int i = 0; i < triangles_.size(); i++)
     {
         remaining_triangles.push_back(i);
     }
     
-    return constructBVHSub(triangle_list, remaining_triangles, bounds_list);
+    return constructBVHSub(remaining_triangles, bounds_list);
 }
 
 /*
@@ -175,15 +171,14 @@ the triangles, and then creates useful information for the triangle
 such as uv coordinates for the intersection plane and the normal.
 
 */
-rendModel::rendModel(cObject * source_object)
+rendModel::rendModel(cObject * const source_object)
 {
-    std::cout << "Creating rendModel" << std::endl;
+    std::cout << "Creating rendModel" << std::endl;	
     
-    triangle_count_ = source_object->getNumTriangle();
-	triangles_ = new renderTriangle[triangle_count_];
-	
+    std::vector<bounding_box> bounding_boxes;
+    bounding_boxes.resize(source_object->getNumTriangle());
     
-    struct bbox *bounding_boxes = new struct bbox[triangle_count_];
+    triangles_.resize(source_object->getNumTriangle());
 	
     int i=0;
 	for (auto &source_triangle : *source_object)
@@ -248,7 +243,7 @@ rendModel::rendModel(cObject * source_object)
 	}
     
     std::cout << "    Creating BVH for rendModel" << std::endl;
-    root_ = constructBVH(triangles_, triangle_count_, bounding_boxes);
+    root_ = constructBVH(bounding_boxes);
     
     assert(root_ != nullptr); //is this correct? can a rendmodel have no bvhnode? TODO: figure it out perhaps!
     
@@ -267,6 +262,31 @@ rendModel::rendModel(cObject * source_object)
   
 }
 
+rendModel::~rendModel()
+{
+    std::vector<BVHnode *> bvh_list;
+    bvh_list.push_back(root_);
+    
+    while (!bvh_list.empty())
+    {
+        BVHnode* curr_node;
+        curr_node = bvh_list.back();
+        bvh_list.pop_back();
+        
+        if (curr_node->left)
+        {
+            bvh_list.push_back(curr_node->left);
+        }
+        if (curr_node->right)
+        {
+            bvh_list.push_back(curr_node->right);
+        }
+        
+        delete curr_node;
+    }    
+    
+}
+
 /*
  Private utility function for bounding box - ray intersections, returns true if there's a proper intersection, 
  false otherwise.
@@ -275,7 +295,7 @@ rendModel::rendModel(cObject * source_object)
     http://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm
   
  */
-bool rendModel::boxIntersection(const bbox& b, const Ray& ray, const vec3& inv_dir)
+bool rendModel::boxIntersection(const bounding_box& b, const Ray& ray, const vec3& inv_dir)
 {
     double tx1 = (b.low.x - ray.o.x) * inv_dir.x;
     double tx2 = (b.high.x - ray.o.x) * inv_dir.x;
@@ -320,12 +340,12 @@ void rendModel::bvhTraversal(BVHnode* start, Ray &ray, std::vector<int> &triangl
     std::vector<BVHnode *> node_stack;
     node_stack.push_back(start);
     
-    while (node_stack.size() > 0)
+    while (!node_stack.empty())
     {
         //hey why do we go through all of this instead of starting from the front?
         //well because std::vector wants you do pop from the back, apparently it's faster
         //so here we are, taking nodes from the back of the list always
-        curr_node = node_stack[node_stack.size() - 1];
+        curr_node = node_stack.back();
         node_stack.pop_back();
         
         if (boxIntersection(curr_node->bounds, ray, inv_dir))

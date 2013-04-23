@@ -43,15 +43,20 @@ private:
         cimg_library::CImg<double> *buffer;
         cimg_library::CImg<double> *normals_buffer;
         cimg_library::CImg<double> *depth_buffer;
+        
+        cimg_library::CImgDisplay *regular_display;
+        cimg_library::CImgDisplay *normals_display;
+        cimg_library::CImgDisplay *depth_display;
+        
         int width, height;
     } image_;
     
     std::vector<cObject*> objects_;
-    std::vector<rendModel> render_models_;
+    std::vector<rendModel*> render_models_;
     
     unsigned int pass_number_;
     
-    void intersectScene(Ray* ray);
+    void intersectScene(Ray &ray);
     static void setImage(cimg_library::CImg<double> *image, int i, int j, col3& colour, unsigned int pass_number);
     void shadePixel(int i, int j, camera_vectors &render_vectors, double factor);
     
@@ -63,7 +68,9 @@ private:
     void renderPass(camera_vectors &render_vectors);
 	
 public:
+    ~cPathtracer();
     cPathtracer();
+    
     void render();
     void addObject(cObject *obj);
     void setCamera(point3 origin, point3 look_at, double fov);

@@ -78,7 +78,7 @@ void debugSceneSpider()
 }
 
 int main(int argc, const char* argv[])
-{
+{    
 	debugSceneSpider();
 	return 1;
 }
