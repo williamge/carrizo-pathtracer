@@ -18,12 +18,12 @@
 #include "material.h"
 
 /* 
- Takes the cObject object and turns it in to a returned rendModel 
- to be rendered.
-*/
+ Takes the cObject and creates and returns a pointer to a rendModel corresponding to the 
+ cObject.
+ */
 std::shared_ptr<rendModel> cObject::addToRender()
 {
-    std::shared_ptr<rendModel> new_rendmodel (new rendModel(this));
+    std::shared_ptr<rendModel> new_rendmodel (new rendModel(*this));
     return new_rendmodel;
 }
 
@@ -279,7 +279,7 @@ cObject::cObject(int option)
 }
 
 /*
- Load object from filename.
+ Creates cObject from an object/model/scene loaded from filename.
  */
 cObject::cObject(std::string filename)
 {
@@ -356,14 +356,22 @@ cObject::cObject(std::string filename)
     }
 }
 
+/* Set the translation vector for the object to trans_vec.
+ */
 void cObject::translate(vec3 trans_vec)
 {
     translate_vector_ = trans_vec;
 }
+
+/* Set the rotation for the object to the rotation degrees found in rotate_vec.
+ */
 void cObject::rotate(vec3 rotate_vec)
 {
     rotate_vector_ = rotate_vec;
 }
+
+/* Set the scale vector for the object to scale_vec.
+ */
 void cObject::scale(vec3 scale_vec)
 {
     scale_vector_ = scale_vec;
@@ -374,32 +382,44 @@ void cObject::assignMaterial()
     
 }
 
+/* Returns the 3D point of the vertex found by the index "vertex".
+ */
 point3 cObject::getVertex(unsigned int vertex)
 {
     return vertices_[vertex];
 }
 
+/* Returns the 3D vector normal of the vertex normal found by the index "vertex".
+ */
 vec3 cObject::getVertexNormal(unsigned int vertex)
 {
     return vertex_normals_[vertex];
 }
 
+/* Returns the translation vector for the object.
+ */
 vec3 cObject::getTranslate()
 {
     return translate_vector_;
 }
 
+/* Returns the rotation degrees for the object in vector format.
+ */
 vec3 cObject::getRotate()
 {
     return rotate_vector_;
 }
 
+/* Returns the scale vector for the object.
+ */
 vec3 cObject::getScale()
 {
     return scale_vector_;
 }
 
+/* Returns the total number of triangles found in the object.
+ */
 unsigned int cObject::getNumTriangle()
 {
-    return triangles_.size();
+    return static_cast<unsigned int>(triangles_.size());
 }

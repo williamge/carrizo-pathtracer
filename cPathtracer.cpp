@@ -42,8 +42,8 @@ std::uniform_real_distribution<double> dis(0.0,1.0);
  
  */
 
-/* Adds the cObject pointed to by "obj" to the list of objects for the
- current scene
+/* Adds a pointer to the cObject "obj" to the list of objects for the
+ current scene.
  */
 void cPathtracer::addObject(cObject &obj)
 {
@@ -96,7 +96,9 @@ void cPathtracer::setImage(CImg<double> *image, int i, int j, col3& colour, unsi
 }
 
 /*
- Shades the given pixel at (i,j).
+ Shades the given pixel at (i,j), running through the different shaders enabled for the scene.
+ 
+ TODO: implement selectable shaders
  */
 void cPathtracer::shadePixel(int i, int j, camera_vectors &render_vectors, double factor)
 {
@@ -174,7 +176,6 @@ bool cPathtracer::readyObjects()
 
 void cPathtracer::renderPass(camera_vectors &render_vectors)
 {    
-    //timing start
     auto start_time = std::chrono::high_resolution_clock::now();
 	
     //factor for "sensor" screen derived from fov, each ray for the render uses this number to set the fov
@@ -204,6 +205,11 @@ void cPathtracer::render()
     image_.normals_display = new CImgDisplay(*image_.normals_buffer, "Normals Shader");
     image_.depth_display = new CImgDisplay(*image_.depth_buffer, "Depth Shader");
     
+    if (!image_.buffer) //if dimensions weren't set, set them to a default value
+    {
+        setDimensions(640, 480);
+    }
+    
     readyObjects();
     
     //this is just a struct to hold the vectors we need to set up the camera screen
@@ -220,6 +226,8 @@ void cPathtracer::render()
         << render_vectors.direction_vector.z << std::endl;
      
     vec3 up_vector = vec3 (0.0,1.0,0.0);
+    //if the render_vector crossed with the up_vector would be messy (i.e. they're the same) 
+    //then we have to make a new appropriate up_vector
     if (up_vector == render_vectors.direction_vector)
     {
         up_vector = vec3(0.0, 0.0, -1.0);

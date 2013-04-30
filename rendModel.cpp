@@ -141,15 +141,11 @@ std::shared_ptr<BVHnode> rendModel::constructBVHSub(const std::vector<int> &inde
 }
 
 /*
-
-Top level method of creating a BVH object for the scene, returning the 
+Top level method of creating a BVH object for the scene, returning the
 root node to the constructed BVH.
 
-*"tri_list" is a pointer to the list of triangles to place in to the BVH
-*"tri_count" is the number of triangles in the scene
-*"bounds_list" is a pointer to the list of bounding boxes for the scene,
+"bounds_list" is the list of bounding boxes for the scene,
     having been constructed by the "rendModel" constructor
-
 */
 std::shared_ptr<BVHnode>rendModel::constructBVH(const std::vector<bounding_box> &bounds_list)
 {
@@ -164,40 +160,37 @@ std::shared_ptr<BVHnode>rendModel::constructBVH(const std::vector<bounding_box> 
 }
 
 /*
-
-The constructor for a rendModel, takes in a list of triangles and their 
-count, creates corresponding renderTriangles, creates bounding boxes for
-the triangles, and then creates useful information for the triangle
-such as uv coordinates for the intersection plane and the normal.
-
+The constructor for a rendModel, takes in a cObject and creates corresponding renderTriangles,
+ creates bounding boxes for the triangles, and then creates useful information for the
+ trianglesuch as uv coordinates for the intersection plane and the normal.
 */
-rendModel::rendModel(cObject * const source_object)
+rendModel::rendModel(cObject &source_object)
 {
     std::cout << "Creating rendModel" << std::endl;	
     
     std::vector<bounding_box> bounding_boxes;
-    bounding_boxes.resize(source_object->getNumTriangle());
+    bounding_boxes.resize(source_object.getNumTriangle());
     
-    triangles_.resize(source_object->getNumTriangle());
+    triangles_.resize(source_object.getNumTriangle());
 	
-    //TODO: extract this block into a new function
+    //TODO: extract this block into a new function maybe
     int i=0;
-	for (auto &source_triangle : *source_object)
+	for (auto &source_triangle : source_object)
 	{
-		point3 p1 = source_object->getVertex(source_triangle.vertices[0]);
-		point3 p2 = source_object->getVertex(source_triangle.vertices[1]);
-		point3 p3 = source_object->getVertex(source_triangle.vertices[2]);
+		point3 p1 = source_object.getVertex(source_triangle.vertices[0]);
+		point3 p2 = source_object.getVertex(source_triangle.vertices[1]);
+		point3 p3 = source_object.getVertex(source_triangle.vertices[2]);
         
         //apply transformations to each point
         
-        vec3 scale_vector = source_object->getScale();
+        vec3 scale_vector = source_object.getScale();
         p1.apply(scale_vector);
         p2.apply(scale_vector);
         p3.apply(scale_vector);
         
         //TODO: implement rotate transformation
         
-        vec3 translate_vector = source_object->getTranslate();
+        vec3 translate_vector = source_object.getTranslate();
         
         p1 += translate_vector;
         p2 += translate_vector;
@@ -227,13 +220,13 @@ rendModel::rendModel(cObject * const source_object)
         if (source_triangle.vertex_normals) //does it have vertex normals?
         {
             triangles_[i].vertex_normals[0] =
-                source_object->getVertexNormal(source_triangle.vertex_normal[0]); 
+                source_object.getVertexNormal(source_triangle.vertex_normal[0]);
             
             triangles_[i].vertex_normals[1] =
-                source_object->getVertexNormal(source_triangle.vertex_normal[1]);
+                source_object.getVertexNormal(source_triangle.vertex_normal[1]);
             
             triangles_[i].vertex_normals[2] =
-                source_object->getVertexNormal(source_triangle.vertex_normal[2]);
+                source_object.getVertexNormal(source_triangle.vertex_normal[2]);
         }
         else
         {
@@ -299,9 +292,11 @@ bool rendModel::boxIntersection(const bounding_box& b, const Ray& ray, const vec
     return (tmax >= std::max(0.0, tmin));
 }
 
-/* Traverses the BVH with root node "start" by ray "ray". The resulting triangles to be 
+/* 
+ Traverses the BVH with root node "start" by ray "ray". The resulting triangles to be
  intersected are stored in "triangle_list_out", which must be defined and passed to bvhTraversal 
- by the caller of the function.
+ by the caller of the function to save time instead of having to create and copy a vector each 
+ call of this function.
  */
 void rendModel::bvhTraversal(std::shared_ptr<BVHnode> start, Ray &ray, std::vector<int> &triangle_list_out)
 {
@@ -351,10 +346,9 @@ void rendModel::bvhTraversal(std::shared_ptr<BVHnode> start, Ray &ray, std::vect
 }
 
 /*
-
-Object defined method to intersect a ray with the model, traversing the BVH for the model 
-in a smart way.
-
+Intersects a ray with the model, traversing the BVH for the model and computing hit 
+ characteristics for the ray-model intersection if there is one. Returns true on hit, false 
+ otherwise.
 */
 bool rendModel::intersect(Ray& ray)
 {

@@ -65,7 +65,7 @@ private:
     
 public:
 
-    rendModel(cObject * const sourceObject);
+    rendModel(cObject &sourceObject);
     ~rendModel();
     
     bool intersect(Ray& ray);
