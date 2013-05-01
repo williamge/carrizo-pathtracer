@@ -233,6 +233,9 @@ rendModel::rendModel(cObject &source_object)
             triangles_[i].vertex_normals[0] = triangles_[i].vertex_normals[1] =
                 triangles_[i].vertex_normals[2] = triangles_[i].normal;
         }
+        
+        triangles_[i].triangle_material = source_triangle.triangle_material;
+        
         i++;
 	}
     
@@ -419,13 +422,16 @@ bool rendModel::intersect(Ray& ray)
             {
                 ray.intersection.normal = -ray.intersection.normal;
             }
+            
             ray.intersection.hit = true;
+            ray.intersection.ray_material = triangles_[i].triangle_material;
 		}
 	}
 	
 	if (hit_triangle > -1)
 	{
 		//TODO: set material in or something else
+        
 		return true;
 	}
 	return false;

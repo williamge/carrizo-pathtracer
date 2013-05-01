@@ -45,11 +45,24 @@ void cObject::makeCTRIANGLE()
     
     triangle.vertex_normals = false;
     
+    std::shared_ptr<material> default_material (new material);
+    default_material->diffuse = col3(0.5, 0.5, 0.5);
+    default_material->specular = default_material->emissive = default_material->reflective = default_material->transparent = col3(0.0, 0.0, 0.0);
+    default_material->shininess = default_material->shininess_strength = default_material->reflectivity = 0.0;
+    default_material->refractivity = 0.0;
+    triangle.triangle_material = default_material;
+    
     triangles_.push_back(triangle);
 }
 
 void cObject::makeCBOX()
 {
+    
+    std::shared_ptr<material> default_material (new material);
+    default_material->diffuse = col3(0.5, 0.5, 0.5);
+    default_material->specular = default_material->emissive = default_material->reflective = default_material->transparent = col3(0.0, 0.0, 0.0);
+    default_material->shininess = default_material->shininess_strength = default_material->reflectivity = 0.0;
+    default_material->refractivity = 0.0;
     
     vertices_.resize(36);
     
@@ -108,6 +121,7 @@ void cObject::makeCBOX()
     triangle1.vertices[2] = 2; //top right
     
     triangle1.vertex_normals = false;
+    triangle1.triangle_material = default_material;
     
     objectTriangle triangle2;
     triangle2.vertices[0] = 3; //top right
@@ -115,6 +129,7 @@ void cObject::makeCBOX()
     triangle2.vertices[2] = 5; //bottom right
     
     triangle2.vertex_normals = false;
+    triangle2.triangle_material = default_material;
     
     //back side
     objectTriangle triangle3;
@@ -123,6 +138,7 @@ void cObject::makeCBOX()
     triangle3.vertices[2] = 8; //top right
     
     triangle3.vertex_normals = false;
+    triangle3.triangle_material = default_material;
     
     objectTriangle triangle4;
     triangle4.vertices[0] = 9; //top right
@@ -130,6 +146,7 @@ void cObject::makeCBOX()
     triangle4.vertices[2] = 11; //bottom right
     
     triangle4.vertex_normals = false;
+    triangle4.triangle_material = default_material;
     
     //bottom side
     objectTriangle triangle5;
@@ -138,6 +155,7 @@ void cObject::makeCBOX()
     triangle5.vertices[2] = 14; //far right
     
     triangle5.vertex_normals = false;
+    triangle5.triangle_material = default_material;
     
     objectTriangle triangle6;
     triangle6.vertices[0] = 15; //far right
@@ -145,6 +163,7 @@ void cObject::makeCBOX()
     triangle6.vertices[2] = 17; //close right
     
     triangle6.vertex_normals = false;
+    triangle6.triangle_material = default_material;
     
     //top side
     objectTriangle triangle7;
@@ -153,6 +172,7 @@ void cObject::makeCBOX()
     triangle7.vertices[2] = 20; //far right
     
     triangle7.vertex_normals = false;
+    triangle7.triangle_material = default_material;
     
     objectTriangle triangle8;
     triangle8.vertices[0] = 21; //far right
@@ -160,6 +180,7 @@ void cObject::makeCBOX()
     triangle8.vertices[2] = 23; //close right
     
     triangle8.vertex_normals = false;
+    triangle8.triangle_material = default_material;
     
     //left side
     objectTriangle triangle9;
@@ -168,6 +189,7 @@ void cObject::makeCBOX()
     triangle9.vertices[2] = 26; //close top
     
     triangle9.vertex_normals = false;
+    triangle9.triangle_material = default_material;
     
     objectTriangle triangle10;
     triangle10.vertices[0] = 27; //far bottom
@@ -175,6 +197,7 @@ void cObject::makeCBOX()
     triangle10.vertices[2] = 29; //close bottom
     
     triangle10.vertex_normals = false;
+    triangle10.triangle_material = default_material;
     
     //right side
     objectTriangle triangle11;
@@ -183,6 +206,7 @@ void cObject::makeCBOX()
     triangle11.vertices[2] = 32; //close top
     
     triangle11.vertex_normals = false;
+    triangle11.triangle_material = default_material;
     
     objectTriangle triangle12;
     triangle12.vertices[0] = 33; //far bottom
@@ -190,6 +214,7 @@ void cObject::makeCBOX()
     triangle12.vertices[2] = 35; //close bottom
     
     triangle12.vertex_normals = false;
+    triangle12.triangle_material = default_material;
     
     triangles_.push_back(triangle1);
     triangles_.push_back(triangle2);
@@ -208,6 +233,12 @@ void cObject::makeCBOX()
 void cObject::makeCTESTOBJECT()
 {
     
+    std::shared_ptr<material> default_material (new material);
+    default_material->diffuse = col3(0.5, 0.5, 0.5);
+    default_material->specular = default_material->emissive = default_material->reflective = default_material->transparent = col3(0.0, 0.0, 0.0);
+    default_material->shininess = default_material->shininess_strength = default_material->reflectivity = 0.0;
+    default_material->refractivity = 0.0;
+    
     vertices_.resize(9);
 	
     //left
@@ -221,6 +252,7 @@ void cObject::makeCTESTOBJECT()
 	triangle1.vertices[0] = 2;
 	
     triangle1.vertex_normals = false;
+    triangle1.triangle_material = default_material;
     
 	triangles_.push_back(triangle1);
 	
@@ -235,6 +267,7 @@ void cObject::makeCTESTOBJECT()
 	triangle2.vertices[1] = 5;
 	
     triangle2.vertex_normals = false;
+    triangle2.triangle_material = default_material;
     
     triangles_.push_back(triangle2);
     
@@ -249,6 +282,7 @@ void cObject::makeCTESTOBJECT()
 	triangle3.vertices[1] =  8;
     
     triangle3.vertex_normals = false;
+    triangle3.triangle_material = default_material;
 	
 	triangles_.push_back(triangle3);
     
@@ -294,18 +328,100 @@ cObject::cObject(std::string filename)
     
     const aiScene* p_scene = importer.ReadFile(filename, aiProcess_Triangulate |aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
     
+    //std::vector<std::shared_ptr<material>> materials_;
+    
     if (p_scene)
     {     
         for (unsigned int i=0; i < p_scene->mNumMeshes; i++)
         {
             const aiMesh* current_mesh = p_scene->mMeshes[i];
             
+            materials_.push_back(std::shared_ptr<material>(new material));
+            struct aiMaterial *ai_material = p_scene->mMaterials[current_mesh->mMaterialIndex];
+            
+            aiColor4D diffuse;
+            if (AI_SUCCESS == aiGetMaterialColor(ai_material, AI_MATKEY_COLOR_DIFFUSE, &diffuse))
+            {
+                materials_.back()->diffuse = col3(diffuse.r, diffuse.g, diffuse.b);
+                std::cout << diffuse.r << " " << diffuse.g << " " << diffuse.b << std::endl;
+            }
+            else
+            {
+                materials_.back()->diffuse = col3(0.0, 0.0, 0.0);
+            }
+            
+            aiColor4D specular;
+            if (AI_SUCCESS == aiGetMaterialColor(ai_material, AI_MATKEY_COLOR_SPECULAR, &specular))
+            {
+                materials_.back()->specular = col3(specular.r, specular.g, specular.b);
+                std::cout << "  " << specular.r << " " << specular.g << " " << specular.b << std::endl;
+            }
+            else
+            {
+                materials_.back()->specular = col3(0.0, 0.0, 0.0);
+            }
+            
+            aiColor4D emissive;
+            if (AI_SUCCESS == aiGetMaterialColor(ai_material, AI_MATKEY_COLOR_EMISSIVE, &emissive))
+            {
+                materials_.back()->emissive = col3(emissive.r, emissive.g, emissive.b);
+                std::cout << "  " << emissive.r << " " << emissive.g << " " << emissive.b << std::endl;
+            }
+            else
+            {
+                materials_.back()->emissive = col3(0.0, 0.0, 0.0);
+            }
+            
+            aiColor4D reflective;
+            if (AI_SUCCESS == aiGetMaterialColor(ai_material, AI_MATKEY_COLOR_REFLECTIVE, &reflective))
+            {
+                materials_.back()->reflective= col3(reflective.r, reflective.g, reflective.b);
+                std::cout << "  " << reflective.r << " " << reflective.g << " " << reflective.b << std::endl;
+            }
+            else
+            {
+                materials_.back()->reflective = col3(0.0, 0.0, 0.0);
+            }
+            
+            aiColor4D transparent;
+            if (AI_SUCCESS == aiGetMaterialColor(ai_material, AI_MATKEY_COLOR_TRANSPARENT, &transparent))
+            {
+                materials_.back()->transparent = col3(transparent.r, transparent.g, transparent.b);
+                std::cout << "  " << transparent.r << " " << transparent.g << " " << transparent.b << std::endl;
+            }
+            else
+            {
+                materials_.back()->transparent = col3(0.0, 0.0, 0.0);
+            }
+            
+            float shininess = 0.0;
+            unsigned int max;
+            aiGetMaterialFloatArray(ai_material, AI_MATKEY_SHININESS, &shininess, &max);
+            materials_.back()->shininess = shininess;
+            std::cout << "  " << shininess << std::endl;
+            
+            float shininess_strength = 0.0;
+            aiGetMaterialFloatArray(ai_material, AI_MATKEY_SHININESS_STRENGTH, &shininess_strength, &max);
+            materials_.back()->shininess_strength = shininess_strength;
+            std::cout << "  " << shininess_strength << std::endl;
+            
+            float reflectivity = 0.0;
+            aiGetMaterialFloatArray(ai_material, AI_MATKEY_REFLECTIVITY, &reflectivity, &max);
+            materials_.back()->reflectivity = reflectivity;
+            std::cout << "  " << reflectivity << std::endl;
+            
+            float refractivity = 0.0;
+            aiGetMaterialFloatArray(ai_material, AI_MATKEY_REFRACTI, &refractivity, &max);
+            materials_.back()->refractivity = refractivity;
+            std::cout << "  " << refractivity << std::endl;
+            
+            
             /*  we need this so we can keep the references to indices from the file
             aligning to the same vertices in our array of vertices, so we just take
             the number of vertices already in our (future) list and add this offset
             later on to keep it all aligned.
              */
-            unsigned int vertex_offset = vertices_.size();
+            unsigned int vertex_offset = static_cast<unsigned int>(vertices_.size());
             
             for (unsigned int j=0; j < current_mesh->mNumVertices; j++)
             {
@@ -338,6 +454,8 @@ cObject::cObject(std::string filename)
                     current_triangle.vertex_normal[2] = face.mIndices[2] + vertex_offset;
                 
                 current_triangle.vertex_normals = true;
+                
+                current_triangle.triangle_material = materials_[materials_.size() -1];
                 
                 triangles_.push_back(current_triangle);
             }
@@ -377,9 +495,14 @@ void cObject::scale(vec3 scale_vec)
     scale_vector_ = scale_vec;
 }
 
-void cObject::assignMaterial()
+/* Assigns the material referred to in new_material to all the triangles in the cObject.
+ */
+void cObject::assignAllMaterial(std::shared_ptr<material> new_material)
 {
-    
+    for (auto &triangle : triangles_)
+    {
+        triangle.triangle_material = new_material;
+    }
 }
 
 /* Returns the 3D point of the vertex found by the index "vertex".

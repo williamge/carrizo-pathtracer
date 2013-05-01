@@ -14,6 +14,8 @@
 #include "vecmat.h"
 #include "ray.h"
 
+#include "material.h"
+
 using namespace vecmat;
 
 class cObject;
@@ -35,7 +37,7 @@ typedef struct renderTriangle_t{
 	vec3 u, v;
 	vec3 normal;
     vec3 vertex_normals[3];
-	//material *mat;
+    std::shared_ptr<material> triangle_material;
 } renderTriangle;
 
 typedef struct bbox_t {

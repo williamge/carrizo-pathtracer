@@ -9,6 +9,8 @@
 #ifndef carrizo_pathtracer_ray_h
 #define carrizo_pathtracer_ray_h
 
+#include "material.h"
+
 using namespace vecmat;
 
 typedef struct ray_t{
@@ -20,7 +22,7 @@ typedef struct ray_t{
 		double t_value;
 		point3 point;
 		vec3 normal;
-		//material *mat;
+        std::shared_ptr<material> ray_material;
 		bool hit; //get rid of
 	} intersection;
 	

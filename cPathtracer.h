@@ -20,7 +20,7 @@
 
 using namespace vecmat;
 
-const int MAX_PASS_NUMBER = 32;
+const int MAX_PASS_NUMBER = 4;
 
 class rendModel;
 class cObject;
@@ -43,10 +43,20 @@ private:
         cimg_library::CImg<double> *buffer;
         cimg_library::CImg<double> *normals_buffer;
         cimg_library::CImg<double> *depth_buffer;
+        cimg_library::CImg<double> *diffuse_buffer;
+        cimg_library::CImg<double> *specular_buffer;
+        cimg_library::CImg<double> *emissive_buffer;
+        cimg_library::CImg<double> *reflective_buffer;
+        cimg_library::CImg<double> *transparent_buffer;
         
         cimg_library::CImgDisplay *regular_display;
         cimg_library::CImgDisplay *normals_display;
         cimg_library::CImgDisplay *depth_display;
+        cimg_library::CImgDisplay *diffuse_display;
+        cimg_library::CImgDisplay *specular_display;
+        cimg_library::CImgDisplay *emissive_display;
+        cimg_library::CImgDisplay *reflective_display;
+        cimg_library::CImgDisplay *transparent_display;
         
         int width, height;
     } image_;

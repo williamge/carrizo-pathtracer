@@ -10,6 +10,7 @@
 #define carrizo_pathtracer_cObject_h
 
 #include "vecmat.h"
+#include "material.h"
 
 using namespace vecmat;
 
@@ -21,7 +22,8 @@ typedef struct objecttriangle_t{
 	unsigned int vertices[3];
     unsigned int vertex_normal[3];
     bool vertex_normals;
-	
+    
+    std::shared_ptr<material> triangle_material;
 } objectTriangle;
 
 class cObject
@@ -31,6 +33,8 @@ private:
     std::vector<vec3> vertex_normals_;
     
     std::vector<objectTriangle> triangles_; //why do we only count objectTriangle? should probably make a polygon thing too or something
+    
+    std::vector<std::shared_ptr<material>> materials_;
 
     vec3 translate_vector_;
     vec3 rotate_vector_;
@@ -46,7 +50,7 @@ public:
     void translate(vec3 trans_vec);
     void rotate(vec3 rotate_vec);
     void scale(vec3 scale_vec);
-    void assignMaterial();	
+    void assignAllMaterial(std::shared_ptr<material> new_material);
     std::shared_ptr<rendModel> addToRender();
     
     point3 getVertex(unsigned int vertex);

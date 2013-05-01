@@ -122,7 +122,36 @@ void cPathtracer::shadePixel(int i, int j, camera_vectors &render_vectors, doubl
     
     setImage(image_.buffer, i, j, regular_col, pass_number_);    
     setImage(image_.normals_buffer, i, j, normals_col, pass_number_);    
-    setImage(image_.depth_buffer, i, j, depth_col, pass_number_);    
+    setImage(image_.depth_buffer, i, j, depth_col, pass_number_);
+    
+    //there must be a better way
+    //TODO: find that better way
+    
+    col3 diffuse_col;
+    col3 specular_col;
+    col3 emissive_col;
+    col3 reflective_col;
+    col3 transparent_col;
+    
+    if (rayt.intersection.hit)
+	{
+		diffuse_col = rayt.intersection.ray_material->diffuse;
+        specular_col = rayt.intersection.ray_material->specular;
+        emissive_col = rayt.intersection.ray_material->emissive;
+        reflective_col = rayt.intersection.ray_material->reflective;
+        transparent_col = rayt.intersection.ray_material->transparent;
+	}
+    else
+    {
+        diffuse_col = specular_col = emissive_col = reflective_col = transparent_col = col3(0.0, 0.0, 0.0);
+    }
+    
+    setImage(image_.diffuse_buffer, i, j, diffuse_col, pass_number_);
+    setImage(image_.specular_buffer, i, j, specular_col, pass_number_);
+    setImage(image_.emissive_buffer, i, j, emissive_col, pass_number_);
+    setImage(image_.reflective_buffer, i, j, reflective_col, pass_number_);
+    setImage(image_.transparent_buffer, i, j, transparent_col, pass_number_);
+    
 }
 
 /* The regular default shader for a ray in the scene, takes in ray, returns the colour for that ray
@@ -204,6 +233,11 @@ void cPathtracer::render()
     image_.regular_display = new CImgDisplay(*image_.buffer, "Regular Shader");
     image_.normals_display = new CImgDisplay(*image_.normals_buffer, "Normals Shader");
     image_.depth_display = new CImgDisplay(*image_.depth_buffer, "Depth Shader");
+    image_.diffuse_display = new CImgDisplay(*image_.diffuse_buffer, "Diffuse Shader");
+    image_.specular_display = new CImgDisplay(*image_.specular_buffer, "Specular Shader");
+    image_.emissive_display = new CImgDisplay(*image_.emissive_buffer, "Emissive Shader");
+    image_.reflective_display = new CImgDisplay(*image_.reflective_buffer, "Reflectivity Shader");
+    image_.transparent_display = new CImgDisplay(*image_.transparent_buffer, "Transparency Shader");
     
     if (!image_.buffer) //if dimensions weren't set, set them to a default value
     {
@@ -255,6 +289,11 @@ void cPathtracer::render()
         image_.regular_display->display(*image_.buffer);
         image_.normals_display->display(*image_.normals_buffer);
         image_.depth_display->display(*image_.depth_buffer);
+        image_.diffuse_display->display(*image_.diffuse_buffer);
+        image_.specular_display->display(*image_.specular_buffer);
+        image_.emissive_display->display(*image_.emissive_buffer);
+        image_.reflective_display->display(*image_.reflective_buffer);
+        image_.transparent_display->display(*image_.transparent_buffer);
     }
     
     image_.buffer->normalize(0, 255);
@@ -278,6 +317,13 @@ void cPathtracer::setDimensions(int width, int height)
     
     if (image_.depth_buffer != nullptr) {delete image_.depth_buffer;}
     image_.depth_buffer = new CImg<double> (image_.width, image_.height, 1, 3);
+    
+    //TODO: make these not dangerous
+    image_.diffuse_buffer = new CImg<double> (image_.width, image_.height, 1, 3);
+    image_.specular_buffer = new CImg<double> (image_.width, image_.height, 1, 3);
+    image_.emissive_buffer = new CImg<double> (image_.width, image_.height, 1, 3);
+    image_.reflective_buffer = new CImg<double> (image_.width, image_.height, 1, 3);
+    image_.transparent_buffer = new CImg<double> (image_.width, image_.height, 1, 3);
 }
 
 /*
@@ -295,10 +341,20 @@ cPathtracer::~cPathtracer()
     delete image_.buffer;
     delete image_.normals_buffer;
     delete image_.depth_buffer;
+    delete image_.diffuse_buffer;
+    delete image_.specular_buffer;
+    delete image_.emissive_buffer;
+    delete image_.reflective_buffer;
+    delete image_.transparent_buffer;
     
     delete image_.regular_display;
     delete image_.normals_display;
     delete image_.depth_display;
+    delete image_.diffuse_display;
+    delete image_.specular_display;
+    delete image_.emissive_display;
+    delete image_.reflective_display;
+    delete image_.transparent_display;
     
 }
 
