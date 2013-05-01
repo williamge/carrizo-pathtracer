@@ -289,6 +289,23 @@ void cObject::makeCTESTOBJECT()
 
 }
 
+/* Debug-only function to check that materials are all set and ready, stems from a bug found 
+ during development where the materials weren't set for all cObjects (in this case, the default 
+ objects) which can be hard to track down. Objects should generally nned to have materials, because 
+ why wouldn't they.
+ */
+bool cObject::DEBUGcheckMaterials()
+{
+    for (auto &triangle : triangles_)
+    {
+        if (!triangle.triangle_material)
+        {
+            return false;
+        }
+    }        
+    return true;
+}
+
 /*
  Create an object in the scene from the provided objects.
  */
@@ -310,6 +327,8 @@ cObject::cObject(int option)
             makeCTESTOBJECT();
             break;
     }
+    
+    assert(DEBUGcheckMaterials());
 }
 
 /*
@@ -328,91 +347,95 @@ cObject::cObject(std::string filename)
     
     const aiScene* p_scene = importer.ReadFile(filename, aiProcess_Triangulate |aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
     
-    //std::vector<std::shared_ptr<material>> materials_;
+    std::vector<std::shared_ptr<material>> materials;
     
     if (p_scene)
-    {     
+    {
+        materials.reserve(p_scene->mNumMaterials);
+        
         for (unsigned int i=0; i < p_scene->mNumMeshes; i++)
         {
             const aiMesh* current_mesh = p_scene->mMeshes[i];
             
-            materials_.push_back(std::shared_ptr<material>(new material));
+            materials.push_back(std::shared_ptr<material>(new material));
             struct aiMaterial *ai_material = p_scene->mMaterials[current_mesh->mMaterialIndex];
+            
+            //TODO: you might need to incorporate the alpha channel values in the material
             
             aiColor4D diffuse;
             if (AI_SUCCESS == aiGetMaterialColor(ai_material, AI_MATKEY_COLOR_DIFFUSE, &diffuse))
             {
-                materials_.back()->diffuse = col3(diffuse.r, diffuse.g, diffuse.b);
+                materials.back()->diffuse = col3(diffuse.r, diffuse.g, diffuse.b);
                 std::cout << diffuse.r << " " << diffuse.g << " " << diffuse.b << std::endl;
             }
             else
             {
-                materials_.back()->diffuse = col3(0.0, 0.0, 0.0);
+                materials.back()->diffuse = col3(0.0, 0.0, 0.0);
             }
             
             aiColor4D specular;
             if (AI_SUCCESS == aiGetMaterialColor(ai_material, AI_MATKEY_COLOR_SPECULAR, &specular))
             {
-                materials_.back()->specular = col3(specular.r, specular.g, specular.b);
+                materials.back()->specular = col3(specular.r, specular.g, specular.b);
                 std::cout << "  " << specular.r << " " << specular.g << " " << specular.b << std::endl;
             }
             else
             {
-                materials_.back()->specular = col3(0.0, 0.0, 0.0);
+                materials.back()->specular = col3(0.0, 0.0, 0.0);
             }
             
             aiColor4D emissive;
             if (AI_SUCCESS == aiGetMaterialColor(ai_material, AI_MATKEY_COLOR_EMISSIVE, &emissive))
             {
-                materials_.back()->emissive = col3(emissive.r, emissive.g, emissive.b);
+                materials.back()->emissive = col3(emissive.r, emissive.g, emissive.b);
                 std::cout << "  " << emissive.r << " " << emissive.g << " " << emissive.b << std::endl;
             }
             else
             {
-                materials_.back()->emissive = col3(0.0, 0.0, 0.0);
+                materials.back()->emissive = col3(0.0, 0.0, 0.0);
             }
             
             aiColor4D reflective;
             if (AI_SUCCESS == aiGetMaterialColor(ai_material, AI_MATKEY_COLOR_REFLECTIVE, &reflective))
             {
-                materials_.back()->reflective= col3(reflective.r, reflective.g, reflective.b);
+                materials.back()->reflective= col3(reflective.r, reflective.g, reflective.b);
                 std::cout << "  " << reflective.r << " " << reflective.g << " " << reflective.b << std::endl;
             }
             else
             {
-                materials_.back()->reflective = col3(0.0, 0.0, 0.0);
+                materials.back()->reflective = col3(0.0, 0.0, 0.0);
             }
             
             aiColor4D transparent;
             if (AI_SUCCESS == aiGetMaterialColor(ai_material, AI_MATKEY_COLOR_TRANSPARENT, &transparent))
             {
-                materials_.back()->transparent = col3(transparent.r, transparent.g, transparent.b);
+                materials.back()->transparent = col3(transparent.r, transparent.g, transparent.b);
                 std::cout << "  " << transparent.r << " " << transparent.g << " " << transparent.b << std::endl;
             }
             else
             {
-                materials_.back()->transparent = col3(0.0, 0.0, 0.0);
+                materials.back()->transparent = col3(0.0, 0.0, 0.0);
             }
             
             float shininess = 0.0;
             unsigned int max;
             aiGetMaterialFloatArray(ai_material, AI_MATKEY_SHININESS, &shininess, &max);
-            materials_.back()->shininess = shininess;
+            materials.back()->shininess = shininess;
             std::cout << "  " << shininess << std::endl;
             
             float shininess_strength = 0.0;
             aiGetMaterialFloatArray(ai_material, AI_MATKEY_SHININESS_STRENGTH, &shininess_strength, &max);
-            materials_.back()->shininess_strength = shininess_strength;
+            materials.back()->shininess_strength = shininess_strength;
             std::cout << "  " << shininess_strength << std::endl;
             
             float reflectivity = 0.0;
             aiGetMaterialFloatArray(ai_material, AI_MATKEY_REFLECTIVITY, &reflectivity, &max);
-            materials_.back()->reflectivity = reflectivity;
+            materials.back()->reflectivity = reflectivity;
             std::cout << "  " << reflectivity << std::endl;
             
             float refractivity = 0.0;
             aiGetMaterialFloatArray(ai_material, AI_MATKEY_REFRACTI, &refractivity, &max);
-            materials_.back()->refractivity = refractivity;
+            materials.back()->refractivity = refractivity;
             std::cout << "  " << refractivity << std::endl;
             
             
@@ -455,7 +478,7 @@ cObject::cObject(std::string filename)
                 
                 current_triangle.vertex_normals = true;
                 
-                current_triangle.triangle_material = materials_[materials_.size() -1];
+                current_triangle.triangle_material = materials.back();
                 
                 triangles_.push_back(current_triangle);
             }
@@ -472,6 +495,8 @@ cObject::cObject(std::string filename)
         std::cout << "Error loading object [assimp]" << std::endl;
         exit(EXIT_FAILURE);
     }
+    
+    assert(DEBUGcheckMaterials());
 }
 
 /* Set the translation vector for the object to trans_vec.

@@ -355,7 +355,7 @@ Intersects a ray with the model, traversing the BVH for the model and computing 
 */
 bool rendModel::intersect(Ray& ray)
 {
-	int hit_triangle = -1;
+	long hit_triangle = -1;
     
     std::vector<int> triangle_list;
     
@@ -430,8 +430,9 @@ bool rendModel::intersect(Ray& ray)
 	
 	if (hit_triangle > -1)
 	{
-		//TODO: set material in or something else
-        
+        /* BUG: there might be a bug here, if you set material in here then the diffuse shader
+        looks all weird, there doesn't seem like there should be any issue but apparently there
+        could be */
 		return true;
 	}
 	return false;

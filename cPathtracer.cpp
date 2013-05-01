@@ -116,30 +116,81 @@ void cPathtracer::shadePixel(int i, int j, camera_vectors &render_vectors, doubl
     rayt.intersection.hit = false;
     
     intersectScene(rayt);
-    col3 regular_col = regularShader(rayt);
-    col3 normals_col = normalsShader(rayt);
-    col3 depth_col = depthShader(rayt);
     
-    setImage(image_.buffer, i, j, regular_col, pass_number_);    
-    setImage(image_.normals_buffer, i, j, normals_col, pass_number_);    
+    regularShader(rayt, i, j);
+    normalsShader(rayt, i, j);
+    depthShader(rayt, i, j);
+    materialShader(rayt, i, j);    
+}
+
+/* The regular default shader for a ray in the scene, takes in ray, returns the colour for that ray
+ */
+void cPathtracer::regularShader(Ray ray, int i, int j)
+{
+    col3 regular_col;
+    if (ray.intersection.hit)
+	{
+		regular_col = 0.5 * ray.intersection.normal + 0.5;
+	}
+    else
+    {
+        regular_col = col3(0,0,0);
+    }
+    
+    setImage(image_.buffer, i, j, regular_col, pass_number_);  
+}
+
+/* The normals shader for a ray in the scene, shading each ray with the normal vector of the surface it hits with the x value
+ as red, y as blue, z as green. Takes in ray, returns the colour for that ray
+ */
+void cPathtracer::normalsShader(Ray ray, int i, int j)
+{
+    col3 normals_col;
+    if (ray.intersection.hit)
+	{
+		normals_col = 0.5 * ray.intersection.normal + 0.5;
+	}
+    else
+    {
+        normals_col = col3(0,0,0);
+    }
+    
+    setImage(image_.normals_buffer, i, j, normals_col, pass_number_);
+}
+
+/* The depth shader for a ray in the scene, shading each ray with the depth value on the surface of the object, taken from
+ the t-value of the intersection.
+ */
+void cPathtracer::depthShader(Ray ray, int i, int j)
+{
+    col3 depth_col;
+    if (ray.intersection.hit)
+    {
+       depth_col = col3 (ray.intersection.t_value,ray.intersection.t_value,ray.intersection.t_value);
+    }
+    else
+    {
+        depth_col = col3(0.0, 0.0, 0.0);
+    }
+    
     setImage(image_.depth_buffer, i, j, depth_col, pass_number_);
-    
-    //there must be a better way
-    //TODO: find that better way
-    
+}
+
+void cPathtracer::materialShader(Ray ray, int i, int j)
+{
     col3 diffuse_col;
     col3 specular_col;
     col3 emissive_col;
     col3 reflective_col;
     col3 transparent_col;
     
-    if (rayt.intersection.hit)
+    if (ray.intersection.hit)
 	{
-		diffuse_col = rayt.intersection.ray_material->diffuse;
-        specular_col = rayt.intersection.ray_material->specular;
-        emissive_col = rayt.intersection.ray_material->emissive;
-        reflective_col = rayt.intersection.ray_material->reflective;
-        transparent_col = rayt.intersection.ray_material->transparent;
+		diffuse_col = ray.intersection.ray_material->diffuse;
+        specular_col = ray.intersection.ray_material->specular;
+        emissive_col = ray.intersection.ray_material->emissive;
+        reflective_col = ray.intersection.ray_material->reflective;
+        transparent_col = ray.intersection.ray_material->transparent;
 	}
     else
     {
@@ -151,42 +202,6 @@ void cPathtracer::shadePixel(int i, int j, camera_vectors &render_vectors, doubl
     setImage(image_.emissive_buffer, i, j, emissive_col, pass_number_);
     setImage(image_.reflective_buffer, i, j, reflective_col, pass_number_);
     setImage(image_.transparent_buffer, i, j, transparent_col, pass_number_);
-    
-}
-
-/* The regular default shader for a ray in the scene, takes in ray, returns the colour for that ray
- */
-col3 cPathtracer::regularShader(Ray ray)
-{
-    if (ray.intersection.hit)
-	{
-		return (0.5 * ray.intersection.normal + 0.5);
-	}
-	return col3(0,0,0);
-}
-
-/* The normals shader for a ray in the scene, shading each ray with the normal vector of the surface it hits with the x value
- as red, y as blue, z as green. Takes in ray, returns the colour for that ray
- */
-col3 cPathtracer::normalsShader(Ray ray)
-{
-    if (ray.intersection.hit)
-	{
-		return (0.5 * ray.intersection.normal + 0.5);
-	}
-	return col3(0,0,0);
-}
-
-/* The depth shader for a ray in the scene, shading each ray with the depth value on the surface of the object, taken from
- the t-value of the intersection.
- */
-col3 cPathtracer::depthShader(Ray ray)
-{
-    if (ray.intersection.hit)
-    {
-        return col3 (ray.intersection.t_value,ray.intersection.t_value,ray.intersection.t_value);
-    }
-    return col3(0.0, 0.0, 0.0);
 }
 
 /* Primes the scene to be rendered.

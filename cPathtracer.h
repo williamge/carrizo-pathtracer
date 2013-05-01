@@ -70,9 +70,10 @@ private:
     static void setImage(cimg_library::CImg<double> *image, int i, int j, col3& colour, unsigned int pass_number);
     void shadePixel(int i, int j, camera_vectors &render_vectors, double factor);
     
-    col3 regularShader(Ray ray);
-    col3 normalsShader(Ray ray);
-    col3 depthShader(Ray ray);
+    void regularShader(Ray ray, int i, int j);
+    void normalsShader(Ray ray, int i, int j);
+    void depthShader(Ray ray, int i, int j);
+    void materialShader(Ray ray, int i, int j);
     
     bool readyObjects();
     void renderPass(camera_vectors &render_vectors);

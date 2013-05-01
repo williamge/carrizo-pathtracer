@@ -33,8 +33,6 @@ private:
     std::vector<vec3> vertex_normals_;
     
     std::vector<objectTriangle> triangles_; //why do we only count objectTriangle? should probably make a polygon thing too or something
-    
-    std::vector<std::shared_ptr<material>> materials_;
 
     vec3 translate_vector_;
     vec3 rotate_vector_;
@@ -43,6 +41,9 @@ private:
     void makeCTRIANGLE();
     void makeCBOX();
     void makeCTESTOBJECT();
+    
+    bool DEBUGcheckMaterials();
+    
 public:
     cObject(int option);
     cObject(std::string filename);
