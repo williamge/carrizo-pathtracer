@@ -324,20 +324,36 @@ void cPathtracer::setDimensions(int width, int height)
     image_.width = width;
 	image_.height = height;
     
-    if (image_.buffer != nullptr) {delete image_.buffer;}
+    delete image_.buffer;
+    image_.buffer = nullptr;
     image_.buffer = new CImg<double> (image_.width, image_.height, 1, 3);
     
-    if (image_.normals_buffer != nullptr) {delete image_.normals_buffer;}
+    delete image_.normals_buffer;
+    image_.normals_buffer = nullptr;
     image_.normals_buffer = new CImg<double> (image_.width, image_.height, 1, 3);
     
-    if (image_.depth_buffer != nullptr) {delete image_.depth_buffer;}
+    delete image_.depth_buffer;
+    image_.depth_buffer = nullptr;
     image_.depth_buffer = new CImg<double> (image_.width, image_.height, 1, 3);
     
-    //TODO: make these not dangerous
+    delete image_.diffuse_buffer;
+    image_.diffuse_buffer = nullptr;
     image_.diffuse_buffer = new CImg<double> (image_.width, image_.height, 1, 3);
+    
+    delete image_.specular_buffer;
+    image_.specular_buffer = nullptr;
     image_.specular_buffer = new CImg<double> (image_.width, image_.height, 1, 3);
+    
+    delete image_.emissive_buffer;
+    image_.emissive_buffer = nullptr;
     image_.emissive_buffer = new CImg<double> (image_.width, image_.height, 1, 3);
+    
+    delete image_.reflective_buffer;
+    image_.reflective_buffer = nullptr;
     image_.reflective_buffer = new CImg<double> (image_.width, image_.height, 1, 3);
+    
+    delete image_.transparent_buffer;
+    image_.transparent_buffer = nullptr;
     image_.transparent_buffer = new CImg<double> (image_.width, image_.height, 1, 3);
 }
 
@@ -382,4 +398,10 @@ cPathtracer::cPathtracer()
     image_.regular_display = nullptr;
     image_.normals_display = nullptr;
     image_.depth_display = nullptr;
+    
+    image_.diffuse_buffer = nullptr;
+    image_.specular_buffer = nullptr;
+    image_.emissive_buffer = nullptr;
+    image_.reflective_buffer = nullptr;
+    image_.transparent_buffer = nullptr;
 }
