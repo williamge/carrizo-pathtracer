@@ -51,13 +51,23 @@ void debugSceneSpider()
     cPathtracer pt;
 	
     cObject spider_obj ("/Users/william/Downloads/assimp-master/test/models/OBJ/spider.obj");
-    
 	pt.addObject(spider_obj);
     
     cObject floor_obj (CBOX);
     floor_obj.scale(vec3 (250.0, 1.0, 250.0));
     floor_obj.translate(vec3(0.0, -43.3, 0.0));
     pt.addObject(floor_obj);
+    
+    cObject lighting_box (CBOX);
+    lighting_box.scale( vec3(125.0, 1.0, 125.0));
+    lighting_box.translate( vec3(0.0, 150.0, 0.0));
+    
+    std::shared_ptr<material> lighting_box_material (new material);
+    lighting_box_material->emissive = col3(1.0, 1.0, 1.0);
+    lighting_box_material->diffuse = lighting_box_material->specular = lighting_box_material->reflective = lighting_box_material->transparent = col3(0.0, 0.0, 0.0);
+    lighting_box.assignAllMaterial(lighting_box_material);
+    
+    pt.addObject(lighting_box);
 	
 	pt.setDimensions(640,480);
     pt.setCamera( point3(200.0, 200.0, 200.0), point3(0.0,0.0,0.0), 55.0); //spider
