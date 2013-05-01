@@ -123,7 +123,7 @@ void cPathtracer::shadePixel(int i, int j, camera_vectors &render_vectors, doubl
     materialShader(rayt, i, j);    
 }
 
-/* The regular default shader for a ray in the scene, takes in ray, returns the colour for that ray
+/* The regular default shader for a ray in the scene, takes in ray, sets the colour for that ray
  */
 void cPathtracer::regularShader(Ray ray, int i, int j)
 {
@@ -140,8 +140,8 @@ void cPathtracer::regularShader(Ray ray, int i, int j)
     setImage(image_.buffer, i, j, regular_col, pass_number_);  
 }
 
-/* The normals shader for a ray in the scene, shading each ray with the normal vector of the surface it hits with the x value
- as red, y as blue, z as green. Takes in ray, returns the colour for that ray
+/* The normals shader for a ray in the scene, shading each ray with the normal vector of the surface 
+ it hits with the x value as red, y as blue, z as green. Takes in ray, sets the colour for that ray
  */
 void cPathtracer::normalsShader(Ray ray, int i, int j)
 {
@@ -158,8 +158,8 @@ void cPathtracer::normalsShader(Ray ray, int i, int j)
     setImage(image_.normals_buffer, i, j, normals_col, pass_number_);
 }
 
-/* The depth shader for a ray in the scene, shading each ray with the depth value on the surface of the object, taken from
- the t-value of the intersection.
+/* The depth shader for a ray in the scene, shading each ray with the depth value on the surface of
+ the object, taken from the t-value of the intersection.
  */
 void cPathtracer::depthShader(Ray ray, int i, int j)
 {
@@ -176,6 +176,9 @@ void cPathtracer::depthShader(Ray ray, int i, int j)
     setImage(image_.depth_buffer, i, j, depth_col, pass_number_);
 }
 
+/* The material shader, sets the pixels of each of the corresponding buffers for material colours 
+ to the values from the material of the object hit by the primary ray.
+ */
 void cPathtracer::materialShader(Ray ray, int i, int j)
 {
     col3 diffuse_col;
