@@ -23,3 +23,6 @@ The same day I also remembered that vertex normals were a thing and decided to i
 ![image](https://bitbucket.org/williamg/carrizo-pathtracer/raw/f253ec0da910c4bedf083f4f6cb2d14508e02465/image%20log/2013-04-19-01.png)
 
 Multiple passes of the image can happen now, as can be seen here with this image that was taken with 32 passes, each pixel's ray having been jittered a bit to reduce aliasing.
+
+![image](https://bitbucket.org/williamg/carrizo-pathtracer/raw/master/image%20log/2013-05-01-01.png)
+ Basic shading with a basic path tracing routine, this took who knows how many passes (it was a large number) and is still quite noisy, need to come up with some better sampling methods to lower the variance, maybe eventually implement bidirectional path tracing.

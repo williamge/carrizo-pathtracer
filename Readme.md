@@ -13,9 +13,12 @@ So far it can create and traverse BVH structures, compute intersections for tria
 - **/image log/** : A listing of pictures rendered by the program over time
 - **/include/** : Necessary libraries included with the program
 - **/tests/** : Google Test unit tests for the project, details are included in a readme file inside the folder
-- **carrizo.[cpp/h]** : The main file for the program, serves as the basis for the setting up of a scene and the rendering of the scene
+- **carrizo.[cpp/h]** : The main file for the program, serves as the basis for the setting up of a scene
 - **cObject.[cpp/h]** : The file that holds the higher level scene objects for the program
-- **Makefile** : Simple file to run GNU Make with, quite barebones and tries to compile with clang
+- **cPathtracer.[cpp/h]** : Includes the rendering class that holds the scene and renders it using path tracing methods
+- **Makefile** : Simple file to run GNU Make with, quite barebones and tries to compile with Clang
+- **material.h** : Holds the definition for the material struct used throughout the program
+- **ray.h** : Holds the definition for a standard ray struct that is used throughout the program
 - **rendModel.[cpp/h]** : Holds the rendering model object that is derived from **cObject** for rendering purposes. **carrizo** uses **cObject** to manage the scene then tells **cObject** to computer **rendModel** objects for use when rendering the scene.
 - **UML - Class.png** : A UML Class diagram for the project, right now it is a bit out of date.
 - **vecmat.[cpp/h]** : Vector math definitions for the project, simple stuff like defining a 3D vector and the equivalent operations.
@@ -33,7 +36,10 @@ The *Open Asset Importing Library* is used to import 3D assets into the program,
 - Ray intersection
 - Importing models/assets by file
 - Multiple rendering passes
+- Materials and shading of diffused light through the Lambertian model
+- Basic unbiased path tracing methods
 
 ###Next steps to take
-- Unit tests
-- Materials and shading
+- More unit tests
+- Better shading (specular, reflections, etc.)
+- Faster shading
