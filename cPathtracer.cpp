@@ -126,16 +126,21 @@ void cPathtracer::shadePixel(int i, int j, camera_vectors &render_vectors, doubl
 
 /* Returns a random vector in the hemisphere bounded by the vector "direction".
  
- Right now it simply chooses random numbers in [-1,1] to use as the vector's components, this is bad, 
- this is biased and does not choose very fair samples.
+ The method by which it does this is by generating a random "z" term for the new vector and an angle, 
+ then completing the equation "1 = x^2 + y^2 + z^2" for the x and y terms, then checking if this new 
+ vector and the supplied vector are in the same direction, reversing the new vector if necessary.
  */
 vec3 cPathtracer::sampleHemisphere(vec3 direction)
 {
-    vec3 random_ray_direction (dis_minus_one_to_one(gen),
-                               dis_minus_one_to_one(gen),
-                               dis_minus_one_to_one(gen));
+    double z = dis_minus_one_to_one(gen);
+    double theta = vecmat_constant::pi * dis_minus_one_to_one(gen);
     
-    random_ray_direction.normalize();
+    double z_term = sqrt(1.0 - pow(z,2.0));
+    
+    vec3 random_ray_direction (
+                               std::sin(theta) * z_term,
+                               std::cos(theta) * z_term,
+                               z);
     
     if (random_ray_direction * direction < 0.0)
     {
