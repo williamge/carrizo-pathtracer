@@ -20,7 +20,7 @@
 
 using namespace vecmat;
 
-const int MAX_PASS_NUMBER = 4;
+const int MAX_PASS_NUMBER = 256;
 
 class rendModel;
 class cObject;
@@ -69,6 +69,8 @@ private:
     void intersectScene(Ray &ray);
     static void setImage(cimg_library::CImg<double> *image, int i, int j, col3& colour, unsigned int pass_number);
     void shadePixel(int i, int j, camera_vectors &render_vectors, double factor);
+    
+    static vec3 sampleHemisphere(vec3 direction);
     
     void regularShader(Ray ray, int i, int j);
     void normalsShader(Ray ray, int i, int j);

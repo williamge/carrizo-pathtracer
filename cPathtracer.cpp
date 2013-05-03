@@ -21,7 +21,8 @@ using namespace cimg_library;
 //should probably think of a better way to do this
 std::random_device rd;
 std::mt19937 gen(rd());
-std::uniform_real_distribution<double> dis(0.0,1.0);
+std::uniform_real_distribution<double> dis_zero_to_one(0.0,1.0);
+std::uniform_real_distribution<double> dis_minus_one_to_one(-1.0,1.0);
 
 /*
  * Terminology:
@@ -110,8 +111,8 @@ void cPathtracer::shadePixel(int i, int j, camera_vectors &render_vectors, doubl
     rayt.d += (-(-double(image_.height)/2.0 + j)*factor) * render_vectors.y_unit;
     
     //randomly jitters the pixel's ray across the screen to reduce aliasing
-    rayt.d += (factor * (dis(gen) - 0.5) ) * render_vectors.x_unit;
-    rayt.d += (factor * (dis(gen) - 0.5) ) * render_vectors.y_unit;
+    rayt.d += (factor * (dis_zero_to_one(gen) - 0.5) ) * render_vectors.x_unit;
+    rayt.d += (factor * (dis_zero_to_one(gen) - 0.5) ) * render_vectors.y_unit;
     
     rayt.intersection.hit = false;
     
@@ -120,22 +121,98 @@ void cPathtracer::shadePixel(int i, int j, camera_vectors &render_vectors, doubl
     regularShader(rayt, i, j);
     normalsShader(rayt, i, j);
     depthShader(rayt, i, j);
-    materialShader(rayt, i, j);    
+    materialShader(rayt, i, j);
+}
+
+/* Returns a random vector in the hemisphere bounded by the vector "direction".
+ 
+ Right now it simply chooses random numbers in [-1,1] to use as the vector's components, this is bad, 
+ this is biased and does not choose very fair samples.
+ */
+vec3 cPathtracer::sampleHemisphere(vec3 direction)
+{
+    vec3 random_ray_direction (dis_minus_one_to_one(gen),
+                               dis_minus_one_to_one(gen),
+                               dis_minus_one_to_one(gen));
+    
+    random_ray_direction.normalize();
+    
+    if (random_ray_direction * direction < 0.0)
+    {
+        random_ray_direction = -random_ray_direction;
+    }
+    
+    return random_ray_direction;
 }
 
 /* The regular default shader for a ray in the scene, takes in ray, sets the colour for that ray
+ 
+ Currently using a straight up pathtracing method with a simple BRDF from the Lambertian diffuse model
  */
 void cPathtracer::regularShader(Ray ray, int i, int j)
 {
-    col3 regular_col;
+    col3 regular_col = col3(0.0,0.0,0.0); //the final colour to be set for the given primary ray
+    
     if (ray.intersection.hit)
-	{
-		regular_col = 0.5 * ray.intersection.normal + 0.5;
-	}
-    else
     {
-        regular_col = col3(0,0,0);
+        Ray outward_ray = ray;  //don't worry about it, this is just so the first run in the loop is
+                                //handled correctly.
+        
+        //outward ray: for a point of intersection along a path, this is the ray going out
+        //inward ray: for a point of intersection along a path, this is the ray that came in to the point
+        
+        for (;;) //most implementations use a recursive function call, for some reason I'm doing it this way
+        {                 
+            Ray inward_ray = outward_ray;
+            
+            outward_ray.o = inward_ray.intersection.point + (inward_ray.intersection.normal * 0.00005); //small number, TODO: make this better
+            outward_ray.d = inward_ray.intersection.normal;
+            outward_ray.intersection.hit = false;
+            
+            //TODO: make this way way better instead of the bizarre sampling that it is now
+            double probability_weight;
+            probability_weight = 0.9;
+            if (
+                (
+                    (inward_ray.intersection.ray_material->emissive.r
+                     + inward_ray.intersection.ray_material->emissive.g
+                     + inward_ray.intersection.ray_material->emissive.b
+                     )/ 3.0
+                 ) < 1.0
+                ) //if the material isn't that bright, make the chance that it will be used as an emissive source smaller
+            {
+                probability_weight = 0.1;
+            }
+            
+            double termination_sample = dis_zero_to_one(gen);
+            
+            if (termination_sample >= probability_weight)
+            {            
+                outward_ray.d = sampleHemisphere(outward_ray.d);
+                
+                intersectScene(outward_ray);
+                
+                col3 diffuse_col = col3(0.0, 0.0, 0.0);
+                
+                if (outward_ray.intersection.hit)
+                {
+                    //lambertian model shading (diffuse only)
+                    double lambert_factor = outward_ray.d * inward_ray.intersection.normal;
+                    diffuse_col += lambert_factor
+                                    * (1.0/ (1.0 - probability_weight))
+                                    * outward_ray.intersection.ray_material->emissive.apply_r(inward_ray.intersection.ray_material->diffuse);
+                }
+                
+                regular_col += diffuse_col;
+            }
+            else
+            {
+                regular_col += (1.0/probability_weight) * inward_ray.intersection.ray_material->emissive;
+                break;
+            }
+        }
     }
+    //TODO: implement environment mapping here
     
     setImage(image_.buffer, i, j, regular_col, pass_number_);  
 }
@@ -312,6 +389,12 @@ void cPathtracer::render()
         image_.emissive_display->display(*image_.emissive_buffer);
         image_.reflective_display->display(*image_.reflective_buffer);
         image_.transparent_display->display(*image_.transparent_buffer);
+        
+        const unsigned int key_seq[] = {cimg::keyS};
+        if (image_.regular_display->is_key_sequence(key_seq, 1))
+        {
+            break;
+        }
     }
     
     image_.buffer->normalize(0, 255);
@@ -407,4 +490,8 @@ cPathtracer::cPathtracer()
     image_.emissive_buffer = nullptr;
     image_.reflective_buffer = nullptr;
     image_.transparent_buffer = nullptr;
+    
+    pass_number_ = 0;
+    
+    setCamera(point3(0.0, 0.0 ,0.0), point3(0.0, 0.0, -1.0), 60);
 }
