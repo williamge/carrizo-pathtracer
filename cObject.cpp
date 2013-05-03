@@ -366,7 +366,7 @@ cObject::cObject(std::string filename)
             if (AI_SUCCESS == aiGetMaterialColor(ai_material, AI_MATKEY_COLOR_DIFFUSE, &diffuse))
             {
                 materials.back()->diffuse = col3(diffuse.r, diffuse.g, diffuse.b);
-                std::cout << diffuse.r << " " << diffuse.g << " " << diffuse.b << std::endl;
+                std::cout << "Diffuse: " << diffuse.r << " " << diffuse.g << " " << diffuse.b << std::endl;
             }
             else
             {
@@ -377,7 +377,7 @@ cObject::cObject(std::string filename)
             if (AI_SUCCESS == aiGetMaterialColor(ai_material, AI_MATKEY_COLOR_SPECULAR, &specular))
             {
                 materials.back()->specular = col3(specular.r, specular.g, specular.b);
-                std::cout << "  " << specular.r << " " << specular.g << " " << specular.b << std::endl;
+                std::cout << "  " << "Specular: " << specular.r << " " << specular.g << " " << specular.b << std::endl;
             }
             else
             {
@@ -388,7 +388,7 @@ cObject::cObject(std::string filename)
             if (AI_SUCCESS == aiGetMaterialColor(ai_material, AI_MATKEY_COLOR_EMISSIVE, &emissive))
             {
                 materials.back()->emissive = col3(emissive.r, emissive.g, emissive.b);
-                std::cout << "  " << emissive.r << " " << emissive.g << " " << emissive.b << std::endl;
+                std::cout << "  " << "Emissive: " << emissive.r << " " << emissive.g << " " << emissive.b << std::endl;
             }
             else
             {
@@ -399,7 +399,7 @@ cObject::cObject(std::string filename)
             if (AI_SUCCESS == aiGetMaterialColor(ai_material, AI_MATKEY_COLOR_REFLECTIVE, &reflective))
             {
                 materials.back()->reflective= col3(reflective.r, reflective.g, reflective.b);
-                std::cout << "  " << reflective.r << " " << reflective.g << " " << reflective.b << std::endl;
+                std::cout << "  " << "Reflective: " << reflective.r << " " << reflective.g << " " << reflective.b << std::endl;
             }
             else
             {
@@ -410,7 +410,7 @@ cObject::cObject(std::string filename)
             if (AI_SUCCESS == aiGetMaterialColor(ai_material, AI_MATKEY_COLOR_TRANSPARENT, &transparent))
             {
                 materials.back()->transparent = col3(transparent.r, transparent.g, transparent.b);
-                std::cout << "  " << transparent.r << " " << transparent.g << " " << transparent.b << std::endl;
+                std::cout << "  " << "Transparent: " << transparent.r << " " << transparent.g << " " << transparent.b << std::endl;
             }
             else
             {
@@ -421,22 +421,22 @@ cObject::cObject(std::string filename)
             unsigned int max;
             aiGetMaterialFloatArray(ai_material, AI_MATKEY_SHININESS, &shininess, &max);
             materials.back()->shininess = shininess;
-            std::cout << "  " << shininess << std::endl;
+            std::cout << "  " << "Shininess: " << shininess << std::endl;
             
             float shininess_strength = 0.0;
             aiGetMaterialFloatArray(ai_material, AI_MATKEY_SHININESS_STRENGTH, &shininess_strength, &max);
             materials.back()->shininess_strength = shininess_strength;
-            std::cout << "  " << shininess_strength << std::endl;
+            std::cout << "  " << "Shininess strength: " << shininess_strength << std::endl;
             
             float reflectivity = 0.0;
             aiGetMaterialFloatArray(ai_material, AI_MATKEY_REFLECTIVITY, &reflectivity, &max);
             materials.back()->reflectivity = reflectivity;
-            std::cout << "  " << reflectivity << std::endl;
+            std::cout << "  " << "Reflectivity: " << reflectivity << std::endl;
             
             float refractivity = 0.0;
             aiGetMaterialFloatArray(ai_material, AI_MATKEY_REFRACTI, &refractivity, &max);
             materials.back()->refractivity = refractivity;
-            std::cout << "  " << refractivity << std::endl;
+            std::cout << "  " << "Refractivity: " << refractivity << std::endl;
             
             
             /*  we need this so we can keep the references to indices from the file
