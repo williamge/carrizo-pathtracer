@@ -41,7 +41,6 @@ opposed to "constructBVH(...)"
 std::shared_ptr<BVHnode> rendModel::constructBVHSub(const std::vector<int> &index_list,const std::vector<bounding_box> &bounds_list)
 {
     std::shared_ptr<BVHnode> node (new BVHnode);
-    //node->left = node->right = nullptr;
     
     bounding_box centroid_bounds; //bounding box for the centroids of primitives in the index_list
     centroid_bounds.low = bounds_list[index_list[0]].centroid;
@@ -206,7 +205,6 @@ rendModel::rendModel(cObject &source_object)
         bounding_boxes[i].high.z = std::max(p1.z, std::max(p2.z,p3.z));
         
         bounding_boxes[i].centroid = 0.5 * (bounding_boxes[i].high + bounding_boxes[i].low);
-        
 		
 		triangles_[i].a = p1;
 		triangles_[i].normal = (p2 - p1).vecCross(p3 - p1);
@@ -301,7 +299,7 @@ bool rendModel::boxIntersection(const bounding_box& b, const Ray& ray, const vec
  by the caller of the function to save time instead of having to create and copy a vector each 
  call of this function.
  */
-void rendModel::bvhTraversal(std::shared_ptr<BVHnode> start, Ray &ray, std::vector<int> &triangle_list_out)
+void rendModel::bvhTraversal(const std::shared_ptr<BVHnode> &start, Ray &ray, std::vector<int> &triangle_list_out)
 {
     /*
      gameplan: start from root BVHnode, add each child node (left and right), each time taking one node
@@ -317,6 +315,7 @@ void rendModel::bvhTraversal(std::shared_ptr<BVHnode> start, Ray &ray, std::vect
     
     std::shared_ptr<BVHnode> curr_node;
     std::vector<std::shared_ptr<BVHnode>> node_stack;
+
     node_stack.push_back(start);
     
     while (!node_stack.empty())
@@ -335,11 +334,11 @@ void rendModel::bvhTraversal(std::shared_ptr<BVHnode> start, Ray &ray, std::vect
                 triangle_list_out.push_back(tri);
             }
             
-            if (curr_node->left != nullptr)
+            if (curr_node->left)
             {
                 node_stack.push_back(curr_node->left);
             }
-            if (curr_node->right != nullptr)
+            if (curr_node->right)
             {
                 node_stack.push_back(curr_node->right);
             }

@@ -60,7 +60,7 @@ private:
     
     static bounding_box boundsUnion(bounding_box box, point3 point);
     static bool boxIntersection(const bounding_box& b, const Ray& r, const vec3& inv_dir);
-    static void bvhTraversal(std::shared_ptr<BVHnode> start, Ray &ray, std::vector<int> &triangle_list_out);
+    static void bvhTraversal(const std::shared_ptr<BVHnode> &start, Ray &ray, std::vector<int> &triangle_list_out);
     
     std::shared_ptr<BVHnode> constructBVHSub(const std::vector<int> &index_list, const std::vector<bounding_box> &bounds_list);
     std::shared_ptr<BVHnode> constructBVH(const std::vector<bounding_box> &bounds_list);
