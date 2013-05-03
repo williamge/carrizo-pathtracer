@@ -21,6 +21,7 @@
 using namespace vecmat;
 
 const int MAX_PASS_NUMBER = 256;
+const int PRIMARY_SAMPLES = 16;
 
 class rendModel;
 class cObject;
@@ -72,7 +73,10 @@ private:
     
     static vec3 sampleHemisphere(vec3 direction);
     
-    void regularShader(Ray ray, int i, int j);
+    col3 readEnvironmentMap(Ray &ray);
+    
+    col3 regularShaderRecurse(Ray &ray, int i, int j);
+    void regularShader(Ray &ray, int i, int j);
     void normalsShader(Ray ray, int i, int j);
     void depthShader(Ray ray, int i, int j);
     void materialShader(Ray ray, int i, int j);

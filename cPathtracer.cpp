@@ -150,74 +150,93 @@ vec3 cPathtracer::sampleHemisphere(vec3 direction)
     return random_ray_direction;
 }
 
+/* Returns the colour value to be read from the environment map with the Ray "ray".
+ 
+ TODO: implement environment maps
+ */
+col3 cPathtracer::readEnvironmentMap(Ray &ray)
+{
+    return col3(0.0, 0.0, 0.0);
+}
+
+/* The recursive part of the regular shader, since shaders have to fit a certain signature.
+ */
+col3 cPathtracer::regularShaderRecurse(Ray &ray, int i, int j)
+{
+    col3 ray_col(0.0, 0.0, 0.0);
+    
+    Ray inward_ray = ray;
+    Ray outward_ray;
+    
+    outward_ray.o = inward_ray.intersection.point + (inward_ray.intersection.normal * 0.00005); //small number, TODO: make this better
+    outward_ray.d = inward_ray.intersection.normal;
+    outward_ray.intersection.hit = false;
+    
+    //TODO: make this way way better instead of the bizarre sampling that it is now
+    double probability_weight;
+    probability_weight = inward_ray.intersection.ray_material->emissive.r
+    + inward_ray.intersection.ray_material->emissive.g
+    + inward_ray.intersection.ray_material->emissive.b;
+    probability_weight *= (1.0/3.0);
+    probability_weight = std::max(probability_weight, 0.1);
+    
+    double termination_sample = dis_zero_to_one(gen);
+    
+    if (termination_sample >= probability_weight)
+    {
+        outward_ray.d = sampleHemisphere(outward_ray.d);
+        
+        intersectScene(outward_ray);
+        
+        if (outward_ray.intersection.hit)
+        {
+             //diffuse component of lighting
+            double lambert_factor = outward_ray.d * inward_ray.intersection.normal;
+            
+            ray_col += lambert_factor * (1.0/ (1.0 - probability_weight))
+                * inward_ray.intersection.ray_material->diffuse.apply_r (
+                          regularShaderRecurse(outward_ray, i, j)
+                    );
+        }
+        else
+        {
+            ray_col += readEnvironmentMap(outward_ray);
+        }
+    }
+    else
+    {
+        ray_col += (1.0/probability_weight) * inward_ray.intersection.ray_material->emissive;
+    }
+    
+    return ray_col;
+}
+
 /* The regular default shader for a ray in the scene, takes in ray, sets the colour for that ray
  
  Currently using a straight up pathtracing method with a simple BRDF from the Lambertian diffuse model
  */
-void cPathtracer::regularShader(Ray ray, int i, int j)
+void cPathtracer::regularShader(Ray &ray, int i, int j)
 {
     col3 regular_col = col3(0.0,0.0,0.0); //the final colour to be set for the given primary ray
     
     if (ray.intersection.hit)
     {
-        Ray outward_ray = ray;  //don't worry about it, this is just so the first run in the loop is
-                                //handled correctly.
-        
-        //outward ray: for a point of intersection along a path, this is the ray going out
-        //inward ray: for a point of intersection along a path, this is the ray that came in to the point
-        
-        for (;;) //most implementations use a recursive function call, for some reason I'm doing it this way
-        {                 
-            Ray inward_ray = outward_ray;
-            
-            outward_ray.o = inward_ray.intersection.point + (inward_ray.intersection.normal * 0.00005); //small number, TODO: make this better
-            outward_ray.d = inward_ray.intersection.normal;
-            outward_ray.intersection.hit = false;
-            
-            //TODO: make this way way better instead of the bizarre sampling that it is now
-            double probability_weight;
-            probability_weight = 0.9;
-            if (
-                (
-                    (inward_ray.intersection.ray_material->emissive.r
-                     + inward_ray.intersection.ray_material->emissive.g
-                     + inward_ray.intersection.ray_material->emissive.b
-                     )/ 3.0
-                 ) < 1.0
-                ) //if the material isn't that bright, make the chance that it will be used as an emissive source smaller
-            {
-                probability_weight = 0.1;
-            }
-            
-            double termination_sample = dis_zero_to_one(gen);
-            
-            if (termination_sample >= probability_weight)
-            {            
-                outward_ray.d = sampleHemisphere(outward_ray.d);
-                
-                intersectScene(outward_ray);
-                
-                col3 diffuse_col = col3(0.0, 0.0, 0.0);
-                
-                if (outward_ray.intersection.hit)
-                {
-                    //lambertian model shading (diffuse only)
-                    double lambert_factor = outward_ray.d * inward_ray.intersection.normal;
-                    diffuse_col += lambert_factor
-                                    * (1.0/ (1.0 - probability_weight))
-                                    * outward_ray.intersection.ray_material->emissive.apply_r(inward_ray.intersection.ray_material->diffuse);
-                }
-                
-                regular_col += diffuse_col;
-            }
-            else
-            {
-                regular_col += (1.0/probability_weight) * inward_ray.intersection.ray_material->emissive;
-                break;
-            }
+        //For each primary ray we want to take a whole number of samples because the shading to
+        //each primary ray makes more of an impact than the primary ray, which only really affects
+        //anti-aliasing.
+        //
+        //So we can ignore collecting more primary rays in exchange for taking more secondary rays.
+        for (int samples = 0; samples < PRIMARY_SAMPLES; samples++)
+        {            
+            regular_col += regularShaderRecurse(ray, i, j);
         }
+        
+        regular_col = regular_col * (1.0/PRIMARY_SAMPLES);        
     }
-    //TODO: implement environment mapping here
+    else
+    {
+        regular_col += readEnvironmentMap(ray);
+    }
     
     setImage(image_.buffer, i, j, regular_col, pass_number_);  
 }
@@ -227,15 +246,11 @@ void cPathtracer::regularShader(Ray ray, int i, int j)
  */
 void cPathtracer::normalsShader(Ray ray, int i, int j)
 {
-    col3 normals_col;
+    col3 normals_col (0.0, 0.0, 0.0);
     if (ray.intersection.hit)
 	{
 		normals_col = 0.5 * ray.intersection.normal + 0.5;
 	}
-    else
-    {
-        normals_col = col3(0,0,0);
-    }
     
     setImage(image_.normals_buffer, i, j, normals_col, pass_number_);
 }
@@ -245,14 +260,10 @@ void cPathtracer::normalsShader(Ray ray, int i, int j)
  */
 void cPathtracer::depthShader(Ray ray, int i, int j)
 {
-    col3 depth_col;
+    col3 depth_col (0.0, 0.0, 0.0);
     if (ray.intersection.hit)
     {
        depth_col = col3 (ray.intersection.t_value,ray.intersection.t_value,ray.intersection.t_value);
-    }
-    else
-    {
-        depth_col = col3(0.0, 0.0, 0.0);
     }
     
     setImage(image_.depth_buffer, i, j, depth_col, pass_number_);
@@ -269,6 +280,9 @@ void cPathtracer::materialShader(Ray ray, int i, int j)
     col3 reflective_col;
     col3 transparent_col;
     
+    diffuse_col = specular_col = emissive_col = reflective_col = transparent_col = col3(0.0, 0.0, 0.0);
+    
+    
     if (ray.intersection.hit)
 	{
 		diffuse_col = ray.intersection.ray_material->diffuse;
@@ -279,7 +293,7 @@ void cPathtracer::materialShader(Ray ray, int i, int j)
 	}
     else
     {
-        diffuse_col = specular_col = emissive_col = reflective_col = transparent_col = col3(0.0, 0.0, 0.0);
+        emissive_col = readEnvironmentMap(ray);
     }
     
     setImage(image_.diffuse_buffer, i, j, diffuse_col, pass_number_);
