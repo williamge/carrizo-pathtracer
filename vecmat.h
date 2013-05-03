@@ -29,6 +29,7 @@ namespace vecmat {
         void normalize();
         vec3_t vecCross (const vec3_t b); //returns the cross product of two vectors
         void apply(const vec3_t b); //applies vector b to the 'this' vector by multiplying each component in 'this' to its counterpart in b
+        vecmat::vec3_t apply_r (const vec3_t b); //same as apply but returns the result
         
         //vector compound assignment
         vec3_t& operator += (const vec3_t b);
