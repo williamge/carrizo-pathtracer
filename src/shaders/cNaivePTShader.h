@@ -47,6 +47,7 @@ public:
     void prepareShader();
     void shadePixel(Ray &ray, int i, int j);
     
+    ~cNaivePTShader();
     cNaivePTShader(cPathtracer &parent_pt);
 };
 

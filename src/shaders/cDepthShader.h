@@ -39,6 +39,7 @@ public:
     void prepareShader();
     void shadePixel(Ray &ray, int i, int j);
     
+    ~cDepthShader();
     cDepthShader(cPathtracer &parent_pt);
 };
 

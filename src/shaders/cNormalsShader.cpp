@@ -55,6 +55,11 @@ void cNormalsShader::shadePixel(Ray &ray, int i, int j)
     setImage(buffer_, i, j, normals_col, pass_number_);
 }
 
+cNormalsShader::~cNormalsShader()
+{
+    delete buffer_;
+    delete display_;
+}
 
 cNormalsShader::cNormalsShader(cPathtracer &parent_pt): pass_number_(0)
 {

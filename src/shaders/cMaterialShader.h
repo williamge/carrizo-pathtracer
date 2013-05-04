@@ -48,6 +48,7 @@ public:
     void prepareShader();
     void shadePixel(Ray &ray, int i, int j);
     
+    ~cMaterialShader();
     cMaterialShader(cPathtracer &parent_pt);
 };
 

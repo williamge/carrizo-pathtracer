@@ -69,8 +69,7 @@ void cMaterialShader::shadePixel(Ray &ray, int i, int j)
     col3 reflective_col;
     col3 transparent_col;
     
-    diffuse_col = specular_col = emissive_col = reflective_col = transparent_col = col3(0.0, 0.0, 0.0);
-    
+    diffuse_col = specular_col = emissive_col = reflective_col = transparent_col = col3(0.0, 0.0, 0.0);    
     
     if (ray.intersection.hit)
 	{
@@ -92,6 +91,20 @@ void cMaterialShader::shadePixel(Ray &ray, int i, int j)
     setImage(transparent_buffer_, i, j, transparent_col, pass_number_);
 }
 
+cMaterialShader::~cMaterialShader()
+{
+    delete diffuse_buffer_;
+    delete specular_buffer_;
+    delete emissive_buffer_;
+    delete reflective_buffer_;
+    delete transparent_buffer_;
+    
+    delete diffuse_display_;
+    delete specular_display_;
+    delete emissive_display_;
+    delete reflective_display_;
+    delete transparent_display_;
+}
 
 cMaterialShader::cMaterialShader(cPathtracer &parent_pt): pass_number_(0)
 {

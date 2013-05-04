@@ -38,7 +38,8 @@ class cNormalsShader : public cShader{
         void endPass();
         void prepareShader();
         void shadePixel(Ray &ray, int i, int j);
-        
+    
+        ~cNormalsShader();
         cNormalsShader(cPathtracer &parent_pt);
 };
 

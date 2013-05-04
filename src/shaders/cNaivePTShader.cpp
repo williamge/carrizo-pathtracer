@@ -71,6 +71,11 @@ void cNaivePTShader::shadePixel(Ray &ray, int i, int j)
     setImage(buffer_, i, j, regular_col, pass_number_);
 }
 
+cNaivePTShader::~cNaivePTShader()
+{
+    delete buffer_;
+    delete display_;
+}
 
 cNaivePTShader::cNaivePTShader(cPathtracer &parent_pt): pass_number_(0)
 {
