@@ -8,6 +8,9 @@
 
 #include <random>
 #include <chrono>
+#include <dispatch/dispatch.h>
+
+#include <assert.h>
 
 #include "cPathtracer.h"
 #include "cObject.h"
@@ -286,9 +289,29 @@ col3 cPathtracer::regularShaderIterate(Ray &ray, int i, int j)
     
     for (long i = (path.size() - 1) - 1; i >= 0; i--)
     {
+        col3 incident_light (0.0, 0.0, 0.0);
+        
         double lambert_factor = path[i+1].ray.d * path[i].ray.intersection.normal;
         
-        past_col = lambert_factor * (1.0/ (1.0 - path[i].probability)) * path[i].ray.intersection.ray_material->diffuse.apply_r(past_col);
+        //diffuse (lambert)
+        incident_light += lambert_factor * path[i].ray.intersection.ray_material->diffuse.apply_r(past_col);
+        
+        if (path[i].ray.intersection.ray_material->shininess > 0.0)
+        {
+            //phong specular reflection
+            vec3 specular_reflect_vec = (2.0 * (path[i+1].ray.d * path[i].ray.intersection.normal) * path[i].ray.intersection.normal) - path[i+1].ray.d;
+            double specular_factor = specular_reflect_vec * path[i].ray.d;
+            specular_factor = pow(specular_factor, path[i].ray.intersection.ray_material->shininess);
+
+            //specular (phong)
+            incident_light += specular_factor
+                *
+                    (path[i].ray.intersection.ray_material->specular
+                        * path[i].ray.intersection.ray_material->shininess_strength)
+                    .apply_r(past_col);
+        }
+       
+        past_col = (1.0/ (1.0 - path[i].probability)) * incident_light;
     }
     
 
@@ -411,10 +434,23 @@ void cPathtracer::renderPass(camera_vectors &render_vectors)
                             ( double(image_.height)/2 ) / tan( camera_.fov * vecmat_constant::pi/360.0 )
                          );
     
+    auto pixels_dispatch_queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0);
+    auto pixels_dispatch_group = dispatch_group_create();
+    
 	cimg_forXY(*(image_.buffer), i,j)
 	{
-		shadePixel(i, j, render_vectors, factor);
+        dispatch_group_async(pixels_dispatch_group, pixels_dispatch_queue,
+                                ^{shadePixel(i, j, render_vectors, factor);
+                             });
+		//shadePixel(i, j, render_vectors, factor);
 	}
+    
+    if (dispatch_group_wait(pixels_dispatch_group, DISPATCH_TIME_FOREVER))
+    {
+        std::cout << "Rendering pass timed out" << std::endl;
+    }
+    
+    dispatch_release(pixels_dispatch_group);
     
     auto end_time = std::chrono::high_resolution_clock::now();
     
