@@ -25,6 +25,16 @@ typedef struct material_t {
     float shininess; float shininess_strength;
     float reflectivity;
     float refractivity;
+    
+    material_t()
+    {
+        diffuse = col3(0.0, 0.0, 0.0);
+        specular = emissive = reflective = transparent = col3(0.0, 0.0, 0.0);
+        
+        shininess = refractivity = 0.0;
+        shininess_strength = refractivity = 1.0;
+    };
+    
 } material;
 
 #endif
