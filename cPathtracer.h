@@ -76,6 +76,7 @@ private:
     col3 readEnvironmentMap(Ray &ray);
     
     col3 regularShaderRecurse(Ray &ray, int i, int j);
+    col3 regularShaderIterate(Ray &ray, int i, int j);
     void regularShader(Ray &ray, int i, int j);
     void normalsShader(Ray ray, int i, int j);
     void depthShader(Ray ray, int i, int j);
