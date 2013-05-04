@@ -21,10 +21,10 @@
 using namespace vecmat;
 
 const int MAX_PASS_NUMBER = 256;
-const int PRIMARY_SAMPLES = 16;
 
 class rendModel;
 class cObject;
+class cShader;
 
 typedef struct camera_vectors_t {
     vec3 direction_vector;
@@ -38,62 +38,39 @@ private:
         point3 origin;
         point3 look_at;
         double fov;
+        double factor;
     } camera_;
     
     struct{
-        cimg_library::CImg<double> *buffer;
-        cimg_library::CImg<double> *normals_buffer;
-        cimg_library::CImg<double> *depth_buffer;
-        cimg_library::CImg<double> *diffuse_buffer;
-        cimg_library::CImg<double> *specular_buffer;
-        cimg_library::CImg<double> *emissive_buffer;
-        cimg_library::CImg<double> *reflective_buffer;
-        cimg_library::CImg<double> *transparent_buffer;
-        
-        cimg_library::CImgDisplay *regular_display;
-        cimg_library::CImgDisplay *normals_display;
-        cimg_library::CImgDisplay *depth_display;
-        cimg_library::CImgDisplay *diffuse_display;
-        cimg_library::CImgDisplay *specular_display;
-        cimg_library::CImgDisplay *emissive_display;
-        cimg_library::CImgDisplay *reflective_display;
-        cimg_library::CImgDisplay *transparent_display;
-        
         int width, height;
     } image_;
+    
+    std::vector<std::shared_ptr<cShader>> shaders_;
     
     std::vector<cObject *> objects_;
     std::vector<std::shared_ptr<rendModel>> render_models_;
     
     unsigned int pass_number_;
     
-    void intersectScene(Ray &ray);
-    static void setImage(cimg_library::CImg<double> *image, int i, int j, col3& colour, unsigned int pass_number);
-    void shadePixel(int i, int j, camera_vectors &render_vectors, double factor);
-    
-    static vec3 sampleHemisphere(vec3 direction);
-    
-    col3 readEnvironmentMap(Ray &ray);
-    
-    col3 regularShaderRecurse(Ray &ray, int i, int j);
-    col3 regularShaderIterate(Ray &ray, int i, int j);
-    void regularShader(Ray &ray, int i, int j);
-    void normalsShader(Ray ray, int i, int j);
-    void depthShader(Ray ray, int i, int j);
-    void materialShader(Ray ray, int i, int j);
-    
     bool readyObjects();
     void renderPass(camera_vectors &render_vectors);
+    
+    void shadePixel(int i, int j, camera_vectors &render_vectors);
 	
 public:
     ~cPathtracer();
     cPathtracer();
+     
+    col3 readEnvironmentMap(Ray &ray);
+    
+    void intersectScene(Ray &ray);
     
     void render();
     void addObject(cObject &obj);
     void setCamera(point3 origin, point3 look_at, double fov);
     void setDimensions(int width, int height);
-    
+    std::pair<int, int> getDimensions();
+
 };
 
 

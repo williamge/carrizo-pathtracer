@@ -3,6 +3,9 @@
 vecmat::vec3::vec3_t(double ax, double ay, double az) {
     data[0] = ax; data[1] = ay; data[2] = az;
 }
+vecmat::vec3::vec3_t(double a) {
+    data[0] = a; data[1] = a; data[2] = a;
+}
 vecmat::vec3::vec3_t(){
     data[0] = 0.0; data[1] = 0.0; data[2] = 0.0;
 }

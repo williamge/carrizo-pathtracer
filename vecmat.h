@@ -24,6 +24,7 @@ namespace vecmat {
 
         
         vec3_t(double ax, double ay, double az);
+        vec3_t(double a);
         vec3_t();
         
         void normalize();
