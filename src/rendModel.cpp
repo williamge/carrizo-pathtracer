@@ -15,7 +15,7 @@
 #include "carrizo.h"
 #include "cObject.h"
 #include "material.h"
-
+#include "ray.h"
 
 /*
  Given a bounding box and a point, boundsUnion expands the bounding box to include the 
@@ -310,7 +310,6 @@ void rendModel::bvhTraversal(const std::shared_ptr<BVHnode> &start, Ray &ray, st
     
     //precomputation, faster for boxIntersection
     //this looks like it should fail from divide by zero, but for reasons it doesn't, enjoy!
-    //oh also this is just precomputation for something to be done in inv_
     vec3 inv_dir (1.0 / ray.d.x, 1.0 / ray.d.y, 1.0 / ray.d.z);
     
     std::shared_ptr<BVHnode> curr_node;

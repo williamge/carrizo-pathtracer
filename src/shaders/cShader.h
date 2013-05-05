@@ -12,6 +12,7 @@
 #include <iostream>
 
 #include "vecmat.h"
+#include "CImg.h"
 
 using namespace vecmat;
 

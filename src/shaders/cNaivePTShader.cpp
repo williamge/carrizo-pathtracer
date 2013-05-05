@@ -14,6 +14,7 @@ using namespace cimg_library;
 #include "cNaivePTShader.h"
 
 #include "cPathtracer.h"
+#include "ray.h"
 
 /* The naive pathtracing shader for a ray in the scene, takes in ray, sets the colour for that ray 
  using a naive implementation of a pathtracing function using the Lambertian diffuse model and Phong 
@@ -104,25 +105,23 @@ col3 cNaivePTShader::regularShaderIterate(Ray &ray, int i, int j)
     path.push_back(outward_ray_info);
     
     col3 ray_col(0.0, 0.0, 0.0);
-    for (;;)
+    
+    double probability_weight = 0.9;
+    
+    for (;;) //loop to build the path for the given incident ray "ray"
     {
         Ray inward_ray = outward_ray;
         
-        outward_ray.o = inward_ray.intersection.point + (inward_ray.intersection.normal * 0.00005); //small number, TODO: make this better
+        outward_ray.o = inward_ray.intersection.point + (inward_ray.intersection.normal * 0.005); //small number, TODO: make this better
         outward_ray.d = inward_ray.intersection.normal;
         outward_ray.intersection.hit = false;
         
         //TODO: make this way way better instead of the bizarre sampling that it is now
-        double probability_weight;
-        probability_weight = inward_ray.intersection.ray_material->emissive.r
-        + inward_ray.intersection.ray_material->emissive.g
-        + inward_ray.intersection.ray_material->emissive.b;
-        probability_weight *= (1.0/3.0);
-        probability_weight = std::max(probability_weight, 0.1);
+        probability_weight = probability_weight * inward_ray.intersection.ray_material->diffuse.average();
         
         double termination_sample = dis_zero_to_one(gen);
         
-        if (termination_sample < probability_weight)
+        if (termination_sample > probability_weight)
         {
             break;
         }
@@ -145,6 +144,9 @@ col3 cNaivePTShader::regularShaderIterate(Ray &ray, int i, int j)
         
     }
     
+    //we've constructed the path, now we're solving the rendering equation from the last ray in the
+    //path backwards.
+    
     col3 past_col (0.0, 0.0, 0.0);
     if (path.back().ray.intersection.hit)
     {
@@ -152,17 +154,17 @@ col3 cNaivePTShader::regularShaderIterate(Ray &ray, int i, int j)
     }
     else
     {
-        past_col = parent_pt_->readEnvironmentMap(path.back().ray);
+        past_col = (1.0/ (1.0 - path.back().probability)) * parent_pt_->readEnvironmentMap(path.back().ray);
     }
     
     for (long i = (path.size() - 1) - 1; i >= 0; i--)
     {
-        col3 incident_light (0.0, 0.0, 0.0);
+        col3 brdf_col (0.0, 0.0, 0.0);
         
         double lambert_factor = path[i+1].ray.d * path[i].ray.intersection.normal;
         
         //diffuse (lambert)
-        incident_light += lambert_factor * path[i].ray.intersection.ray_material->diffuse.apply_r(past_col);
+        brdf_col += path[i].ray.intersection.ray_material->diffuse;
         
         if (path[i].ray.intersection.ray_material->shininess > 0.0)
         {
@@ -172,14 +174,12 @@ col3 cNaivePTShader::regularShaderIterate(Ray &ray, int i, int j)
             specular_factor = pow(specular_factor, path[i].ray.intersection.ray_material->shininess);
             
             //specular (phong)
-            incident_light += specular_factor
+            brdf_col += specular_factor
             *
             (path[i].ray.intersection.ray_material->specular
-             * path[i].ray.intersection.ray_material->shininess_strength)
-            .apply_r(past_col);
-        }
-        
-        past_col = (1.0/ (1.0 - path[i].probability)) * incident_light;
+             * path[i].ray.intersection.ray_material->shininess_strength);
+        }        
+        past_col = path[i].ray.intersection.ray_material->emissive + (1.0/ (1.0 - path[i].probability)) * brdf_col.apply_r(past_col) * lambert_factor;
     }
     
     
@@ -248,15 +248,15 @@ col3 cNaivePTShader::regularShaderRecurse(Ray &ray, int i, int j)
  */
 vec3 cNaivePTShader::sampleHemisphere(vec3 direction)
 {
-    double z = dis_minus_one_to_one(gen);
-    double theta = vecmat_constant::pi * dis_minus_one_to_one(gen);
+    double r = 2.0 * vecmat_constant::pi * dis_zero_to_one(gen);
+    double theta = vecmat_constant::pi * dis_zero_to_one(gen);
     
-    double z_term = sqrt(1.0 - pow(z,2.0));
+    double z_term = std::sin(theta);
     
     vec3 random_ray_direction (
-                               std::sin(theta) * z_term,
-                               std::cos(theta) * z_term,
-                               z);
+                               std::sin(r) * z_term,
+                               std::cos(r) * z_term,
+                               std::cos(theta));
     
     if (random_ray_direction * direction < 0.0)
     {

@@ -16,6 +16,7 @@
 #include "cObject.h"
 #include "rendModel.h"
 #include "material.h"
+#include "ray.h"
 
 #include "cShader.h"
 #include "cDepthShader.h"
@@ -110,6 +111,7 @@ col3 cPathtracer::readEnvironmentMap(Ray &ray)
  */
 bool cPathtracer::readyObjects()
 {
+    //add render models to queue to be rendered
     for (int i = 0; i < objects_.size(); i++)
 	{
 		render_models_.push_back( objects_[i]->addToRender() );
@@ -268,8 +270,8 @@ cPathtracer::cPathtracer()
     
     /* debug test thing */
     shaders_.push_back(std::shared_ptr<cShader> (new cNormalsShader(*this)));
-    shaders_.push_back(std::shared_ptr<cShader> (new cDepthShader(*this)));
-    shaders_.push_back(std::shared_ptr<cShader> (new cMaterialShader(*this)));
+    //shaders_.push_back(std::shared_ptr<cShader> (new cDepthShader(*this)));
+    //shaders_.push_back(std::shared_ptr<cShader> (new cMaterialShader(*this)));
     shaders_.push_back(std::shared_ptr<cShader> (new cNaivePTShader(*this)));
     
     setCamera(point3(0.0, 0.0 ,0.0), point3(0.0, 0.0, -1.0), 60);

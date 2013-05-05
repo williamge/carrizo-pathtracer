@@ -9,6 +9,7 @@
 #include "cObject.h"
 #include "vecmat.h"
 #include "cPathtracer.h"
+#include "material.h"
 
 using namespace vecmat;
 
@@ -68,9 +69,9 @@ void debugSceneSpider()
     //lighting_box.scale( vec3(125.0, 1.0, 125.0));
     //lighting_box.translate( vec3(0.0, 150.0, 0.0));
     //lighting_box.scale( vec3(1000.0, 1.0, 1000.0));
-    //lighting_box.translate( vec3(0.0, 300.0, 0.0));
-    lighting_box.scale( vec3(125.0, 1.0, 125.0));
-    lighting_box.translate( vec3(0.0, 200.0, 0.0));
+    //lighting_box.translate( vec3(0.0, 390.0, 0.0));
+    lighting_box.scale( vec3(250.0, 1.0, 250.0));
+    lighting_box.translate( vec3(0.0, 300.0, 0.0));
     
     std::shared_ptr<material> lighting_box_material (new material);
     lighting_box_material->emissive = col3(1.0, 1.0, 1.0);

@@ -10,7 +10,8 @@
 #define carrizo_pathtracer_cObject_h
 
 #include "vecmat.h"
-#include "material.h"
+
+typedef struct material_t material;
 
 using namespace vecmat;
 

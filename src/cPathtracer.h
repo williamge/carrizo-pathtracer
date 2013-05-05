@@ -13,10 +13,9 @@
 #include <vector>
 #define cimg_use_png
 
-#include "CImg.h"
-
 #include "vecmat.h"
-#include "ray.h"
+
+typedef struct ray_t Ray;
 
 using namespace vecmat;
 
@@ -25,6 +24,8 @@ const int MAX_PASS_NUMBER = 256;
 class rendModel;
 class cObject;
 class cShader;
+
+typedef struct renderTriangle_t renderTriangle;
 
 typedef struct camera_vectors_t {
     vec3 direction_vector;

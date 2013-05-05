@@ -15,6 +15,7 @@ using namespace cimg_library;
 #include "cDepthShader.h"
 
 #include "cPathtracer.h"
+#include "ray.h"
 
 /* The depth shader for a ray in the scene, shading each ray with the depth value on the surface of
  the object, taken from the t-value of the intersection.

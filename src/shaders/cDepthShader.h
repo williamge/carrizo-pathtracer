@@ -13,10 +13,6 @@
 
 #include "CImg.h"
 
-#include "vecmat.h"
-
-using namespace vecmat;
-
 class cPathtracer;
 typedef struct camera_vectors_t camera_vectors;
 typedef struct ray_t Ray;

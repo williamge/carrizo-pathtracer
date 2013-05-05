@@ -32,6 +32,9 @@ namespace vecmat {
         void apply(const vec3_t b); //applies vector b to the 'this' vector by multiplying each component in 'this' to its counterpart in b
         vecmat::vec3_t apply_r (const vec3_t b); //same as apply but returns the result
         
+        double average();
+        double length();
+        
         //vector compound assignment
         vec3_t& operator += (const vec3_t b);
         vec3_t& operator -= (const vec3_t b);

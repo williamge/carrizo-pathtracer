@@ -14,6 +14,7 @@ using namespace cimg_library;
 #include "cNormalsShader.h"
 
 #include "cPathtracer.h"
+#include "ray.h"
 
 /* The normals shader for a ray in the scene, shading each ray with the normal vector of the surface
  it hits with the x value as red, y as blue, z as green. Takes in ray, sets the colour for that ray

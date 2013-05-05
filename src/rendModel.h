@@ -12,13 +12,13 @@
 #include <vector>
 
 #include "vecmat.h"
-#include "ray.h"
-
-#include "material.h"
 
 using namespace vecmat;
 
 class cObject;
+
+typedef struct ray_t Ray;
+typedef struct material_t material;
 
 /*
  -don't group the triangles, one triangle set per object, materials are per triangle
@@ -57,6 +57,8 @@ class rendModel
 private:    
     std::shared_ptr<BVHnode> root_;
     std::vector<renderTriangle> triangles_;
+    
+    std::vector<renderTriangle> emissive_triangles_;
     
     static bounding_box boundsUnion(bounding_box box, point3 point);
     static bool boxIntersection(const bounding_box& b, const Ray& r, const vec3& inv_dir);

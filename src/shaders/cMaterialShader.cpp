@@ -14,6 +14,7 @@ using namespace cimg_library;
 #include "cMaterialShader.h"
 
 #include "cPathtracer.h"
+#include "ray.h"
 
 /* The material shader, sets the pixels of each of the corresponding buffers for material colours
  to the values from the material of the object hit by the primary ray.

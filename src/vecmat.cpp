@@ -39,6 +39,14 @@ vecmat::vec3_t vecmat::vec3_t::apply_r (const vec3_t b)
     return vec3_t (data[0]*b.data[0], data[1]*b.data[1], data[2]*b.data[2]);
 }
 
+double vecmat::vec3_t::length()
+{
+    return sqrt(data[0]*data[0] + data[1]*data[1] + data[2]*data[2]);
+}
+double vecmat::vec3_t::average()
+{
+    return 0.33333333333333333 * (data[0] + data[1] + data[2]);
+}
 
 vecmat::vec3& vecmat::vec3::operator+= (const vec3 b)
 {
