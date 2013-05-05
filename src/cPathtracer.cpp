@@ -55,6 +55,20 @@ void cPathtracer::addObject(cObject &obj)
     objects_.push_back(&obj);
 }
 
+/* Add a shader to the scene, this shader will be run each render pass.
+ */
+void cPathtracer::addShader(std::shared_ptr<cShader> &shader)
+{
+    shaders_.push_back(shader);
+}
+
+/* Add a shader to the scene, this shader will only run once instead of being run each render pass. 
+ */
+void cPathtracer::addRunOnceShader(std::shared_ptr<cShader> &shader)
+{
+    shaders_one_pass_.push_back(shader);
+}
+
 /*
  Simply intersects each render model in the scene with the current ray,
  to trace the ray.
@@ -66,6 +80,19 @@ void cPathtracer::intersectScene(Ray &ray)
 	{
 		render_models_[i]->intersect(ray);
 	}
+}
+
+/* Returns a renderTriangle that is emissive (the only type of light in the scene) from the scene and 
+ the probability that that light was to be chosen instead of any other.
+ */
+std::pair<renderTriangle, double> cPathtracer::getRandomLight()
+{
+    std::uniform_int_distribution<unsigned long> emissive_range (0, emissive_triangles_.size()-1);
+
+    std::pair<renderTriangle, double> return_pair;
+    return_pair.first = emissive_triangles_[emissive_range(gen)];
+    return_pair.second = 1.0/emissive_triangles_.size();
+    return return_pair;
 }
 
 /*
@@ -112,10 +139,41 @@ col3 cPathtracer::readEnvironmentMap(Ray &ray)
 bool cPathtracer::readyObjects()
 {
     //add render models to queue to be rendered
-    for (int i = 0; i < objects_.size(); i++)
+    for (auto &object : objects_)
 	{
-		render_models_.push_back( objects_[i]->addToRender() );
+		render_models_.push_back( object->addToRender() );
 	}
+    
+    for (auto &render_model : render_models_)
+    {
+        for (auto iter = render_model->emissive_begin(); iter != render_model->emissive_end(); iter++)
+        {
+            //TODO: change type from renderTriangle to something new, precompute triangle area here
+            emissive_triangles_.push_back(*iter);
+        }
+    }
+    
+    return false;
+}
+
+/* Cleans up the scene after a rendering.
+ 
+ TODO: give it a reason to return a bool
+ */
+bool cPathtracer::cleanObjects()
+{
+    render_models_.clear();    
+    emissive_triangles_.clear();
+    
+    //TODO: maybe add this?
+    //might not be necessary
+    /*
+     for (auto &shader : shaders_)
+     { 
+        shader->clean();
+     }
+     
+     */
     
     return false;
 }
@@ -171,6 +229,12 @@ void cPathtracer::render()
         setDimensions(640, 480);
     }
     
+    if (shaders_.empty() && shaders_one_pass_.empty())
+    {
+        shaders_.push_back(std::shared_ptr<cShader> (new cNormalsShader(*this)));
+        shaders_.push_back(std::shared_ptr<cShader> (new cNaivePTShader(*this)));
+    }
+    
     readyObjects();
     
     //this is just a struct to hold the vectors we need to set up the camera screen
@@ -224,11 +288,18 @@ void cPathtracer::render()
         {
             break;
         } */
+        
+        if (pass_number_ > 1 && !shaders_.empty())
+        {
+            break;
+        }
     }
     
    /* image_.buffer->normalize(0, 255);
     image_.buffer->save_png("output.png"); */
     std::cout << "Rendering done" <<std::endl;
+    
+    cleanObjects();
 }
 
 /*
@@ -269,10 +340,10 @@ cPathtracer::cPathtracer()
     image_.width = image_.height = 0;
     
     /* debug test thing */
-    shaders_.push_back(std::shared_ptr<cShader> (new cNormalsShader(*this)));
+    //shaders_.push_back(std::shared_ptr<cShader> (new cNormalsShader(*this)));
     //shaders_.push_back(std::shared_ptr<cShader> (new cDepthShader(*this)));
     //shaders_.push_back(std::shared_ptr<cShader> (new cMaterialShader(*this)));
-    shaders_.push_back(std::shared_ptr<cShader> (new cNaivePTShader(*this)));
+    //shaders_.push_back(std::shared_ptr<cShader> (new cNaivePTShader(*this)));
     
     setCamera(point3(0.0, 0.0 ,0.0), point3(0.0, 0.0, -1.0), 60);
 }

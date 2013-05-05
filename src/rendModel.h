@@ -72,6 +72,9 @@ public:
     rendModel(cObject &sourceObject);
     ~rendModel();
     
+    std::vector<renderTriangle>::iterator emissive_begin(){return emissive_triangles_.begin();}
+    std::vector<renderTriangle>::iterator emissive_end(){return emissive_triangles_.end();}
+    
     bool intersect(Ray& ray);
 };
 

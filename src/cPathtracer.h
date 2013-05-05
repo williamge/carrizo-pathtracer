@@ -47,13 +47,17 @@ private:
     } image_;
     
     std::vector<std::shared_ptr<cShader>> shaders_;
+    std::vector<std::shared_ptr<cShader>> shaders_one_pass_;
     
     std::vector<cObject *> objects_;
     std::vector<std::shared_ptr<rendModel>> render_models_;
     
+    std::vector<renderTriangle> emissive_triangles_;
+    
     unsigned int pass_number_;
     
     bool readyObjects();
+    bool cleanObjects();
     void renderPass(camera_vectors &render_vectors);
     
     void shadePixel(int i, int j, camera_vectors &render_vectors);
@@ -66,8 +70,14 @@ public:
     
     void intersectScene(Ray &ray);
     
+    std::pair<renderTriangle, double> getRandomLight();
+    
     void render();
     void addObject(cObject &obj);
+    
+    void addShader(std::shared_ptr<cShader> &shader);
+    void addRunOnceShader(std::shared_ptr<cShader> &shader);
+    
     void setCamera(point3 origin, point3 look_at, double fov);
     void setDimensions(int width, int height);
     std::pair<int, int> getDimensions();
