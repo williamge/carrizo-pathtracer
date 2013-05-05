@@ -57,12 +57,8 @@ void cNaivePTShader::shadePixel(Ray &ray, int i, int j)
         //anti-aliasing.
         //
         //So we can ignore collecting more primary rays in exchange for taking more secondary rays.
-        for (int samples = 0; samples < PRIMARY_SAMPLES; samples++)
-        {
-            regular_col += regularShaderIterate(ray, i, j);
-        }
-        
-        regular_col = regular_col * (1.0/PRIMARY_SAMPLES);
+
+        regular_col += regularShaderIterate(ray, i, j);
     }
     else
     {
@@ -93,98 +89,104 @@ col3 cNaivePTShader::regularShaderIterate(Ray &ray, int i, int j)
         double probability;
     } ray_info;
     
-    std::vector<ray_info> path;
+    col3 regular_col (0.0);
     
-    Ray outward_ray = ray;
-    
-    ray_info outward_ray_info;
-    outward_ray_info.ray = outward_ray;
-    outward_ray_info.probability = std::max(0.1, (outward_ray.intersection.ray_material->emissive.r
-                                                  + outward_ray.intersection.ray_material->emissive.g
-                                                  + outward_ray.intersection.ray_material->emissive.b) / 3.0);
-    path.push_back(outward_ray_info);
-    
-    col3 ray_col(0.0, 0.0, 0.0);
-    
-    double probability_weight = 0.9;
-    
-    for (;;) //loop to build the path for the given incident ray "ray"
+    for (int samples = 0; samples < PRIMARY_SAMPLES; samples++)
     {
-        Ray inward_ray = outward_ray;
         
-        outward_ray.o = inward_ray.intersection.point + (inward_ray.intersection.normal * 0.005); //small number, TODO: make this better
-        outward_ray.d = inward_ray.intersection.normal;
-        outward_ray.intersection.hit = false;
+        std::vector<ray_info> path;
         
-        //TODO: make this way way better instead of the bizarre sampling that it is now
-        probability_weight = probability_weight * inward_ray.intersection.ray_material->diffuse.average();
+        Ray outward_ray = ray;
         
-        double termination_sample = dis_zero_to_one(gen);
+        ray_info outward_ray_info;
+        outward_ray_info.ray = outward_ray;
+        outward_ray_info.probability = std::max(0.1, (outward_ray.intersection.ray_material->emissive.r
+                                                      + outward_ray.intersection.ray_material->emissive.g
+                                                      + outward_ray.intersection.ray_material->emissive.b) / 3.0);
+        path.push_back(outward_ray_info);
         
-        if (termination_sample > probability_weight)
+        col3 ray_col(0.0, 0.0, 0.0);
+        
+        double probability_weight = 0.9;
+        
+        for (;;) //loop to build the path for the given incident ray "ray"
         {
-            break;
-        }
-        else
-        {
-            outward_ray.d = sampleHemisphere(outward_ray.d);
+            Ray inward_ray = outward_ray;
             
-            parent_pt_->intersectScene(outward_ray);
+            outward_ray.o = inward_ray.intersection.point + (inward_ray.intersection.normal * 0.005); //small number, TODO: make this better
+            outward_ray.d = inward_ray.intersection.normal;
+            outward_ray.intersection.hit = false;
             
-            ray_info outward_ray_info;
-            outward_ray_info.ray = outward_ray;
-            outward_ray_info.probability = probability_weight;
-            path.push_back(outward_ray_info);
+            //TODO: make this way way better instead of the bizarre sampling that it is now
+            probability_weight = probability_weight * inward_ray.intersection.ray_material->diffuse.average();
             
-            if (!outward_ray.intersection.hit)
+            double termination_sample = dis_zero_to_one(gen);
+            
+            if (termination_sample > probability_weight)
             {
                 break;
             }
+            else
+            {
+                outward_ray.d = sampleHemisphere(outward_ray.d, dis_zero_to_one(gen), dis_zero_to_one(gen));
+                
+                parent_pt_->intersectScene(outward_ray);
+                
+                ray_info outward_ray_info;
+                outward_ray_info.ray = outward_ray;
+                outward_ray_info.probability = probability_weight;
+                path.push_back(outward_ray_info);
+                
+                if (!outward_ray.intersection.hit)
+                {
+                    break;
+                }
+            }
+            
         }
         
-    }
-    
-    //we've constructed the path, now we're solving the rendering equation from the last ray in the
-    //path backwards.
-    
-    col3 past_col (0.0, 0.0, 0.0);
-    if (path.back().ray.intersection.hit)
-    {
-        past_col = (1.0/path.back().probability) * path.back().ray.intersection.ray_material->emissive;
-    }
-    else
-    {
-        past_col = (1.0/ (1.0 - path.back().probability)) * parent_pt_->readEnvironmentMap(path.back().ray);
-    }
-    
-    for (long i = (path.size() - 1) - 1; i >= 0; i--)
-    {
-        col3 brdf_col (0.0, 0.0, 0.0);
+        //we've constructed the path, now we're solving the rendering equation from the last ray in the
+        //path backwards.
         
-        double lambert_factor = path[i+1].ray.d * path[i].ray.intersection.normal;
-        
-        //diffuse (lambert)
-        brdf_col += path[i].ray.intersection.ray_material->diffuse;
-        
-        if (path[i].ray.intersection.ray_material->shininess > 0.0)
+        col3 past_col (0.0, 0.0, 0.0);
+        if (path.back().ray.intersection.hit)
         {
-            //phong specular reflection
-            vec3 specular_reflect_vec = (2.0 * (path[i+1].ray.d * path[i].ray.intersection.normal) * path[i].ray.intersection.normal) - path[i+1].ray.d;
-            double specular_factor = specular_reflect_vec * path[i].ray.d;
-            specular_factor = pow(specular_factor, path[i].ray.intersection.ray_material->shininess);
+            past_col = (1.0/path.back().probability) * path.back().ray.intersection.ray_material->emissive;
+        }
+        else
+        {
+            past_col = (1.0/ (1.0 - path.back().probability)) * parent_pt_->readEnvironmentMap(path.back().ray);
+        }
+        
+        for (long i = (path.size() - 1) - 1; i >= 0; i--)
+        {
+            col3 brdf_col (0.0, 0.0, 0.0);
             
-            //specular (phong)
-            brdf_col += specular_factor
-            *
-            (path[i].ray.intersection.ray_material->specular
-             * path[i].ray.intersection.ray_material->shininess_strength);
-        }        
-        past_col = path[i].ray.intersection.ray_material->emissive + (1.0/ (1.0 - path[i].probability)) * brdf_col.apply_r(past_col) * lambert_factor;
+            double lambert_factor = path[i+1].ray.d * path[i].ray.intersection.normal;
+            
+            //diffuse (lambert)
+            brdf_col += path[i].ray.intersection.ray_material->diffuse;
+            
+            if (path[i].ray.intersection.ray_material->shininess > 0.0)
+            {
+                //phong specular reflection
+                vec3 specular_reflect_vec = (2.0 * (path[i+1].ray.d * path[i].ray.intersection.normal) * path[i].ray.intersection.normal) - path[i+1].ray.d;
+                double specular_factor = specular_reflect_vec * path[i].ray.d;
+                specular_factor = pow(specular_factor, path[i].ray.intersection.ray_material->shininess);
+                
+                //specular (phong)
+                brdf_col += specular_factor
+                *
+                (path[i].ray.intersection.ray_material->specular
+                 * path[i].ray.intersection.ray_material->shininess_strength);
+            }        
+            past_col = path[i].ray.intersection.ray_material->emissive + (1.0/ (1.0 - path[i].probability)) * brdf_col.apply_r(past_col) * lambert_factor;
+        }
+        
+        regular_col += past_col;
     }
     
-    
-    
-    return past_col;
+    return regular_col * (1.0/PRIMARY_SAMPLES);
 }
 
 /* The recursive part of the pathtracing. May be removed in the future because of 
@@ -213,7 +215,7 @@ col3 cNaivePTShader::regularShaderRecurse(Ray &ray, int i, int j)
     
     if (termination_sample >= probability_weight)
     {
-        outward_ray.d = sampleHemisphere(outward_ray.d);
+        outward_ray.d = sampleHemisphere(outward_ray.d, dis_zero_to_one(gen), dis_zero_to_one(gen));
         
         parent_pt_->intersectScene(outward_ray);
         
@@ -246,10 +248,10 @@ col3 cNaivePTShader::regularShaderRecurse(Ray &ray, int i, int j)
  then completing the equation "1 = x^2 + y^2 + z^2" for the x and y terms, then checking if this new
  vector and the supplied vector are in the same direction, reversing the new vector if necessary.
  */
-vec3 cNaivePTShader::sampleHemisphere(vec3 direction)
-{
-    double r = 2.0 * vecmat_constant::pi * dis_zero_to_one(gen);
-    double theta = vecmat_constant::pi * dis_zero_to_one(gen);
+vec3 cNaivePTShader::sampleHemisphere(vec3 direction, double random_double1, double random_double2)
+{    
+    double r = 2.0 * vecmat_constant::pi * random_double1;
+    double theta = vecmat_constant::pi * random_double2;
     
     double z_term = std::sin(theta);
     

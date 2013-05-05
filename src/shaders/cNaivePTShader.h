@@ -36,7 +36,7 @@ private:
     cimg_library::CImg<double> *buffer_;
     cimg_library::CImgDisplay *display_;
     
-    vec3 sampleHemisphere(vec3 direction);
+    vec3 sampleHemisphere(vec3 direction, double, double);
     
     col3 regularShaderIterate(Ray &ray, int i, int j);
     col3 regularShaderRecurse(Ray &ray, int i, int j);
