@@ -41,6 +41,7 @@ void cNaivePTShader::prepareShader()
     delete buffer_; buffer_ = nullptr;
     buffer_ = new CImg<double> (width_, height_, 1, 3);
     
+    delete display_; display_ = nullptr;
     display_ = new CImgDisplay(*buffer_, "Naive Pathtracing Shader");
 }
 
@@ -74,9 +75,8 @@ cNaivePTShader::~cNaivePTShader()
     delete display_;
 }
 
-cNaivePTShader::cNaivePTShader(cPathtracer &parent_pt): pass_number_(0)
+cNaivePTShader::cNaivePTShader(cPathtracer &parent_pt):  parent_pt_(&parent_pt), pass_number_(0), buffer_(nullptr), display_(nullptr)
 {
-    parent_pt_ = &parent_pt;
 }
 
 /* The same as regularShaderRecurse() but using iteration instead of recursion, kind of

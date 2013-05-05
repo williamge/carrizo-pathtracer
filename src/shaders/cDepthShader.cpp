@@ -41,6 +41,7 @@ void cDepthShader::prepareShader()
     delete buffer_; buffer_ = nullptr;
     buffer_ = new CImg<double> (width_, height_, 1, 3);
     
+    delete display_; display_ = nullptr;
     display_ = new CImgDisplay(*buffer_, "Depth Shader");
 }
 
@@ -63,7 +64,6 @@ cDepthShader::~cDepthShader()
     delete display_;
 }
 
-cDepthShader::cDepthShader(cPathtracer &parent_pt): pass_number_(0)
+cDepthShader::cDepthShader(cPathtracer &parent_pt): parent_pt_(&parent_pt), pass_number_(0), buffer_(nullptr), display_(nullptr)
 {
-    parent_pt_ = &parent_pt;
 }

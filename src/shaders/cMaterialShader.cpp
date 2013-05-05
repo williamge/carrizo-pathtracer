@@ -53,6 +53,12 @@ void cMaterialShader::prepareShader()
     reflective_buffer_ = new CImg<double> (width_, height_, 1, 3);
     transparent_buffer_ = new CImg<double> (width_, height_, 1, 3);
     
+    delete diffuse_display_; diffuse_display_ = nullptr;
+    delete specular_display_; specular_display_ = nullptr;
+    delete emissive_display_; emissive_display_ = nullptr;
+    delete reflective_display_; reflective_display_ = nullptr;
+    delete transparent_display_; transparent_display_ = nullptr;
+    
     diffuse_display_ = new CImgDisplay(*diffuse_buffer_, "Diffuse Shader");
     specular_display_ = new CImgDisplay(*specular_buffer_, "Specular Shader");
     emissive_display_ = new CImgDisplay(*emissive_buffer_, "Emissive Shader");
@@ -107,7 +113,18 @@ cMaterialShader::~cMaterialShader()
     delete transparent_display_;
 }
 
-cMaterialShader::cMaterialShader(cPathtracer &parent_pt): pass_number_(0)
+cMaterialShader::cMaterialShader(cPathtracer &parent_pt): parent_pt_(&parent_pt), pass_number_(0)
 {
-    parent_pt_ = &parent_pt;
+    diffuse_buffer_ = nullptr;
+    specular_buffer_ = nullptr;
+    emissive_buffer_ = nullptr;
+    reflective_buffer_ = nullptr;
+    transparent_buffer_ = nullptr;
+    
+    diffuse_display_ = nullptr;
+    specular_display_ = nullptr;
+    emissive_display_ = nullptr;
+    reflective_display_ = nullptr;
+    transparent_display_ = nullptr;
+    
 }
