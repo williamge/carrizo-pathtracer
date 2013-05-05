@@ -14,18 +14,18 @@
 #define cimg_use_png
 
 #include "vecmat.h"
+#include "rendModel.h"
 
 typedef struct ray_t Ray;
+typedef struct material_t material;
 
 using namespace vecmat;
 
 const int MAX_PASS_NUMBER = 256;
 
-class rendModel;
 class cObject;
 class cShader;
 
-typedef struct renderTriangle_t renderTriangle;
 
 typedef struct camera_vectors_t {
     vec3 direction_vector;
@@ -47,12 +47,15 @@ private:
     } image_;
     
     std::vector<std::shared_ptr<cShader>> shaders_;
-    std::vector<std::shared_ptr<cShader>> shaders_one_pass_;
+    std::vector<std::shared_ptr<cShader>> shaders_one_pass_; //TODO: implement these
     
     std::vector<cObject *> objects_;
     std::vector<std::shared_ptr<rendModel>> render_models_;
     
     std::vector<renderTriangle> emissive_triangles_;
+    
+    std::shared_ptr<material> nonEmissiveMaterial_;
+    renderTriangle fake_light_;
     
     unsigned int pass_number_;
     

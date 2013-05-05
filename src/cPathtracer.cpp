@@ -87,9 +87,18 @@ void cPathtracer::intersectScene(Ray &ray)
  */
 std::pair<renderTriangle, double> cPathtracer::getRandomLight()
 {
+    std::pair<renderTriangle, double> return_pair;
+    
+    //if there are no emissive triangles in the scene then we have to return a fake one
+    if (emissive_triangles_.empty())
+    {        
+        return_pair.first = fake_light_;
+        return_pair.second = 1.0;
+        return return_pair;
+    }
+    
     std::uniform_int_distribution<unsigned long> emissive_range (0, emissive_triangles_.size()-1);
 
-    std::pair<renderTriangle, double> return_pair;
     return_pair.first = emissive_triangles_[emissive_range(gen)];
     return_pair.second = 1.0/emissive_triangles_.size();
     return return_pair;
@@ -289,7 +298,7 @@ void cPathtracer::render()
             break;
         } */
         
-        if (pass_number_ > 1 && !shaders_.empty())
+        if (pass_number_ > 1 && shaders_.empty())
         {
             break;
         }
@@ -335,15 +344,19 @@ cPathtracer::~cPathtracer()
 
 cPathtracer::cPathtracer()
 {
-    pass_number_ = 0;
-    
-    image_.width = image_.height = 0;
-    
-    /* debug test thing */
-    //shaders_.push_back(std::shared_ptr<cShader> (new cNormalsShader(*this)));
-    //shaders_.push_back(std::shared_ptr<cShader> (new cDepthShader(*this)));
-    //shaders_.push_back(std::shared_ptr<cShader> (new cMaterialShader(*this)));
-    //shaders_.push_back(std::shared_ptr<cShader> (new cNaivePTShader(*this)));
-    
+    pass_number_ = 0;   
+    image_.width = image_.height = 0;      
     setCamera(point3(0.0, 0.0 ,0.0), point3(0.0, 0.0, -1.0), 60);
+    
+    //in case we need it, like if there are no emissive materials in the scene but we need
+    //to return one
+    nonEmissiveMaterial_ = std::shared_ptr<material> (new material);
+    nonEmissiveMaterial_->diffuse = nonEmissiveMaterial_->specular = nonEmissiveMaterial_->emissive = nonEmissiveMaterial_->reflective = nonEmissiveMaterial_->transparent = col3(0.0, 0.0, 0.0);
+    
+    //in case we need to return a light but the scene doesn't have any
+    fake_light_.a = point3(0.0);
+    fake_light_.u = vec3(0.0, 1.0, 0.0);
+    fake_light_.v = vec3(0.0, 0.0, 1.0);
+    fake_light_.normal = fake_light_.u.vecCross(fake_light_.v);
+    fake_light_.triangle_material = nonEmissiveMaterial_;
 }
