@@ -189,59 +189,6 @@ col3 cNaivePTShader::regularShaderIterate(Ray &ray, int i, int j)
     return regular_col * (1.0/PRIMARY_SAMPLES);
 }
 
-/* The recursive part of the pathtracing. May be removed in the future because of 
- "regularShaderIterate()".
- */
-col3 cNaivePTShader::regularShaderRecurse(Ray &ray, int i, int j)
-{
-    col3 ray_col(0.0, 0.0, 0.0);
-    
-    Ray inward_ray = ray;
-    Ray outward_ray;
-    
-    outward_ray.o = inward_ray.intersection.point + (inward_ray.intersection.normal * 0.00005); //small number, TODO: make this better
-    outward_ray.d = inward_ray.intersection.normal;
-    outward_ray.intersection.hit = false;
-    
-    //TODO: make this way way better instead of the bizarre sampling that it is now
-    double probability_weight;
-    probability_weight = inward_ray.intersection.ray_material->emissive.r
-    + inward_ray.intersection.ray_material->emissive.g
-    + inward_ray.intersection.ray_material->emissive.b;
-    probability_weight *= (1.0/3.0);
-    probability_weight = std::max(probability_weight, 0.1);
-    
-    double termination_sample = dis_zero_to_one(gen);
-    
-    if (termination_sample >= probability_weight)
-    {
-        outward_ray.d = sampleHemisphere(outward_ray.d, dis_zero_to_one(gen), dis_zero_to_one(gen));
-        
-        parent_pt_->intersectScene(outward_ray);
-        
-        if (outward_ray.intersection.hit)
-        {
-            //diffuse component of lighting
-            double lambert_factor = outward_ray.d * inward_ray.intersection.normal;
-            
-            ray_col += lambert_factor * (1.0/ (1.0 - probability_weight))
-            * inward_ray.intersection.ray_material->diffuse.apply_r (
-                                                                     regularShaderRecurse(outward_ray, i, j)
-                                                                     );
-        }
-        else
-        {
-            ray_col += parent_pt_->readEnvironmentMap(outward_ray);
-        }
-    }
-    else
-    {
-        ray_col += (1.0/probability_weight) * inward_ray.intersection.ray_material->emissive;
-    }
-    
-    return ray_col;
-}
-
 /* Returns a random vector in the hemisphere bounded by the vector "direction".
  
  The method by which it does this is by generating a random "z" term for the new vector and an angle,
