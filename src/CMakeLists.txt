@@ -2,4 +2,6 @@ FILE (GLOB_RECURSE project_SRCS *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
 SET (project_LIBS ${X11_LIBRARIES} ${ASSIMP_LIBRARIES})
 SET (project_BIN ${PROJECT_NAME})
 
-ADD_EXECUTABLE(${PROJECT_NAME} ${project_SRCS} ${project_LIBS})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+ADD_EXECUTABLE(${project_BIN} ${project_SRCS})
+TARGET_LINK_LIBRARIES(${project_BIN} ${project_LIBS})
