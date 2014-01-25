@@ -234,7 +234,7 @@ rendModel::rendModel(cObject &source_object)
         
         triangles_[i].triangle_material = source_triangle.triangle_material;
         
-        if (triangles_[i].triangle_material->emissive.length())
+        if (triangles_[i].triangle_material->emissive.length() > 0.0)
         {
             emissive_triangles_.push_back(triangles_[i]);
         }        
