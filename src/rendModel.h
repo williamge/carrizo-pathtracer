@@ -10,6 +10,7 @@
 #define carrizo_pathtracer_rendModel_h
 
 #include <vector>
+#include <memory>
 
 #include "vecmat.h"
 
