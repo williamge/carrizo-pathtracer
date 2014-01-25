@@ -7,7 +7,10 @@
 //
 
 #include <chrono>
+
+#ifdef USEGCD
 #include <dispatch/dispatch.h>
+#endif
 
 #include <assert.h>
 
@@ -195,7 +198,8 @@ void cPathtracer::renderPass(camera_vectors &render_vectors)
     {
         shader->preparePass();
     }
-    
+   
+#ifdef USEGCD 
     auto pixels_dispatch_queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0);
     auto pixels_dispatch_group = dispatch_group_create();
     
@@ -215,6 +219,16 @@ void cPathtracer::renderPass(camera_vectors &render_vectors)
     }
     
     dispatch_release(pixels_dispatch_group);
+
+#else
+    for (int i = 0; i<image_.width; i++)
+    {
+        for (int j = 0; j <image_.height; j++)
+        {
+      	    shadePixel(i, j, render_vectors);
+        }
+    }
+#endif
     
     for (auto &shader : shaders_)
     {
