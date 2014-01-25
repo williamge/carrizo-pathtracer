@@ -18,11 +18,11 @@
 #include "material.h"
 #include "ray.h"
 
-#include "cShader.h"
-#include "cDepthShader.h"
-#include "cMaterialShader.h"
-#include "cNormalsShader.h"
-#include "cNaivePTShader.h"
+#include "shaders/cShader.h"
+#include "shaders/cDepthShader.h"
+#include "shaders/cMaterialShader.h"
+#include "shaders/cNormalsShader.h"
+#include "shaders/cNaivePTShader.h"
 
 
 
