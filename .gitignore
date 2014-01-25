@@ -1,1 +1,5 @@
 *.o
+DerivedData
+*.xcodeproj
+*-debug
+Google Tests
