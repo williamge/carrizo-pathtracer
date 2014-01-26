@@ -11,8 +11,7 @@
 
 #include <random>
 
-static std::random_device rd;
-static std::mt19937 gen(rd());
+static std::mt19937 gen;
 static std::uniform_real_distribution<double> dis_zero_to_one(0.0,1.0);
 static std::uniform_real_distribution<double> dis_minus_one_to_one(-1.0,1.0);
 
