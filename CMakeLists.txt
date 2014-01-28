@@ -15,21 +15,24 @@ SET (APPLICATION_VENDOR_ID "com.williamg")
 SET (APPLICATION_VENDOR_NAME "williamg")
 SET (APPLICATION_ID "${APPLICATION_VENDOR_ID}.${PROJECT_NAME}")
 
-if(UNIX)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++0x")
-endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	add_definitions(-DUSEGCD)
 endif()
 
 #Credit to Matthias Vallentin on stackoverflow for this
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
     execute_process(
         COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-    if (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
-        message(FATAL_ERROR "${PROJECT_NAME} requires g++ 4.7 or greater.")
+    if (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7)
+		add_definitions("-std=gnu++11")
+	elseif (GCC_VERSION VERSION_GREATER 4.3 OR GCC_VERSION VERSION_EQUAL 4.3)
+		add_definitions("-std=gnu++0x")
+    else()
+        message(FATAL_ERROR "${PROJECT_NAME} requires C++11 support.")
     endif ()
+elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+	add_definitions("-std=c++11 -stdlib=libc++")
 endif()
 
 #
