@@ -11,8 +11,8 @@
 
 using namespace cimg_library;
 
-#include "cShader.h"
-#include "cDepthShader.h"
+#include "shaders/cShader.h"
+#include "shaders/cDepthShader.h"
 
 #include "cPathtracer.h"
 #include "ray.h"

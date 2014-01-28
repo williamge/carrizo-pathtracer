@@ -10,8 +10,8 @@
 
 using namespace cimg_library;
 
-#include "cShader.h"
-#include "cNaivePTShader.h"
+#include "shaders/cShader.h"
+#include "shaders/cNaivePTShader.h"
 
 #include "cPathtracer.h"
 #include "ray.h"

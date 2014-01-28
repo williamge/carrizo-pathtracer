@@ -10,8 +10,8 @@
 
 using namespace cimg_library;
 
-#include "cShader.h"
-#include "cMaterialShader.h"
+#include "shaders/cShader.h"
+#include "shaders/cMaterialShader.h"
 
 #include "cPathtracer.h"
 #include "ray.h"
